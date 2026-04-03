@@ -39,6 +39,7 @@ export function Layout({ children, cartItemCount }: LayoutProps) {
   const [mobileOrdersOpen, setMobileOrdersOpen] = useState(false)
   const isLandingPage = location.pathname === '/'
   const ordersMenuRef = useRef<HTMLDivElement | null>(null)
+  const mobileSearchRef = useRef<HTMLInputElement | null>(null)
 
   useEffect(() => {
     const onScroll = () => setHeaderElevated(window.scrollY > 6)
@@ -265,7 +266,14 @@ export function Layout({ children, cartItemCount }: LayoutProps) {
               {/* User Actions */}
               <div className="flex items-center gap-2 lg:gap-4">
                 {/* Search Button - Mobile */}
-                <button className="md:hidden p-2 text-stone-600 hover:bg-stone-100 rounded-lg transition-colors">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMobileMenuOpen(true)
+                    window.setTimeout(() => mobileSearchRef.current?.focus(), 0)
+                  }}
+                  className="md:hidden p-2 text-stone-600 hover:bg-stone-100 rounded-lg transition-colors"
+                >
                   <Search className="w-5 h-5" />
                 </button>
 
@@ -363,6 +371,7 @@ export function Layout({ children, cartItemCount }: LayoutProps) {
                   value={headerSearch}
                   onChange={(e) => setHeaderSearch(e.target.value)}
                   placeholder="Search products..."
+                  ref={mobileSearchRef}
                   className="w-full pl-10 pr-4 py-3 bg-stone-50 border border-stone-200 rounded-lg text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/80 transition-all duration-200"
                 />
                 <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400 pointer-events-none" />
