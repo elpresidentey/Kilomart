@@ -19,8 +19,9 @@ import {
   MapPin,
   LayoutDashboard,
   ClipboardList,
+  ChevronDown,
 } from 'lucide-react'
-import { useState, useEffect } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 interface LayoutProps {
   children: ReactNode
@@ -34,7 +35,10 @@ export function Layout({ children, cartItemCount }: LayoutProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [headerSearch, setHeaderSearch] = useState('')
   const [headerElevated, setHeaderElevated] = useState(false)
+  const [ordersMenuOpen, setOrdersMenuOpen] = useState(false)
+  const [mobileOrdersOpen, setMobileOrdersOpen] = useState(false)
   const isLandingPage = location.pathname === '/'
+  const ordersMenuRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
     const onScroll = () => setHeaderElevated(window.scrollY > 6)
@@ -49,6 +53,22 @@ export function Layout({ children, cartItemCount }: LayoutProps) {
       setHeaderSearch(q)
     }
   }, [location.pathname, location.search])
+
+  useEffect(() => {
+    setOrdersMenuOpen(false)
+    setMobileOrdersOpen(false)
+  }, [location.pathname, location.search])
+
+  useEffect(() => {
+    if (!ordersMenuOpen) return
+    const onPointerDown = (e: MouseEvent) => {
+      const el = ordersMenuRef.current
+      if (!el) return
+      if (e.target instanceof Node && !el.contains(e.target)) setOrdersMenuOpen(false)
+    }
+    window.addEventListener('mousedown', onPointerDown)
+    return () => window.removeEventListener('mousedown', onPointerDown)
+  }, [ordersMenuOpen])
 
   const navigation = user
     ? user.role === 'farmer'
@@ -65,7 +85,7 @@ export function Layout({ children, cartItemCount }: LayoutProps) {
           ...(user.role === 'buyer'
             ? [{ name: 'Dashboard', href: '/buyer', icon: LayoutDashboard }]
             : []),
-          { name: 'My Orders', href: '/orders', icon: Package },
+          { name: 'Orders', href: '/orders', icon: Package },
           { name: 'Profile', href: '/profile', icon: User },
         ]
     : [
@@ -149,28 +169,97 @@ export function Layout({ children, cartItemCount }: LayoutProps) {
 
               {/* Desktop Navigation */}
               <nav className="hidden md:flex items-center gap-0.5">
-                {navigation.map((item) => (
-                  <Link
-                    key={item.name}
-                    to={item.href}
-                    className={cn(
-                      'relative flex items-center gap-1 px-2.5 lg:px-3 py-1.5 rounded-lg text-sm font-medium tap-highlight-none',
-                      'motion-safe:transition-all motion-safe:duration-200 motion-safe:active:scale-[0.98]',
-                      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2',
-                      isActive(item.href)
-                        ? 'bg-emerald-50 text-emerald-700 shadow-sm'
-                        : 'text-stone-600 hover:bg-stone-50 hover:text-stone-900'
-                    )}
-                  >
-                    <item.icon
-                      className={cn(
-                        'w-4 h-4 motion-safe:transition-transform motion-safe:duration-200',
-                        isActive(item.href) && 'motion-safe:scale-110'
+                {navigation.map((item) => {
+                  const isOrdersDropdown =
+                    item.href === '/orders' && user != null && user.role !== 'farmer'
+
+                  if (!isOrdersDropdown) {
+                    return (
+                      <Link
+                        key={item.name}
+                        to={item.href}
+                        className={cn(
+                          'relative flex items-center gap-1 px-2.5 lg:px-3 py-1.5 rounded-lg text-sm font-medium tap-highlight-none',
+                          'motion-safe:transition-all motion-safe:duration-200 motion-safe:active:scale-[0.98]',
+                          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2',
+                          isActive(item.href)
+                            ? 'bg-emerald-50 text-emerald-700 shadow-sm'
+                            : 'text-stone-600 hover:bg-stone-50 hover:text-stone-900'
+                        )}
+                      >
+                        <item.icon
+                          className={cn(
+                            'w-4 h-4 motion-safe:transition-transform motion-safe:duration-200',
+                            isActive(item.href) && 'motion-safe:scale-110'
+                          )}
+                        />
+                        {item.name}
+                      </Link>
+                    )
+                  }
+
+                  const activeOrders =
+                    location.pathname === '/orders' || location.pathname.startsWith('/orders/')
+
+                  return (
+                    <div key={item.name} className="relative" ref={ordersMenuRef}>
+                      <button
+                        type="button"
+                        aria-haspopup="menu"
+                        aria-expanded={ordersMenuOpen}
+                        onClick={() => setOrdersMenuOpen((v) => !v)}
+                        className={cn(
+                          'relative flex items-center gap-1 px-2.5 lg:px-3 py-1.5 rounded-lg text-sm font-medium tap-highlight-none',
+                          'motion-safe:transition-all motion-safe:duration-200 motion-safe:active:scale-[0.98]',
+                          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2',
+                          activeOrders
+                            ? 'bg-emerald-50 text-emerald-700 shadow-sm'
+                            : 'text-stone-600 hover:bg-stone-50 hover:text-stone-900'
+                        )}
+                      >
+                        <item.icon
+                          className={cn(
+                            'w-4 h-4 motion-safe:transition-transform motion-safe:duration-200',
+                            activeOrders && 'motion-safe:scale-110'
+                          )}
+                        />
+                        Orders
+                        <ChevronDown
+                          className={cn(
+                            'w-4 h-4 ml-0.5 motion-safe:transition-transform motion-safe:duration-200',
+                            ordersMenuOpen && 'motion-safe:rotate-180'
+                          )}
+                        />
+                      </button>
+
+                      {ordersMenuOpen && (
+                        <div
+                          role="menu"
+                          className="absolute left-0 mt-2 w-48 rounded-xl border border-stone-200 bg-white shadow-lg shadow-stone-900/10 p-1"
+                        >
+                          <Link
+                            to="/orders"
+                            role="menuitem"
+                            className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-stone-700 hover:bg-stone-50"
+                            onClick={() => setOrdersMenuOpen(false)}
+                          >
+                            <Package className="w-4 h-4" />
+                            My Orders
+                          </Link>
+                          <Link
+                            to="/orders?status=pending"
+                            role="menuitem"
+                            className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-stone-700 hover:bg-stone-50"
+                            onClick={() => setOrdersMenuOpen(false)}
+                          >
+                            <ClipboardList className="w-4 h-4" />
+                            Pending Orders
+                          </Link>
+                        </div>
                       )}
-                    />
-                    {item.name}
-                  </Link>
-                ))}
+                    </div>
+                  )
+                })}
               </nav>
 
               {/* User Actions */}
@@ -281,23 +370,76 @@ export function Layout({ children, cartItemCount }: LayoutProps) {
             </form>
 
             <nav className="px-4 py-3 space-y-1">
-              {navigation.map((item) => (
-                <Link
-                  key={item.name}
-                  to={item.href}
-                  className={cn(
-                    'flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium tap-highlight-none',
-                    'motion-safe:transition-all motion-safe:duration-200 motion-safe:active:scale-[0.99]',
-                    isActive(item.href)
-                      ? 'bg-emerald-50 text-emerald-700'
-                      : 'text-stone-600 hover:bg-stone-50'
-                  )}
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  <item.icon className="w-5 h-5" />
-                  {item.name}
-                </Link>
-              ))}
+              {navigation.map((item) => {
+                const isOrdersDropdown =
+                  item.href === '/orders' && user != null && user.role !== 'farmer'
+
+                if (!isOrdersDropdown) {
+                  return (
+                    <Link
+                      key={item.name}
+                      to={item.href}
+                      className={cn(
+                        'flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium tap-highlight-none',
+                        'motion-safe:transition-all motion-safe:duration-200 motion-safe:active:scale-[0.99]',
+                        isActive(item.href)
+                          ? 'bg-emerald-50 text-emerald-700'
+                          : 'text-stone-600 hover:bg-stone-50'
+                      )}
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      <item.icon className="w-5 h-5" />
+                      {item.name}
+                    </Link>
+                  )
+                }
+
+                const activeOrders = location.pathname === '/orders'
+
+                return (
+                  <div key={item.name} className="rounded-xl">
+                    <button
+                      type="button"
+                      onClick={() => setMobileOrdersOpen((v) => !v)}
+                      className={cn(
+                        'flex w-full items-center justify-between gap-3 px-4 py-3 rounded-xl text-sm font-medium tap-highlight-none',
+                        'motion-safe:transition-all motion-safe:duration-200 motion-safe:active:scale-[0.99]',
+                        activeOrders ? 'bg-emerald-50 text-emerald-700' : 'text-stone-600 hover:bg-stone-50'
+                      )}
+                    >
+                      <span className="flex items-center gap-3">
+                        <Package className="w-5 h-5" />
+                        Orders
+                      </span>
+                      <ChevronDown
+                        className={cn(
+                          'w-5 h-5 motion-safe:transition-transform motion-safe:duration-200',
+                          mobileOrdersOpen && 'motion-safe:rotate-180'
+                        )}
+                      />
+                    </button>
+
+                    {mobileOrdersOpen && (
+                      <div className="mt-1 ml-4 pl-3 border-l border-stone-200 space-y-1">
+                        <Link
+                          to="/orders"
+                          className="block px-4 py-2 rounded-lg text-sm text-stone-600 hover:bg-stone-50"
+                          onClick={() => setMobileMenuOpen(false)}
+                        >
+                          My Orders
+                        </Link>
+                        <Link
+                          to="/orders?status=pending"
+                          className="block px-4 py-2 rounded-lg text-sm text-stone-600 hover:bg-stone-50"
+                          onClick={() => setMobileMenuOpen(false)}
+                        >
+                          Pending Orders
+                        </Link>
+                      </div>
+                    )}
+                  </div>
+                )
+              })}
               {!user && (
                 <div className="pt-3 border-t border-stone-100 space-y-2">
                   <Link to="/login" onClick={() => setMobileMenuOpen(false)}>

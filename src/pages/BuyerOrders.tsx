@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { Layout } from '../components/Layout'
 import { Card, Badge, Button } from '../components/ui'
 import { supabase } from '../lib/supabase'
@@ -45,9 +45,11 @@ function statusUi(status: string): StatusUi {
 
 export function BuyerOrders() {
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
   const { user, loading: authLoading } = useAuth()
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
+  const statusFilter = (searchParams.get('status') || '').toLowerCase()
 
   const fetchOrders = useCallback(async () => {
     if (!user?.id) return
@@ -95,14 +97,22 @@ export function BuyerOrders() {
   }
 
   const showSkeleton = authLoading || loading
+  const visibleOrders =
+    statusFilter === 'pending'
+      ? orders.filter((o) => (o.status || '').toLowerCase() === 'pending')
+      : orders
 
   return (
     <Layout>
       <div className="space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-stone-900">Order history</h1>
-            <p className="text-stone-500">Track and manage your purchases</p>
+            <h1 className="text-2xl font-bold text-stone-900">
+              {statusFilter === 'pending' ? 'Pending orders' : 'Order history'}
+            </h1>
+            <p className="text-stone-500">
+              {statusFilter === 'pending' ? 'Orders waiting to be processed' : 'Track and manage your purchases'}
+            </p>
           </div>
           <Button
             variant="outline"
@@ -130,8 +140,8 @@ export function BuyerOrders() {
                 </div>
               </Card>
             ))
-          ) : orders.length > 0 ? (
-            orders.map((order) => {
+          ) : visibleOrders.length > 0 ? (
+            visibleOrders.map((order) => {
               const cfg = statusUi(order.status)
               const StatusIcon = cfg.icon
               const thumb = order.listing?.images?.[0]
