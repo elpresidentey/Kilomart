@@ -68,7 +68,7 @@ function App() {
       <Routes>
         {/* Public Routes */}
         <Route path="/" element={<LandingPage onClearCart={clearCart} cartItemCount={cartItemCount} />} />
-        <Route path="/marketplace" element={<Marketplace cart={cart} onAddToCart={addToCart} cartItemCount={cartItemCount} />} />
+        <Route path="/marketplace" element={<Marketplace cart={cart} onAddToCart={addToCart} />} />
         <Route path="/cart" element={<Cart cartItemCount={cartItemCount} />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />

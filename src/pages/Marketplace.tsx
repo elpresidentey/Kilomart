@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react'
 import { Layout } from '../components/Layout'
 import { ProduceCard } from '../components/ProduceCard'
-import { Input, Button, Badge } from '../components/ui'
+import { Input, Button } from '../components/ui'
 import { supabase } from '../lib/supabase'
 import type { ProduceListing, CartItem } from '../types'
-import { Search, Filter, MapPin, SlidersHorizontal, ShoppingCart } from 'lucide-react'
-import { Link, useSearchParams } from 'react-router-dom'
+import { Search, Filter, MapPin, SlidersHorizontal } from 'lucide-react'
+import { useSearchParams } from 'react-router-dom'
 import {
   MARKETPLACE_PRODUCT_FILTERS,
   parseCategorySearchParam,
@@ -31,10 +31,9 @@ const QUALITY_GRADES = [
 interface MarketplaceProps {
   cart: CartItem[]
   onAddToCart: (item: CartItem) => void
-  cartItemCount: number
 }
 
-export function Marketplace({ cart: _cart, onAddToCart, cartItemCount }: MarketplaceProps) {
+export function Marketplace({ cart: _cart, onAddToCart }: MarketplaceProps) {
   void _cart // reference to avoid unused warning
   const [searchParams] = useSearchParams()
   const qFromUrl = searchParams.get('q') || ''
@@ -129,17 +128,6 @@ export function Marketplace({ cart: _cart, onAddToCart, cartItemCount }: Marketp
             <p className="text-stone-500">Browse fresh produce at fair prices</p>
           </div>
           <div className="flex items-center gap-2">
-            {cartItemCount > 0 && (
-              <Link to="/cart">
-                <Button variant="secondary" className="relative">
-                  <ShoppingCart className="w-4 h-4 mr-2" />
-                  Cart
-                  <Badge variant="default" size="sm" className="absolute -top-2 -right-2">
-                    {cartItemCount}
-                  </Badge>
-                </Button>
-              </Link>
-            )}
             <Button
               variant="secondary"
               onClick={() => setShowFilters(!showFilters)}
