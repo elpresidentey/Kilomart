@@ -72,6 +72,10 @@ export default {
       },
       fontFamily: {
         sans: ['Cabin', 'system-ui', 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', 'sans-serif'],
+        display: ['"Cabin Condensed"', 'Cabin', 'system-ui', 'sans-serif'],
+      },
+      letterSpacing: {
+        tighter: '-0.02em',
       },
     },
   },
