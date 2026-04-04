@@ -3,6 +3,7 @@ import { AuthProvider, useAuth } from './hooks/useAuth'
 import { LandingPage } from './pages/LandingPage'
 import { Marketplace } from './pages/Marketplace'
 import { Login } from './pages/Login'
+import { AuthCallback } from './pages/AuthCallback'
 import { Signup } from './pages/Signup'
 import { FarmerDashboard } from './pages/FarmerDashboard'
 import { FarmerListings } from './pages/FarmerListings'
@@ -71,6 +72,7 @@ function AppRoutes() {
         <Route path="/cart" element={<Cart />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
+        <Route path="/auth/callback" element={<AuthCallback />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/help" element={<HelpCenter />} />
         <Route path="/legal/:kind" element={<LegalDocument />} />

@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react'
+import { useState, useEffect, type FormEvent } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { Button, Card, Input } from '../components/ui'
 import { useAuth } from '../hooks/useAuth'
@@ -13,6 +13,16 @@ export function Login() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+
+  useEffect(() => {
+    const fromUrl =
+      searchParams.get('error_description') ||
+      searchParams.get('error_code') ||
+      searchParams.get('error')
+    if (fromUrl) {
+      setError(decodeURIComponent(fromUrl.replace(/\+/g, ' ')))
+    }
+  }, [searchParams])
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
