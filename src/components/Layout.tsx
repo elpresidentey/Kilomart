@@ -305,7 +305,9 @@ export function Layout({ children, cartItemCount }: LayoutProps) {
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={signOut}
+                        onClick={() => {
+                          void signOut()
+                        }}
                         className="text-stone-500 hover:text-stone-900"
                       >
                         <LogOut className="w-4 h-4" />
@@ -470,8 +472,8 @@ export function Layout({ children, cartItemCount }: LayoutProps) {
                 <button
                   type="button"
                   onClick={() => {
-                    signOut()
                     setMobileMenuOpen(false)
+                    void signOut()
                   }}
                   className="flex w-full items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-stone-600 hover:bg-stone-50 motion-safe:transition-colors"
                 >

@@ -45,7 +45,6 @@ export function Profile() {
 
   async function handleLogout() {
     await signOut()
-    navigate('/')
   }
 
   if (!user) {

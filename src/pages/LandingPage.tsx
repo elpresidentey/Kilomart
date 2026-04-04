@@ -43,7 +43,7 @@ interface LandingPageProps {
 
 export function LandingPage({ onClearCart, cartItemCount }: LandingPageProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const { user } = useAuth()
+  const { user, signOut } = useAuth()
   const location = useLocation()
   const [newsletterEmail, setNewsletterEmail] = useState('')
   const [newsletterStatus, setNewsletterStatus] = useState<'idle' | 'ok' | 'invalid'>('idle')
@@ -65,7 +65,7 @@ export function LandingPage({ onClearCart, cartItemCount }: LandingPageProps) {
   }, [location.pathname, location.hash])
 
   const handleLogout = async () => {
-    // No-op: landing page should not own global sign-out behavior.
+    await signOut()
   }
 
   function handleNewsletterSubmit(e: FormEvent) {

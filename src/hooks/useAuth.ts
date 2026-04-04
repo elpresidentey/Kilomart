@@ -113,6 +113,10 @@ export function useAuth() {
 
   const signOut = async () => {
     await supabase.auth.signOut()
+    // Send users to home after logout (they may be on /profile, /orders, etc.)
+    if (typeof window !== 'undefined' && window.location.pathname !== '/') {
+      window.location.replace('/')
+    }
   }
 
   return { user, loading, signIn, signUp, signOut }
