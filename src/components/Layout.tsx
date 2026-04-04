@@ -23,6 +23,7 @@ import {
 } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { useCartStore, cartUnitsCount } from '../stores/cartStore'
+import { canAccessBuyerOrders } from '../lib/roles'
 
 interface LayoutProps {
   children: ReactNode
@@ -89,7 +90,7 @@ export function Layout({ children, cartItemCount }: LayoutProps) {
           ...(user.role === 'buyer'
             ? [{ name: 'Dashboard', href: '/buyer', icon: LayoutDashboard }]
             : []),
-          ...(user.role === 'buyer'
+          ...(canAccessBuyerOrders(user.role)
             ? [{ name: 'Orders', href: '/orders', icon: Package }]
             : []),
           { name: 'Profile', href: '/profile', icon: User },
@@ -177,7 +178,7 @@ export function Layout({ children, cartItemCount }: LayoutProps) {
               <nav className="hidden md:flex items-center gap-0.5">
                 {navigation.map((item) => {
                   const isOrdersDropdown =
-                    item.href === '/orders' && user != null && user.role === 'buyer'
+                    item.href === '/orders' && user != null && canAccessBuyerOrders(user.role)
 
                   if (!isOrdersDropdown) {
                     return (
@@ -211,6 +212,7 @@ export function Layout({ children, cartItemCount }: LayoutProps) {
                     <div key={item.name} className="relative" ref={ordersMenuRef}>
                       <button
                         type="button"
+                        aria-label="Orders: open menu for My orders and Pending orders"
                         aria-haspopup="menu"
                         aria-expanded={ordersMenuOpen}
                         onClick={() => setOrdersMenuOpen((v) => !v)}
@@ -388,7 +390,7 @@ export function Layout({ children, cartItemCount }: LayoutProps) {
             <nav className="px-4 py-3 space-y-1">
               {navigation.map((item) => {
                 const isOrdersDropdown =
-                  item.href === '/orders' && user != null && user.role === 'buyer'
+                  item.href === '/orders' && user != null && canAccessBuyerOrders(user.role)
 
                 if (!isOrdersDropdown) {
                   return (

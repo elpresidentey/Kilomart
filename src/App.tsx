@@ -26,7 +26,16 @@ import { Partners } from './pages/Partners'
 import { SocialChannel } from './pages/SocialChannel'
 import type { User } from './types'
 
-function ProtectedRoute({ children, allowedRoles }: { children: React.ReactNode; allowedRoles?: User['role'][] }) {
+function ProtectedRoute({
+  children,
+  allowedRoles,
+  denyRoles,
+}: {
+  children: React.ReactNode
+  allowedRoles?: User['role'][]
+  /** If set, users with one of these roles are sent home (e.g. farmers must not use buyer /orders). */
+  denyRoles?: User['role'][]
+}) {
   const { user, loading } = useAuth()
   const location = useLocation()
 
@@ -41,6 +50,10 @@ function ProtectedRoute({ children, allowedRoles }: { children: React.ReactNode;
   if (!user) {
     const redirect = encodeURIComponent(`${location.pathname}${location.search || ''}`)
     return <Navigate to={`/login?redirect=${redirect}`} replace />
+  }
+
+  if (denyRoles?.includes(user.role)) {
+    return <Navigate to="/" replace />
   }
 
   if (allowedRoles && !allowedRoles.includes(user.role)) {
@@ -90,7 +103,7 @@ function AppRoutes() {
         <Route
           path="/orders"
           element={
-            <ProtectedRoute allowedRoles={['buyer']}>
+            <ProtectedRoute denyRoles={['farmer']}>
               <BuyerOrders />
             </ProtectedRoute>
           }

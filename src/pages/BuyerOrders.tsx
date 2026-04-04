@@ -49,12 +49,14 @@ export function BuyerOrders() {
   const { user, loading: authLoading } = useAuth()
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
+  const [fetchError, setFetchError] = useState<string | null>(null)
   const statusFilter = (searchParams.get('status') || '').toLowerCase()
 
   const fetchOrders = useCallback(async () => {
     if (!user?.id) return
     try {
       setLoading(true)
+      setFetchError(null)
       const { data, error } = await supabase
         .from('orders')
         .select('*, listing:produce_listings(*)')
@@ -63,8 +65,14 @@ export function BuyerOrders() {
 
       if (error) throw error
       setOrders((data as Order[]) || [])
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error fetching orders:', error)
+      const msg =
+        error && typeof error === 'object' && 'message' in error
+          ? String((error as { message: string }).message)
+          : 'Could not load orders.'
+      setFetchError(msg)
+      setOrders([])
     } finally {
       setLoading(false)
     }
@@ -127,6 +135,19 @@ export function BuyerOrders() {
         </div>
 
         <div className="space-y-4">
+          {fetchError && (
+            <Card padding="md" className="border-amber-200 bg-amber-50/80">
+              <p className="text-sm font-medium text-amber-950">Unable to load orders</p>
+              <p className="text-sm text-amber-900/90 mt-1">{fetchError}</p>
+              <p className="text-xs text-amber-800/80 mt-2">
+                If you use Row Level Security in Supabase, ensure policies allow buyers to read their own
+                <code className="mx-1 rounded bg-amber-100/80 px-1">orders</code> rows.
+              </p>
+              <Button variant="outline" size="sm" className="mt-3" onClick={() => fetchOrders()}>
+                Try again
+              </Button>
+            </Card>
+          )}
           {showSkeleton ? (
             [...Array(3)].map((_, i) => (
               <Card key={i} className="animate-pulse" padding="lg">
@@ -251,7 +272,9 @@ export function BuyerOrders() {
               </div>
               <h3 className="text-lg font-medium text-stone-900 mb-2">No orders yet</h3>
               <p className="text-stone-500 mb-6">
-                Start shopping in the marketplace to see your orders here.
+                {statusFilter === 'pending'
+                  ? 'You have no orders in pending status. View all orders from the Orders menu.'
+                  : 'When you complete checkout, your purchases will show here. Make sure you are signed in with the same account you used to pay.'}
               </p>
               <Button onClick={() => navigate('/marketplace')}>Browse marketplace</Button>
             </Card>
