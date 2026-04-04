@@ -2,6 +2,7 @@ import { useState, useEffect, type FormEvent } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { Button } from '../components/ui'
 import { useAuth } from '../hooks/useAuth'
+import { useCartStore, cartUnitsCount } from '../stores/cartStore'
 import { fallbackOnImageError, sanitizeImageUrl, FALLBACK_IMAGE_SRC } from '../lib/image'
 import { 
   Leaf, 
@@ -36,23 +37,13 @@ import {
   Nut,
 } from 'lucide-react'
 
-interface LandingPageProps {
-  onClearCart: () => void
-  cartItemCount: number
-}
-
-export function LandingPage({ onClearCart, cartItemCount }: LandingPageProps) {
+export function LandingPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const { user, signOut } = useAuth()
+  const cartItemCount = useCartStore((s) => cartUnitsCount(s.cart))
   const location = useLocation()
   const [newsletterEmail, setNewsletterEmail] = useState('')
   const [newsletterStatus, setNewsletterStatus] = useState<'idle' | 'ok' | 'invalid'>('idle')
-
-  useEffect(() => {
-    // Keep landing page behavior clean: don't force sign-out users.
-    // Cart clearing is optional; leaving it here to preserve the intended "fresh start".
-    onClearCart?.()
-  }, [])
 
   useEffect(() => {
     if (location.pathname !== '/') return

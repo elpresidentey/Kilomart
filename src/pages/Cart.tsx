@@ -13,11 +13,7 @@ import {
   Truck
 } from 'lucide-react'
 
-interface CartProps {
-  cartItemCount: number
-}
-
-export function Cart({ cartItemCount }: CartProps) {
+export function Cart() {
   const navigate = useNavigate()
   const { cart, removeFromCart, updateQuantity, getCartTotal, clearCart } = useCart()
 
@@ -43,7 +39,7 @@ export function Cart({ cartItemCount }: CartProps) {
   }
 
   return (
-    <Layout cartItemCount={cartItemCount}>
+    <Layout>
       <div className="max-w-6xl mx-auto py-8 px-4">
         <h1 className="text-2xl font-bold text-stone-900 mb-8 flex items-center gap-3">
           <ShoppingCart className="w-7 h-7" />

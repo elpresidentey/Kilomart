@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom'
-import { useAuth } from './hooks/useAuth'
+import { AuthProvider, useAuth } from './hooks/useAuth'
 import { LandingPage } from './pages/LandingPage'
 import { Marketplace } from './pages/Marketplace'
 import { Login } from './pages/Login'
@@ -49,9 +49,9 @@ function ProtectedRoute({ children, allowedRoles }: { children: React.ReactNode;
   return <>{children}</>
 }
 
-function App() {
+function AppRoutes() {
   const { loading } = useAuth()
-  const { addToCart, clearCart, getCartItemCount } = useCart()
+  const { addToCart, getCartItemCount } = useCart()
 
   const cartItemCount = getCartItemCount()
 
@@ -64,12 +64,11 @@ function App() {
   }
 
   return (
-    <BrowserRouter>
-      <Routes>
+    <Routes>
         {/* Public Routes */}
-        <Route path="/" element={<LandingPage onClearCart={clearCart} cartItemCount={cartItemCount} />} />
+        <Route path="/" element={<LandingPage />} />
         <Route path="/marketplace" element={<Marketplace />} />
-        <Route path="/cart" element={<Cart cartItemCount={cartItemCount} />} />
+        <Route path="/cart" element={<Cart />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/contact" element={<Contact />} />
@@ -89,7 +88,7 @@ function App() {
         <Route
           path="/orders"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute allowedRoles={['buyer']}>
               <BuyerOrders />
             </ProtectedRoute>
           }
@@ -157,7 +156,16 @@ function App() {
 
         {/* Catch-all */}
         <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
+    </Routes>
+  )
+}
+
+function App() {
+  return (
+    <BrowserRouter>
+      <AuthProvider>
+        <AppRoutes />
+      </AuthProvider>
     </BrowserRouter>
   )
 }
