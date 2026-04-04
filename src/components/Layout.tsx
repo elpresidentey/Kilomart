@@ -22,6 +22,7 @@ import {
   ChevronDown,
 } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
+import { useCartStore, cartUnitsCount } from '../stores/cartStore'
 
 interface LayoutProps {
   children: ReactNode
@@ -29,6 +30,8 @@ interface LayoutProps {
 }
 
 export function Layout({ children, cartItemCount }: LayoutProps) {
+  const storeCartCount = useCartStore((s) => cartUnitsCount(s.cart))
+  const resolvedCartCount = cartItemCount ?? storeCartCount
   const { user, signOut } = useAuth()
   const location = useLocation()
   const navigate = useNavigate()
@@ -283,9 +286,9 @@ export function Layout({ children, cartItemCount }: LayoutProps) {
                   className="relative p-2 rounded-lg text-stone-600 hover:text-emerald-600 motion-safe:transition-colors motion-safe:duration-200 hover:bg-stone-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 tap-highlight-none"
                 >
                   <ShoppingCart className="w-5 h-5 lg:w-6 lg:h-6" />
-                  {(cartItemCount ?? 0) > 0 && (
+                  {resolvedCartCount > 0 && (
                     <span className="absolute -top-1 -right-1 min-w-[1.25rem] h-5 px-1 bg-emerald-600 text-white text-xs font-bold rounded-full flex items-center justify-center shadow-md ring-2 ring-white motion-safe:transition-transform motion-safe:duration-200">
-                      {(cartItemCount ?? 0) > 9 ? '9+' : cartItemCount}
+                      {resolvedCartCount > 9 ? '9+' : resolvedCartCount}
                     </span>
                   )}
                 </Link>

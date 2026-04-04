@@ -4,17 +4,13 @@ import { Layout } from '../components/Layout'
 import { Button } from '../components/ui'
 import { useAuth } from '../hooks/useAuth'
 import { supabase } from '../lib/supabase'
-import type { CartItem } from '../types'
+import { useCartStore, cartUnitsCount } from '../stores/cartStore'
 import { ArrowLeft, MapPin, Phone, User, CreditCard, Truck, CheckCircle } from 'lucide-react'
 
-interface CheckoutProps {
-  cart: CartItem[]
-  onClearCart: () => void
-  cartItemCount: number
-}
-
-export function Checkout({ cart, onClearCart }: CheckoutProps) {
+export function Checkout() {
   const navigate = useNavigate()
+  const cart = useCartStore((s) => s.cart)
+  const clearCart = useCartStore((s) => s.clearCart)
   const { user, loading: authLoading } = useAuth()
   const [loading, setLoading] = useState(false)
   const [orderComplete, setOrderComplete] = useState(false)
@@ -113,7 +109,7 @@ export function Checkout({ cart, onClearCart }: CheckoutProps) {
 
       setOrderNumber(orderNumbers[0])
       setOrderComplete(true)
-      onClearCart()
+      clearCart()
     } catch (error: any) {
       console.error('Order failed:', error)
       setError(error?.message || error?.error_description || 'Failed to place order. Please try again.')
@@ -163,7 +159,7 @@ export function Checkout({ cart, onClearCart }: CheckoutProps) {
   }
 
   return (
-    <Layout cartItemCount={cart.length}>
+    <Layout cartItemCount={cartUnitsCount(cart)}>
       <div className="max-w-4xl mx-auto py-8">
         <button
           onClick={() => navigate('/marketplace')}

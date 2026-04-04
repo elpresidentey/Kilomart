@@ -51,7 +51,7 @@ function ProtectedRoute({ children, allowedRoles }: { children: React.ReactNode;
 
 function App() {
   const { loading } = useAuth()
-  const { cart, addToCart, clearCart, getCartItemCount } = useCart()
+  const { addToCart, clearCart, getCartItemCount } = useCart()
 
   const cartItemCount = getCartItemCount()
 
@@ -68,7 +68,7 @@ function App() {
       <Routes>
         {/* Public Routes */}
         <Route path="/" element={<LandingPage onClearCart={clearCart} cartItemCount={cartItemCount} />} />
-        <Route path="/marketplace" element={<Marketplace cart={cart} onAddToCart={addToCart} />} />
+        <Route path="/marketplace" element={<Marketplace />} />
         <Route path="/cart" element={<Cart cartItemCount={cartItemCount} />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
@@ -106,7 +106,7 @@ function App() {
           path="/checkout"
           element={
             <ProtectedRoute>
-              <Checkout cart={cart} onClearCart={clearCart} cartItemCount={cartItemCount} />
+              <Checkout />
             </ProtectedRoute>
           }
         />

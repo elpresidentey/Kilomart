@@ -1,78 +1,19 @@
-import { useState, useEffect, useCallback } from 'react'
-import type { CartItem } from '../types'
+import { useCallback } from 'react'
+import { useCartStore, cartLineTotal, cartUnitsCount } from '../stores/cartStore'
 
-const CART_STORAGE_KEY = 'kilomarket_cart'
-
-// Helper to deduplicate cart items
-function deduplicateCart(items: CartItem[]): CartItem[] {
-  const grouped = items.reduce((acc, item) => {
-    if (acc[item.id]) {
-      acc[item.id].quantity += item.quantity
-    } else {
-      acc[item.id] = { ...item }
-    }
-    return acc
-  }, {} as Record<string, CartItem>)
-  return Object.values(grouped)
-}
-
+/**
+ * Backwards-compatible hook: all callers share the same Zustand cart store
+ * (fixes multiple `useState` instances that desynced between App and Cart).
+ */
 export function useCart() {
-  const [cart, setCart] = useState<CartItem[]>(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem(CART_STORAGE_KEY)
-      if (saved) {
-        const parsed = JSON.parse(saved) as CartItem[]
-        // Clean up any duplicates from localStorage
-        return deduplicateCart(parsed)
-      }
-    }
-    return []
-  })
+  const cart = useCartStore((s) => s.cart)
+  const addToCart = useCartStore((s) => s.addToCart)
+  const removeFromCart = useCartStore((s) => s.removeFromCart)
+  const updateQuantity = useCartStore((s) => s.updateQuantity)
+  const clearCart = useCartStore((s) => s.clearCart)
 
-  // Persist cart to localStorage
-  useEffect(() => {
-    localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart))
-  }, [cart])
-
-  const addToCart = useCallback((item: CartItem) => {
-    setCart((prev) => {
-      const existingItem = prev.find((i) => i.id === item.id)
-      if (existingItem) {
-        return prev.map((i) =>
-          i.id === item.id
-            ? { ...i, quantity: i.quantity + item.quantity }
-            : i
-        )
-      }
-      return [...prev, item]
-    })
-  }, [])
-
-  const removeFromCart = useCallback((itemId: string) => {
-    setCart((prev) => prev.filter((i) => i.id !== itemId))
-  }, [])
-
-  const updateQuantity = useCallback((itemId: string, quantity: number) => {
-    if (quantity <= 0) {
-      removeFromCart(itemId)
-      return
-    }
-    setCart((prev) =>
-      prev.map((i) => (i.id === itemId ? { ...i, quantity } : i))
-    )
-  }, [removeFromCart])
-
-  const clearCart = useCallback(() => {
-    setCart([])
-  }, [])
-
-  const getCartTotal = useCallback(() => {
-    return cart.reduce((sum, item) => sum + item.price * item.quantity, 0)
-  }, [cart])
-
-  const getCartItemCount = useCallback(() => {
-    return cart.reduce((sum, item) => sum + item.quantity, 0)
-  }, [cart])
+  const getCartTotal = useCallback(() => cartLineTotal(cart), [cart])
+  const getCartItemCount = useCallback(() => cartUnitsCount(cart), [cart])
 
   return {
     cart,

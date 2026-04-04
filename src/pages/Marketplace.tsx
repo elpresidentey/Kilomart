@@ -3,7 +3,8 @@ import { Layout } from '../components/Layout'
 import { ProduceCard } from '../components/ProduceCard'
 import { Input, Button } from '../components/ui'
 import { supabase } from '../lib/supabase'
-import type { ProduceListing, CartItem } from '../types'
+import { useCartStore } from '../stores/cartStore'
+import type { ProduceListing } from '../types'
 import { Search, Filter, MapPin, SlidersHorizontal } from 'lucide-react'
 import { useSearchParams } from 'react-router-dom'
 import {
@@ -28,13 +29,8 @@ const QUALITY_GRADES = [
   { value: 'C', label: 'Grade C - Fair' },
 ]
 
-interface MarketplaceProps {
-  cart: CartItem[]
-  onAddToCart: (item: CartItem) => void
-}
-
-export function Marketplace({ cart: _cart, onAddToCart }: MarketplaceProps) {
-  void _cart // reference to avoid unused warning
+export function Marketplace() {
+  const addToCart = useCartStore((s) => s.addToCart)
   const [searchParams] = useSearchParams()
   const qFromUrl = searchParams.get('q') || ''
   const [loading, setLoading] = useState(true)
@@ -52,7 +48,7 @@ export function Marketplace({ cart: _cart, onAddToCart }: MarketplaceProps) {
   const [showFilters, setShowFilters] = useState(false)
 
   const handleAddToCart = (listing: ProduceListing, quantity: number) => {
-    onAddToCart({
+    addToCart({
       id: listing.id,
       name: listing.product_name,
       price: listing.price_per_kg,
