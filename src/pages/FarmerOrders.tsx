@@ -37,7 +37,7 @@ export function FarmerOrders() {
       setLoading(true)
       const { data, error } = await supabase
         .from('orders')
-        .select('*, listing:produce_listings(*), buyer:users(id, full_name, phone)')
+        .select('*, listing:produce_listings(*), buyer:users!orders_buyer_id_fkey(id, full_name, phone)')
         .eq('seller_id', user.id)
         .order('created_at', { ascending: false })
 
