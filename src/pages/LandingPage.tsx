@@ -61,7 +61,6 @@ export function LandingPage() {
         'Hi, I am KiloMarket Assistant. Ask me how to order, track deliveries, list products, or understand what KiloMarket does.',
     },
   ])
-  const [heroVideoError, setHeroVideoError] = useState(false)
 
   useEffect(() => {
     if (location.pathname !== '/') return
@@ -617,25 +616,13 @@ export function LandingPage() {
             <div className="relative">
               <div className="relative bg-gradient-to-br from-primary-100 to-emerald-50 rounded-3xl p-3 lg:p-4 shadow-xl">
                 <div className="aspect-video rounded-2xl overflow-hidden bg-stone-900">
-                  {!heroVideoError ? (
-                    <video
-                      className="w-full h-full object-cover"
-                      src="/hero.mp4"
-                      autoPlay
-                      muted
-                      loop
-                      playsInline
-                      onError={() => setHeroVideoError(true)}
-                    />
-                  ) : (
-                    <iframe
-                      className="w-full h-full"
-                      src="https://www.youtube.com/embed/6x1fuxhNOBM?autoplay=1&mute=1&loop=1&playlist=6x1fuxhNOBM"
-                      title="KiloMarket intro video"
-                      allow="autoplay; encrypted-media; picture-in-picture"
-                      allowFullScreen
-                    />
-                  )}
+                  <iframe
+                    className="w-full h-full"
+                    src="https://www.youtube.com/embed/nNjYd1Qh1Ws?autoplay=1&mute=1&loop=1&playlist=nNjYd1Qh1Ws"
+                    title="KiloMarket intro video"
+                    allow="autoplay; encrypted-media; picture-in-picture"
+                    allowFullScreen
+                  />
                 </div>
                 <div className="absolute -bottom-4 -right-4 bg-white rounded-xl p-4 shadow-xl">
                   <div className="flex items-center gap-3">
