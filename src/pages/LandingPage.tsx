@@ -1,5 +1,5 @@
 import { useState, useEffect, type FormEvent } from 'react'
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { Button } from '../components/ui'
 import { useAuth } from '../hooks/useAuth'
 import { useCartStore, cartUnitsCount } from '../stores/cartStore'
@@ -45,11 +45,14 @@ export function LandingPage() {
   const { user, signOut } = useAuth()
   const cartItemCount = useCartStore((s) => cartUnitsCount(s.cart))
   const location = useLocation()
+  const navigate = useNavigate()
   const [language, setLanguage] = useState<'en' | 'pidgin'>('en')
+  const [headerSearch, setHeaderSearch] = useState('')
   const [newsletterEmail, setNewsletterEmail] = useState('')
   const [newsletterStatus, setNewsletterStatus] = useState<'idle' | 'ok' | 'invalid'>('idle')
   const [assistantOpen, setAssistantOpen] = useState(false)
   const [assistantQuery, setAssistantQuery] = useState('')
+  const [heroVideoError, setHeroVideoError] = useState(false)
 
   useEffect(() => {
     if (location.pathname !== '/') return
@@ -63,6 +66,13 @@ export function LandingPage() {
 
   const handleLogout = async () => {
     await signOut()
+  }
+
+  function submitHeaderSearch(e?: FormEvent) {
+    e?.preventDefault()
+    const q = headerSearch.trim()
+    navigate(q ? `/marketplace?q=${encodeURIComponent(q)}` : '/marketplace')
+    setMobileMenuOpen(false)
   }
 
   function handleNewsletterSubmit(e: FormEvent) {
@@ -312,16 +322,18 @@ export function LandingPage() {
               </Link>
 
               {/* Search Bar - Desktop */}
-              <div className="hidden lg:flex flex-1 max-w-md mx-4">
+              <form onSubmit={submitHeaderSearch} className="hidden lg:flex flex-1 max-w-md mx-4">
                 <div className="relative w-full">
                   <input
                     type="text"
+                    value={headerSearch}
+                    onChange={(e) => setHeaderSearch(e.target.value)}
                     placeholder="Search for rice, vegetables, fruits..."
                     className="w-full pl-10 pr-4 py-2.5 bg-stone-50 border border-stone-200 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
                   />
                   <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400" />
                 </div>
-              </div>
+              </form>
 
               {/* Desktop Navigation */}
               <nav className="hidden md:flex items-center gap-0.5">
@@ -419,16 +431,18 @@ export function LandingPage() {
         {mobileMenuOpen && (
           <div className="md:hidden border-t border-stone-100 bg-white shadow-lg">
             {/* Mobile Search */}
-            <div className="px-4 py-3 border-b border-stone-100">
+            <form onSubmit={submitHeaderSearch} className="px-4 py-3 border-b border-stone-100">
               <div className="relative">
                 <input
                   type="text"
+                  value={headerSearch}
+                  onChange={(e) => setHeaderSearch(e.target.value)}
                   placeholder="Search products..."
                   className="w-full pl-10 pr-4 py-3 bg-stone-50 border border-stone-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
                 />
                 <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400" />
               </div>
-            </div>
+            </form>
             
             <nav className="px-4 py-3 space-y-1">
               <Link
@@ -553,13 +567,25 @@ export function LandingPage() {
             <div className="relative">
               <div className="relative bg-gradient-to-br from-primary-100 to-emerald-50 rounded-3xl p-3 lg:p-4 shadow-xl">
                 <div className="aspect-video rounded-2xl overflow-hidden bg-stone-900">
-                  <iframe
-                    className="w-full h-full"
-                    src="https://www.youtube.com/embed/6x1fuxhNOBM?autoplay=1&mute=1&loop=1&playlist=6x1fuxhNOBM"
-                    title="KiloMarket intro video"
-                    allow="autoplay; encrypted-media; picture-in-picture"
-                    allowFullScreen
-                  />
+                  {!heroVideoError ? (
+                    <video
+                      className="w-full h-full object-cover"
+                      src="/hero.mp4"
+                      autoPlay
+                      muted
+                      loop
+                      playsInline
+                      onError={() => setHeroVideoError(true)}
+                    />
+                  ) : (
+                    <iframe
+                      className="w-full h-full"
+                      src="https://www.youtube.com/embed/6x1fuxhNOBM?autoplay=1&mute=1&loop=1&playlist=6x1fuxhNOBM"
+                      title="KiloMarket intro video"
+                      allow="autoplay; encrypted-media; picture-in-picture"
+                      allowFullScreen
+                    />
+                  )}
                 </div>
                 <div className="absolute -bottom-4 -right-4 bg-white rounded-xl p-4 shadow-xl">
                   <div className="flex items-center gap-3">
