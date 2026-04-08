@@ -4,7 +4,6 @@ import { Button } from '../components/ui'
 import { useAuth } from '../hooks/useAuth'
 import { useCartStore, cartUnitsCount } from '../stores/cartStore'
 import { fallbackOnImageError, sanitizeImageUrl, FALLBACK_IMAGE_SRC } from '../lib/image'
-import heroVideo from '../../Hero image/240330_medium.mp4'
 import { 
   Leaf, 
   Home,
@@ -621,7 +620,7 @@ export function LandingPage() {
                   {!heroVideoError ? (
                     <video
                       className="w-full h-full object-cover"
-                      src={heroVideo}
+                      src="/hero.mp4"
                       autoPlay
                       muted
                       loop

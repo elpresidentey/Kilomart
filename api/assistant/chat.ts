@@ -10,9 +10,9 @@ export default async function handler(req: any, res: any) {
   }
 
   const env = (globalThis as any)?.process?.env ?? {}
-  const apiKey = env.OPENAI_API_KEY
+  const apiKey = env.DEEPSEEK_API_KEY
   if (!apiKey) {
-    res.status(500).json({ error: 'OPENAI_API_KEY is not configured' })
+    res.status(500).json({ error: 'DEEPSEEK_API_KEY is not configured' })
     return
   }
 
@@ -39,14 +39,14 @@ export default async function handler(req: any, res: any) {
   ]
 
   try {
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: env.OPENAI_ASSISTANT_MODEL || 'gpt-4o-mini',
+        model: env.DEEPSEEK_MODEL || 'deepseek-chat',
         temperature: 0.3,
         max_tokens: 220,
         messages,
