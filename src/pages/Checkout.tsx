@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useEffect, useMemo, useState } from 'react'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { Layout } from '../components/Layout'
 import { Button } from '../components/ui'
 import { useAuth } from '../hooks/useAuth'
@@ -9,6 +9,7 @@ import { ArrowLeft, MapPin, Phone, User, CreditCard, Truck, CheckCircle } from '
 
 export function Checkout() {
   const navigate = useNavigate()
+  const [searchParams, setSearchParams] = useSearchParams()
   const cart = useCartStore((s) => s.cart)
   const clearCart = useCartStore((s) => s.clearCart)
   const { user, loading: authLoading } = useAuth()
@@ -17,7 +18,7 @@ export function Checkout() {
   const [orderNumber, setOrderNumber] = useState('')
   
   const [error, setError] = useState<string | null>(null)
-  const [paymentMethod, setPaymentMethod] = useState<'cash_on_delivery' | 'bank_transfer'>('cash_on_delivery')
+  const [paymentMethod, setPaymentMethod] = useState<'cash_on_delivery' | 'bank_transfer' | 'paystack'>('cash_on_delivery')
 
   const [deliveryInfo, setDeliveryInfo] = useState({
     fullName: '',
@@ -30,10 +31,102 @@ export function Checkout() {
   const totalAmount = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0)
   const deliveryFee = 1500
   const finalTotal = totalAmount + deliveryFee
+  const callbackBase = typeof window !== 'undefined' ? window.location.origin : ''
+
+  const deliveryPayload = useMemo(
+    () => ({
+      address: deliveryInfo.address,
+      city: deliveryInfo.city,
+      state: deliveryInfo.state,
+      phone: deliveryInfo.phone,
+      contact_name: deliveryInfo.fullName,
+    }),
+    [deliveryInfo]
+  )
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setDeliveryInfo({ ...deliveryInfo, [e.target.name]: e.target.value })
   }
+
+  const createOrdersAndPayments = async (providerReference?: string) => {
+    if (!user) throw new Error('Please log in to place an order')
+    const orderNumbers: string[] = []
+
+    for (const item of cart) {
+      const orderNumber = 'ORD-' + Date.now() + '-' + Math.random().toString(36).substring(2, 8).toUpperCase()
+      const itemTotal = item.price * item.quantity
+      const lineTotal = itemTotal + deliveryFee / cart.length
+
+      const { data: orderRow, error: orderError } = await supabase
+        .from('orders')
+        .insert({
+          order_number: orderNumber,
+          buyer_id: user.id,
+          seller_id: item.seller_id,
+          listing_id: item.id,
+          quantity_kg: item.quantity,
+          price_per_kg: item.price,
+          subtotal: itemTotal,
+          delivery_fee: deliveryFee / cart.length,
+          total_amount: lineTotal,
+          delivery_address: deliveryPayload,
+          status: paymentMethod === 'paystack' ? 'paid' : 'pending',
+        })
+        .select('id')
+        .single()
+
+      if (orderError) throw orderError
+
+      const { error: paymentError } = await supabase.from('payments').insert({
+        order_id: orderRow.id,
+        payer_id: user.id,
+        payee_id: item.seller_id,
+        amount: lineTotal,
+        currency: 'NGN',
+        payment_method: paymentMethod,
+        provider: paymentMethod === 'paystack' ? 'paystack' : null,
+        provider_reference: providerReference || null,
+        status: paymentMethod === 'paystack' ? 'completed' : 'pending',
+      })
+
+      if (paymentError) {
+        console.warn('Could not save payment record:', paymentError)
+      }
+
+      orderNumbers.push(orderNumber)
+    }
+
+    setOrderNumber(orderNumbers[0])
+    setOrderComplete(true)
+    clearCart()
+  }
+
+  useEffect(() => {
+    const reference = searchParams.get('reference') || searchParams.get('trxref')
+    if (!reference || authLoading || !user || cart.length === 0) return
+
+    const marker = `paystack_verified_${reference}`
+    if (sessionStorage.getItem(marker) === '1') return
+
+    ;(async () => {
+      try {
+        setLoading(true)
+        setError(null)
+        const r = await fetch(`/api/paystack/verify?reference=${encodeURIComponent(reference)}`)
+        const data = await r.json()
+        if (!r.ok) throw new Error(data?.error || 'Could not verify payment')
+        if (data.status !== 'success') throw new Error('Payment was not successful')
+
+        await createOrdersAndPayments(reference)
+        sessionStorage.setItem(marker, '1')
+        setSearchParams({}, { replace: true })
+      } catch (e: any) {
+        setError(e?.message || 'Could not verify payment')
+      } finally {
+        setLoading(false)
+      }
+    })()
+  }, [searchParams, authLoading, user, cart.length, setSearchParams])
 
   const placeOrder = async () => {
     // `user` comes from fetching your `public.users` profile row, which is async.
@@ -54,62 +147,31 @@ export function Checkout() {
     
     setError(null)
     setLoading(true)
-    
     try {
-      const orderNumbers: string[] = []
-
-      for (const item of cart) {
-        const orderNumber = 'ORD-' + Date.now() + '-' + Math.random().toString(36).substring(2, 8).toUpperCase()
-        const itemTotal = item.price * item.quantity
-        
-        const lineTotal = itemTotal + deliveryFee / cart.length
-
-        const { data: orderRow, error: orderError } = await supabase
-          .from('orders')
-          .insert({
-            order_number: orderNumber,
-            buyer_id: user.id,
-            seller_id: item.seller_id,
-            listing_id: item.id,
-            quantity_kg: item.quantity,
-            price_per_kg: item.price,
-            subtotal: itemTotal,
-            delivery_fee: deliveryFee / cart.length,
-            total_amount: lineTotal,
-            delivery_address: {
-              address: deliveryInfo.address,
-              city: deliveryInfo.city,
-              state: deliveryInfo.state,
-              phone: deliveryInfo.phone,
-              contact_name: deliveryInfo.fullName
+      if (paymentMethod === 'paystack') {
+        const callbackUrl = callbackBase ? `${callbackBase}/checkout` : '/checkout'
+        const resp = await fetch('/api/paystack/initialize', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: user.email,
+            amountKobo: Math.round(finalTotal * 100),
+            callbackUrl,
+            metadata: {
+              buyer_id: user.id,
+              checkout_source: 'kilomarket_web',
             },
-            status: 'pending'
-          })
-          .select('id')
-          .single()
-
-        if (orderError) throw orderError
-
-        const { error: paymentError } = await supabase.from('payments').insert({
-          order_id: orderRow.id,
-          payer_id: user.id,
-          payee_id: item.seller_id,
-          amount: lineTotal,
-          currency: 'NGN',
-          payment_method: paymentMethod,
-          status: 'pending',
+          }),
         })
-
-        if (paymentError) {
-          console.warn('Could not save payment record (run supabase/payments_policies.sql if needed):', paymentError)
+        const payload = await resp.json()
+        if (!resp.ok || !payload.authorization_url) {
+          throw new Error(payload?.error || 'Could not initialize Paystack payment')
         }
-
-        orderNumbers.push(orderNumber)
+        window.location.href = payload.authorization_url as string
+        return
       }
 
-      setOrderNumber(orderNumbers[0])
-      setOrderComplete(true)
-      clearCart()
+      await createOrdersAndPayments()
     } catch (error: any) {
       console.error('Order failed:', error)
       setError(error?.message || error?.error_description || 'Failed to place order. Please try again.')
@@ -270,9 +332,22 @@ export function Checkout() {
                 <h2 className="text-lg font-semibold text-stone-900">Payment</h2>
               </div>
               <p className="text-sm text-stone-500 mb-4">
-                Online card payments can be connected later (e.g. Paystack). For now, choose how you plan to pay the farmer.
+                Choose your payment option. Paystack card flow is verified server-side before orders are created.
               </p>
               <div className="space-y-3">
+                <label className="flex items-start gap-3 cursor-pointer p-3 rounded-lg border border-stone-200 has-[:checked]:border-emerald-500 has-[:checked]:bg-emerald-50/50">
+                  <input
+                    type="radio"
+                    name="pay"
+                    className="mt-1"
+                    checked={paymentMethod === 'paystack'}
+                    onChange={() => setPaymentMethod('paystack')}
+                  />
+                  <span>
+                    <span className="font-medium text-stone-900">Paystack (card / transfer)</span>
+                    <span className="block text-sm text-stone-500">Secure online payment and instant verification</span>
+                  </span>
+                </label>
                 <label className="flex items-start gap-3 cursor-pointer p-3 rounded-lg border border-stone-200 has-[:checked]:border-emerald-500 has-[:checked]:bg-emerald-50/50">
                   <input
                     type="radio"
@@ -369,7 +444,9 @@ export function Checkout() {
               <p className="text-xs text-stone-500 text-center mt-4">
                 {paymentMethod === 'cash_on_delivery'
                   ? 'You selected cash on delivery. Have the exact amount or confirm transfer with the rider.'
-                  : 'You selected bank transfer. Complete payment using details shared by the seller.'}
+                  : paymentMethod === 'bank_transfer'
+                  ? 'You selected bank transfer. Complete payment using details shared by the seller.'
+                  : 'You selected Paystack. You will be redirected securely to complete payment.'}
               </p>
             </div>
           </div>
