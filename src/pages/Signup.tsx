@@ -121,6 +121,14 @@ export function Signup() {
           {successMessage && (
             <div className="bg-emerald-50 border border-emerald-200 text-emerald-700 p-4 rounded-lg">
               <p className="font-medium">{successMessage}</p>
+              <div className="mt-3 rounded-md bg-white/70 border border-emerald-200 p-3 text-sm">
+                <p className="font-semibold mb-1">Confirmation email steps:</p>
+                <ol className="list-decimal pl-4 space-y-1">
+                  <li>Open the email from KiloMarket/Supabase.</li>
+                  <li>Click the "Confirm your email" button.</li>
+                  <li>You will be redirected back to KiloMarket onboarding.</li>
+                </ol>
+              </div>
               <p className="text-sm mt-2">
                 <Link to="/login" className="text-primary-700 font-medium hover:underline">
                   Click here to sign in

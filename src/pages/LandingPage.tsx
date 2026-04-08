@@ -27,6 +27,9 @@ import {
   Star,
   Mail,
   Award,
+  Globe,
+  Bot,
+  MessageCircle,
   Sprout,
   Beef,
   Wheat,
@@ -42,8 +45,11 @@ export function LandingPage() {
   const { user, signOut } = useAuth()
   const cartItemCount = useCartStore((s) => cartUnitsCount(s.cart))
   const location = useLocation()
+  const [language, setLanguage] = useState<'en' | 'pidgin'>('en')
   const [newsletterEmail, setNewsletterEmail] = useState('')
   const [newsletterStatus, setNewsletterStatus] = useState<'idle' | 'ok' | 'invalid'>('idle')
+  const [assistantOpen, setAssistantOpen] = useState(false)
+  const [assistantQuery, setAssistantQuery] = useState('')
 
   useEffect(() => {
     if (location.pathname !== '/') return
@@ -70,29 +76,50 @@ export function LandingPage() {
     setNewsletterEmail('')
   }
 
+  const copy = {
+    en: {
+      heroTitleTop: 'Farm Produce,',
+      heroTitleBottom: 'Without Market Stress',
+      heroSub:
+        'KiloMarket helps buyers find trusted produce, pay securely, and get reliable delivery while helping farmers sell faster.',
+      featuresHeading: 'Built To Solve Real Market Problems',
+      featuresSub:
+        'Every workflow is designed around what users struggle with today: trust, payment friction, delivery delays, and confusing interfaces.',
+    },
+    pidgin: {
+      heroTitleTop: 'Fresh Food,',
+      heroTitleBottom: 'Without Wahala',
+      heroSub:
+        'KiloMarket help buyers see trusted produce, pay safely, and get better delivery while farmers fit sell quick quick.',
+      featuresHeading: 'We Build Am To Solve Real Wahala',
+      featuresSub:
+        'We focus on real problems: trust issue, payment stress, delivery delay, and hard-to-use apps.',
+    },
+  }[language]
+
   const features = [
     {
-      icon: Leaf,
-      title: 'Farm-Fresh Quality',
-      description: 'Direct from local farmers to your doorstep. No middlemen, no compromises.',
+      icon: CreditCard,
+      title: 'Easy payments',
+      description: 'Checkout is simple and clear, with transparent order totals and supported local payment options.',
       color: 'bg-emerald-500',
     },
     {
-      icon: ShoppingCart,
-      title: 'Buy by the Kilo',
-      description: 'Transparent per-kilogram pricing. Know exactly what you pay for.',
+      icon: Truck,
+      title: 'Effective logistics',
+      description: 'Delivery flow is designed for speed and accountability, so orders move from farm to doorstep with fewer delays.',
       color: 'bg-primary-500',
     },
     {
-      icon: Truck,
-      title: 'Reliable Logistics',
-      description: 'Temperature-controlled transport ensures your produce stays fresh.',
+      icon: ShieldCheck,
+      title: 'Human-first trust',
+      description: 'Verified sellers, clear order status, and confidence signals help buyers and farmers trust each transaction.',
       color: 'bg-amber-500',
     },
     {
-      icon: ShieldCheck,
-      title: 'Verified & Trusted',
-      description: 'Every farmer and product is quality-checked and certified.',
+      icon: Leaf,
+      title: 'Intuitive user experience',
+      description: 'Clear navigation, quick onboarding, and simple order tracking make the app easy for first-time and repeat users.',
       color: 'bg-blue-500',
     },
   ]
@@ -122,13 +149,6 @@ export function LandingPage() {
       color: 'from-emerald-500 to-emerald-600',
       bgColor: 'bg-emerald-50',
     },
-  ]
-
-  const stats = [
-    { value: '500+', label: 'Verified Farmers' },
-    { value: '10K+', label: 'Happy Customers' },
-    { value: '50+', label: 'Cities Covered' },
-    { value: '98%', label: 'Satisfaction Rate' },
   ]
 
   /** Aligned with Supabase `categories` (no seafood). `marketplaceHref` = filter or browse-all for split DB categories. */
@@ -259,6 +279,17 @@ export function LandingPage() {
             </div>
             <div className="flex items-center gap-4">
               <span>Free delivery on orders over ₦50,000</span>
+              <label className="inline-flex items-center gap-2 text-stone-300">
+                <Globe className="w-3.5 h-3.5" />
+                <select
+                  value={language}
+                  onChange={(e) => setLanguage(e.target.value as 'en' | 'pidgin')}
+                  className="bg-stone-900 border border-stone-700 rounded px-2 py-1 text-xs text-stone-100"
+                >
+                  <option value="en">English</option>
+                  <option value="pidgin">Pidgin</option>
+                </select>
+              </label>
             </div>
           </div>
         </div>
@@ -461,16 +492,14 @@ export function LandingPage() {
             {/* Left Content */}
             <div className="space-y-6">
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-stone-900 leading-tight">
-                Fresh Produce,
+                {copy.heroTitleTop}
                 <span className="block text-transparent bg-clip-text bg-gradient-to-r from-primary-600 to-emerald-600">
-                  Fair Prices
+                  {copy.heroTitleBottom}
                 </span>
               </h1>
 
               <p className="text-lg text-stone-600 leading-relaxed max-w-lg">
-                Nigeria's first digital marketplace for agricultural produce. 
-                Buy directly from verified farmers, pay by the kilogram, 
-                and get fresh delivery to your doorstep.
+                {copy.heroSub}
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4">
@@ -520,71 +549,31 @@ export function LandingPage() {
               </div>
             </div>
 
-            {/* Right Content - Hero Image/Graphic */}
+            {/* Right Content - Hero Video */}
             <div className="relative">
-              <div className="relative bg-gradient-to-br from-primary-100 to-emerald-50 rounded-3xl p-8 lg:p-12">
-                {/* Abstract Produce Graphic */}
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="bg-white rounded-2xl p-4 shadow-lg shadow-primary-100/50 transform -rotate-3 hover:rotate-0 transition-transform duration-300">
-                    <div className="w-full aspect-square bg-gradient-to-br from-amber-100 to-amber-200 rounded-xl flex items-center justify-center mb-3">
-                      <span className="text-4xl">🌾</span>
-                    </div>
-                    <p className="font-semibold text-stone-900">Rice</p>
-                    <p className="text-primary-600 font-bold">₦850/kg</p>
-                  </div>
-                  <div className="bg-white rounded-2xl p-4 shadow-lg shadow-primary-100/50 transform rotate-3 hover:rotate-0 transition-transform duration-300 mt-8">
-                    <div className="w-full aspect-square bg-gradient-to-br from-green-100 to-green-200 rounded-xl flex items-center justify-center mb-3">
-                      <span className="text-4xl">🫘</span>
-                    </div>
-                    <p className="font-semibold text-stone-900">Beans</p>
-                    <p className="text-primary-600 font-bold">₦1,200/kg</p>
-                  </div>
-                  <div className="bg-white rounded-2xl p-4 shadow-lg shadow-primary-100/50 transform rotate-3 hover:rotate-0 transition-transform duration-300">
-                    <div className="w-full aspect-square bg-gradient-to-br from-yellow-100 to-yellow-200 rounded-xl flex items-center justify-center mb-3">
-                      <span className="text-4xl">🌽</span>
-                    </div>
-                    <p className="font-semibold text-stone-900">Maize</p>
-                    <p className="text-primary-600 font-bold">₦350/kg</p>
-                  </div>
-                  <div className="bg-white rounded-2xl p-4 shadow-lg shadow-primary-100/50 transform -rotate-3 hover:rotate-0 transition-transform duration-300 -mt-8">
-                    <div className="w-full aspect-square bg-gradient-to-br from-orange-100 to-orange-200 rounded-xl flex items-center justify-center mb-3">
-                      <span className="text-4xl">🍠</span>
-                    </div>
-                    <p className="font-semibold text-stone-900">Yam</p>
-                    <p className="text-primary-600 font-bold">₦650/kg</p>
-                  </div>
+              <div className="relative bg-gradient-to-br from-primary-100 to-emerald-50 rounded-3xl p-3 lg:p-4 shadow-xl">
+                <div className="aspect-video rounded-2xl overflow-hidden bg-stone-900">
+                  <iframe
+                    className="w-full h-full"
+                    src="https://www.youtube.com/embed/6x1fuxhNOBM?autoplay=1&mute=1&loop=1&playlist=6x1fuxhNOBM"
+                    title="KiloMarket intro video"
+                    allow="autoplay; encrypted-media; picture-in-picture"
+                    allowFullScreen
+                  />
                 </div>
-
-                {/* Floating Badge */}
                 <div className="absolute -bottom-4 -right-4 bg-white rounded-xl p-4 shadow-xl">
                   <div className="flex items-center gap-3">
                     <div className="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center">
                       <TrendingUp className="w-6 h-6 text-emerald-600" />
                     </div>
                     <div>
-                      <p className="text-sm text-stone-500">Active Listings</p>
-                      <p className="text-xl font-bold text-stone-900">2,500+</p>
+                      <p className="text-sm text-stone-500">App walkthrough</p>
+                      <p className="text-xl font-bold text-stone-900">Live demo</p>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Stats Section */}
-      <section id="about" className="py-12 bg-stone-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            {stats.map((stat) => (
-              <div key={stat.label} className="text-center">
-                <p className="text-3xl lg:text-4xl font-bold text-primary-600">
-                  {stat.value}
-                </p>
-                <p className="text-stone-600 mt-1">{stat.label}</p>
-              </div>
-            ))}
           </div>
         </div>
       </section>
@@ -635,11 +624,10 @@ export function LandingPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
             <h2 className="text-3xl lg:text-4xl font-bold text-stone-900 mb-4">
-              Why Choose KiloMarket?
+              {copy.featuresHeading}
             </h2>
             <p className="text-lg text-stone-600">
-              We're revolutionizing how Nigerians buy and sell agricultural produce.
-              Transparent pricing, verified quality, seamless delivery.
+              {copy.featuresSub}
             </p>
           </div>
 
@@ -647,7 +635,7 @@ export function LandingPage() {
             {features.map((feature) => (
               <div
                 key={feature.title}
-                className="group p-6 bg-white rounded-2xl border border-stone-100 hover:border-primary-200 hover:shadow-lg hover:shadow-primary-100/50 transition-all duration-300"
+                className="group p-6 bg-white rounded-2xl border border-stone-100 hover:border-primary-200 hover:shadow-lg hover:shadow-primary-100/50 transition-all duration-300 h-full"
               >
                 <div className={`w-14 h-14 ${feature.color} rounded-xl flex items-center justify-center mb-5 group-hover:scale-110 transition-transform`}>
                   <feature.icon className="w-7 h-7 text-white" />
@@ -1125,6 +1113,44 @@ export function LandingPage() {
           </div>
         </div>
       </footer>
+
+      {/* AI Helper Widget */}
+      <div className="fixed bottom-4 right-4 z-50">
+        {assistantOpen && (
+          <div className="mb-3 w-80 rounded-2xl border border-stone-200 bg-white shadow-xl">
+            <div className="flex items-center gap-2 border-b border-stone-100 p-3">
+              <Bot className="h-4 w-4 text-emerald-600" />
+              <p className="text-sm font-medium text-stone-900">KiloMarket Assistant</p>
+            </div>
+            <div className="p-3 space-y-2 text-sm text-stone-700">
+              <p className="text-stone-500">Ask basic questions:</p>
+              <p className="rounded-lg bg-stone-50 p-2">"How do I place an order?"</p>
+              <p className="rounded-lg bg-stone-50 p-2">"What is KiloMarket for?"</p>
+              <input
+                value={assistantQuery}
+                onChange={(e) => setAssistantQuery(e.target.value)}
+                placeholder="Type your question..."
+                className="w-full rounded-lg border border-stone-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              />
+              <div className="rounded-lg bg-emerald-50 p-2 text-emerald-800 text-xs">
+                {assistantQuery.toLowerCase().includes('what')
+                  ? 'KiloMarket connects farmers and buyers with easy payments, clear pricing, and delivery support.'
+                  : assistantQuery.toLowerCase().includes('order')
+                  ? 'Browse marketplace -> add to cart -> checkout -> track from Orders.'
+                  : 'Try asking about checkout, orders, seller listing, or delivery.'}
+              </div>
+            </div>
+          </div>
+        )}
+        <button
+          type="button"
+          onClick={() => setAssistantOpen((v) => !v)}
+          className="inline-flex items-center gap-2 rounded-full bg-emerald-600 px-4 py-3 text-sm font-medium text-white shadow-lg hover:bg-emerald-700"
+        >
+          <MessageCircle className="h-4 w-4" />
+          AI Help
+        </button>
+      </div>
     </div>
   )
 }
