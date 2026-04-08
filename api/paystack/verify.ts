@@ -4,7 +4,8 @@ export default async function handler(req: any, res: any) {
     return
   }
 
-  const secret = process.env.PAYSTACK_SECRET_KEY
+  const env = (globalThis as any)?.process?.env ?? {}
+  const secret = env.PAYSTACK_SECRET_KEY
   if (!secret) {
     res.status(500).json({ error: 'PAYSTACK_SECRET_KEY is not configured' })
     return

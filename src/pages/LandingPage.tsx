@@ -4,6 +4,7 @@ import { Button } from '../components/ui'
 import { useAuth } from '../hooks/useAuth'
 import { useCartStore, cartUnitsCount } from '../stores/cartStore'
 import { fallbackOnImageError, sanitizeImageUrl, FALLBACK_IMAGE_SRC } from '../lib/image'
+import heroVideo from '../../Hero image/240330_medium.mp4'
 import { 
   Leaf, 
   Home,
@@ -52,6 +53,15 @@ export function LandingPage() {
   const [newsletterStatus, setNewsletterStatus] = useState<'idle' | 'ok' | 'invalid'>('idle')
   const [assistantOpen, setAssistantOpen] = useState(false)
   const [assistantQuery, setAssistantQuery] = useState('')
+  const [assistantLoading, setAssistantLoading] = useState(false)
+  const [assistantError, setAssistantError] = useState<string | null>(null)
+  const [assistantMessages, setAssistantMessages] = useState<Array<{ role: 'assistant' | 'user'; content: string }>>([
+    {
+      role: 'assistant',
+      content:
+        'Hi, I am KiloMarket Assistant. Ask me how to order, track deliveries, list products, or understand what KiloMarket does.',
+    },
+  ])
   const [heroVideoError, setHeroVideoError] = useState(false)
 
   useEffect(() => {
@@ -73,6 +83,47 @@ export function LandingPage() {
     const q = headerSearch.trim()
     navigate(q ? `/marketplace?q=${encodeURIComponent(q)}` : '/marketplace')
     setMobileMenuOpen(false)
+  }
+
+  async function sendAssistantMessage() {
+    const question = assistantQuery.trim()
+    if (!question || assistantLoading) return
+
+    const nextUserMessage = { role: 'user' as const, content: question }
+    const history = assistantMessages.slice(-6)
+    setAssistantQuery('')
+    setAssistantError(null)
+    setAssistantLoading(true)
+    setAssistantMessages((prev) => [...prev, nextUserMessage])
+
+    try {
+      const r = await fetch('/api/assistant/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: question,
+          history,
+        }),
+      })
+      const data = await r.json()
+      if (!r.ok || !data?.reply) {
+        throw new Error(data?.error || 'Assistant is unavailable right now.')
+      }
+
+      setAssistantMessages((prev) => [...prev, { role: 'assistant', content: data.reply as string }])
+    } catch (e: any) {
+      setAssistantError(e?.message || 'Assistant is unavailable right now.')
+      setAssistantMessages((prev) => [
+        ...prev,
+        {
+          role: 'assistant',
+          content:
+            'I am having trouble responding right now. Please try again, or visit Help Center / Contact for urgent support.',
+        },
+      ])
+    } finally {
+      setAssistantLoading(false)
+    }
   }
 
   function handleNewsletterSubmit(e: FormEvent) {
@@ -570,7 +621,7 @@ export function LandingPage() {
                   {!heroVideoError ? (
                     <video
                       className="w-full h-full object-cover"
-                      src="/hero.mp4"
+                      src={heroVideo}
                       autoPlay
                       muted
                       loop
@@ -1150,20 +1201,58 @@ export function LandingPage() {
             </div>
             <div className="p-3 space-y-2 text-sm text-stone-700">
               <p className="text-stone-500">Ask basic questions:</p>
-              <p className="rounded-lg bg-stone-50 p-2">"How do I place an order?"</p>
-              <p className="rounded-lg bg-stone-50 p-2">"What is KiloMarket for?"</p>
-              <input
-                value={assistantQuery}
-                onChange={(e) => setAssistantQuery(e.target.value)}
-                placeholder="Type your question..."
-                className="w-full rounded-lg border border-stone-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
-              />
+              <p className="rounded-lg bg-stone-50 p-2 text-xs">"How do I place an order?"</p>
+              <p className="rounded-lg bg-stone-50 p-2 text-xs">"How do I list my products as a farmer?"</p>
+
+              <div className="max-h-56 overflow-y-auto space-y-2 rounded-lg border border-stone-100 bg-stone-50/60 p-2">
+                {assistantMessages.map((m, i) => (
+                  <div
+                    key={`${m.role}-${i}`}
+                    className={`rounded-lg px-2.5 py-2 text-xs leading-relaxed ${
+                      m.role === 'user' ? 'bg-emerald-600 text-white ml-6' : 'bg-white text-stone-700 mr-6'
+                    }`}
+                  >
+                    {m.content}
+                  </div>
+                ))}
+                {assistantLoading && (
+                  <div className="rounded-lg px-2.5 py-2 text-xs bg-white text-stone-500 mr-6">
+                    Thinking...
+                  </div>
+                )}
+              </div>
+
+              {assistantError && (
+                <p className="text-xs text-red-600 bg-red-50 border border-red-200 rounded-md p-2">{assistantError}</p>
+              )}
+
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault()
+                  void sendAssistantMessage()
+                }}
+                className="flex items-center gap-2"
+              >
+                <input
+                  value={assistantQuery}
+                  onChange={(e) => setAssistantQuery(e.target.value)}
+                  placeholder="Type your question..."
+                  className="flex-1 rounded-lg border border-stone-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                />
+                <Button
+                  type="submit"
+                  size="sm"
+                  className="bg-emerald-600 hover:bg-emerald-700"
+                  disabled={assistantLoading || assistantQuery.trim().length === 0}
+                >
+                  Send
+                </Button>
+              </form>
+
               <div className="rounded-lg bg-emerald-50 p-2 text-emerald-800 text-xs">
-                {assistantQuery.toLowerCase().includes('what')
-                  ? 'KiloMarket connects farmers and buyers with easy payments, clear pricing, and delivery support.'
-                  : assistantQuery.toLowerCase().includes('order')
-                  ? 'Browse marketplace -> add to cart -> checkout -> track from Orders.'
-                  : 'Try asking about checkout, orders, seller listing, or delivery.'}
+                Quick links: <Link to="/marketplace" className="underline">Marketplace</Link> ·{' '}
+                <Link to="/orders" className="underline">Orders</Link> ·{' '}
+                <Link to="/listings/new" className="underline">List Product</Link>
               </div>
             </div>
           </div>
