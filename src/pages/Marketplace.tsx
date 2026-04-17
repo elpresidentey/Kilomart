@@ -68,7 +68,7 @@ export function Marketplace() {
 
   const categoryFromUrl = parseCategorySearchParam(searchParams.get('category'))
   useEffect(() => {
-    if (categoryFromUrl) setSelectedProduct(categoryFromUrl)
+    setSelectedProduct(categoryFromUrl ?? ALL_PRODUCTS)
   }, [categoryFromUrl])
 
   async function fetchListings() {
