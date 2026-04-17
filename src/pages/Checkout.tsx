@@ -1,13 +1,55 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { Layout } from '../components/Layout'
 import { Button } from '../components/ui'
 import { useAuth } from '../hooks/useAuth'
 import { supabase } from '../lib/supabase'
 import { useCartStore, cartUnitsCount } from '../stores/cartStore'
+import type { CartItem } from '../types'
 import { ArrowLeft, MapPin, Phone, User, CreditCard, Truck, CheckCircle } from 'lucide-react'
 import { repairText } from '../i18n/repairText'
 import { useI18n } from '../i18n/useI18n'
+
+const CHECKOUT_SNAPSHOT_KEY = 'farmersmarket_checkout_snapshot'
+
+type DeliveryInfo = {
+  fullName: string
+  phone: string
+  address: string
+  city: string
+  state: string
+}
+
+type CheckoutSnapshot = {
+  cart: CartItem[]
+  deliveryInfo: DeliveryInfo
+  paymentMethod: 'cash_on_delivery' | 'bank_transfer' | 'paystack'
+  totalAmount: number
+  deliveryFee: number
+  finalTotal: number
+  createdAt: string
+}
+
+function readCheckoutSnapshot(): CheckoutSnapshot | null {
+  if (typeof window === 'undefined') return null
+  try {
+    const raw = sessionStorage.getItem(CHECKOUT_SNAPSHOT_KEY)
+    if (!raw) return null
+    return JSON.parse(raw) as CheckoutSnapshot
+  } catch {
+    return null
+  }
+}
+
+function writeCheckoutSnapshot(snapshot: CheckoutSnapshot) {
+  if (typeof window === 'undefined') return
+  sessionStorage.setItem(CHECKOUT_SNAPSHOT_KEY, JSON.stringify(snapshot))
+}
+
+function clearCheckoutSnapshot() {
+  if (typeof window === 'undefined') return
+  sessionStorage.removeItem(CHECKOUT_SNAPSHOT_KEY)
+}
 
 export function Checkout() {
   const navigate = useNavigate()
@@ -19,11 +61,12 @@ export function Checkout() {
   const [loading, setLoading] = useState(false)
   const [orderComplete, setOrderComplete] = useState(false)
   const [orderNumber, setOrderNumber] = useState('')
+  const [snapshot, setSnapshot] = useState<CheckoutSnapshot | null>(() => readCheckoutSnapshot())
   
   const [error, setError] = useState<string | null>(null)
   const [paymentMethod, setPaymentMethod] = useState<'cash_on_delivery' | 'bank_transfer' | 'paystack'>('cash_on_delivery')
 
-  const [deliveryInfo, setDeliveryInfo] = useState({
+  const [deliveryInfo, setDeliveryInfo] = useState<DeliveryInfo>({
     fullName: '',
     phone: '',
     address: '',
@@ -124,29 +167,69 @@ export function Checkout() {
           : 'No account email found. Please sign out and sign in again.',
     )
 
-  const deliveryPayload = useMemo(
-    () => ({
-      address: deliveryInfo.address,
-      city: deliveryInfo.city,
-      state: deliveryInfo.state,
-      phone: deliveryInfo.phone,
-      contact_name: deliveryInfo.fullName,
-    }),
-    [deliveryInfo]
-  )
+  const checkoutCart = snapshot?.paymentMethod === 'paystack' && cart.length === 0 ? snapshot.cart : cart
+  const checkoutSubtotal =
+    snapshot?.paymentMethod === 'paystack' && cart.length === 0 ? snapshot.totalAmount : totalAmount
+  const checkoutDeliveryFee =
+    snapshot?.paymentMethod === 'paystack' && cart.length === 0 ? snapshot.deliveryFee : deliveryFee
+  const checkoutFinalTotal =
+    snapshot?.paymentMethod === 'paystack' && cart.length === 0 ? snapshot.finalTotal : finalTotal
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setDeliveryInfo({ ...deliveryInfo, [e.target.name]: e.target.value })
   }
 
-  const createOrdersAndPayments = async (providerReference?: string) => {
+  const createOrdersAndPayments = async (
+    items: CartItem[],
+    currentDeliveryInfo: DeliveryInfo,
+    currentPaymentMethod: 'cash_on_delivery' | 'bank_transfer' | 'paystack',
+    providerReference?: string
+  ) => {
     if (!user) throw new Error(copy.loginToOrder)
+    if (providerReference) {
+      const { data: existingPayments, error: existingPaymentsError } = await supabase
+        .from('payments')
+        .select('order_id')
+        .eq('payer_id', user.id)
+        .eq('provider_reference', providerReference)
+        .limit(1)
+
+      if (existingPaymentsError) {
+        console.warn('Could not query existing payment records:', existingPaymentsError)
+      }
+
+      const existingOrderId = existingPaymentsError ? null : existingPayments?.[0]?.order_id
+      if (existingOrderId) {
+        const { data: existingOrder, error: existingOrderError } = await supabase
+          .from('orders')
+          .select('order_number')
+          .eq('id', existingOrderId)
+          .maybeSingle()
+
+        if (existingOrderError) throw existingOrderError
+
+        setOrderNumber(existingOrder?.order_number || '')
+        setOrderComplete(true)
+        clearCart()
+        clearCheckoutSnapshot()
+        setSnapshot(null)
+        return
+      }
+    }
+
+    const currentDeliveryPayload = {
+      address: currentDeliveryInfo.address,
+      city: currentDeliveryInfo.city,
+      state: currentDeliveryInfo.state,
+      phone: currentDeliveryInfo.phone,
+      contact_name: currentDeliveryInfo.fullName,
+    }
     const orderNumbers: string[] = []
 
-    for (const item of cart) {
+    for (const item of items) {
       const orderNumber = 'ORD-' + Date.now() + '-' + Math.random().toString(36).substring(2, 8).toUpperCase()
       const itemTotal = item.price * item.quantity
-      const lineTotal = itemTotal + deliveryFee / cart.length
+      const lineTotal = itemTotal + checkoutDeliveryFee / items.length
 
       const { data: orderRow, error: orderError } = await supabase
         .from('orders')
@@ -158,10 +241,10 @@ export function Checkout() {
           quantity_kg: item.quantity,
           price_per_kg: item.price,
           subtotal: itemTotal,
-          delivery_fee: deliveryFee / cart.length,
+          delivery_fee: checkoutDeliveryFee / items.length,
           total_amount: lineTotal,
-          delivery_address: deliveryPayload,
-          status: paymentMethod === 'paystack' ? 'paid' : 'pending',
+          delivery_address: currentDeliveryPayload,
+          status: currentPaymentMethod === 'paystack' ? 'paid' : 'pending',
         })
         .select('id')
         .single()
@@ -174,10 +257,10 @@ export function Checkout() {
         payee_id: item.seller_id,
         amount: lineTotal,
         currency: 'NGN',
-        payment_method: paymentMethod,
-        provider: paymentMethod === 'paystack' ? 'paystack' : null,
+        payment_method: currentPaymentMethod,
+        provider: currentPaymentMethod === 'paystack' ? 'paystack' : null,
         provider_reference: providerReference || null,
-        status: paymentMethod === 'paystack' ? 'completed' : 'pending',
+        status: currentPaymentMethod === 'paystack' ? 'completed' : 'pending',
       })
 
       if (paymentError) {
@@ -190,11 +273,15 @@ export function Checkout() {
     setOrderNumber(orderNumbers[0])
     setOrderComplete(true)
     clearCart()
+    clearCheckoutSnapshot()
+    setSnapshot(null)
   }
 
   useEffect(() => {
     const reference = searchParams.get('reference') || searchParams.get('trxref')
-    if (!reference || authLoading || !user || cart.length === 0) return
+    const snapshotData = readCheckoutSnapshot()
+    if (!reference || authLoading || !user) return
+    if (cart.length === 0 && !snapshotData?.cart?.length) return
 
     const marker = `paystack_verified_${reference}`
     if (sessionStorage.getItem(marker) === '1') return
@@ -209,7 +296,10 @@ export function Checkout() {
         if (!r.ok) throw new Error(data?.error || copy.verifyPayment)
         if (!data || data.status !== 'success') throw new Error(copy.payNotSuccessful)
 
-        await createOrdersAndPayments(reference)
+        const itemsToCreate = cart.length > 0 ? cart : snapshotData?.cart || []
+        const deliveryInfoToUse = snapshotData?.deliveryInfo || deliveryInfo
+        const paymentMethodToUse = snapshotData?.paymentMethod || paymentMethod
+        await createOrdersAndPayments(itemsToCreate, deliveryInfoToUse, paymentMethodToUse, reference)
         sessionStorage.setItem(marker, '1')
         setSearchParams({}, { replace: true })
       } catch (e: any) {
@@ -252,6 +342,17 @@ export function Checkout() {
         }
 
         const callbackUrl = callbackBase ? `${callbackBase}/checkout` : '/checkout'
+        const nextSnapshot: CheckoutSnapshot = {
+          cart,
+          deliveryInfo,
+          paymentMethod,
+          totalAmount,
+          deliveryFee,
+          finalTotal,
+          createdAt: new Date().toISOString(),
+        }
+        writeCheckoutSnapshot(nextSnapshot)
+        setSnapshot(nextSnapshot)
         const resp = await fetch(initializeUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -278,7 +379,7 @@ export function Checkout() {
         return
       }
 
-      await createOrdersAndPayments()
+      await createOrdersAndPayments(cart, deliveryInfo, paymentMethod)
     } catch (error: any) {
       console.error('Order failed:', error)
       setError(error?.message || error?.error_description || copy.orderFailed)
@@ -287,7 +388,7 @@ export function Checkout() {
     }
   }
 
-  if (cart.length === 0 && !orderComplete) {
+  if (checkoutCart.length === 0 && !orderComplete) {
     return (
       <Layout cartItemCount={0}>
         <div className="max-w-2xl mx-auto py-16 text-center">
@@ -328,7 +429,7 @@ export function Checkout() {
   }
 
   return (
-    <Layout cartItemCount={cartUnitsCount(cart)}>
+    <Layout cartItemCount={cartUnitsCount(checkoutCart)}>
       <div className="max-w-4xl mx-auto py-8">
         <button
           onClick={() => navigate('/marketplace')}
@@ -498,7 +599,7 @@ export function Checkout() {
               </div>
 
               <div className="space-y-4 mb-6">
-                {cart.map((item) => (
+                {checkoutCart.map((item) => (
                   <div key={item.id} className="flex justify-between items-center py-3 border-b border-stone-100">
                     <div>
                       <p className="font-medium text-stone-900">{item.name}</p>
@@ -514,18 +615,18 @@ export function Checkout() {
               <div className="space-y-3 border-t border-stone-200 pt-4">
                 <div className="flex justify-between text-stone-600">
                   <span>{t('checkout.subtotal')}</span>
-                  <span>N{totalAmount.toLocaleString()}</span>
+                  <span>N{checkoutSubtotal.toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between text-stone-600">
                   <span className="flex items-center gap-2">
                     <Truck className="w-4 h-4" />
                     {t('checkout.deliveryFee')}
                   </span>
-                  <span>N{deliveryFee.toLocaleString()}</span>
+                  <span>N{checkoutDeliveryFee.toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between text-lg font-bold text-stone-900 pt-3 border-t border-stone-200">
                   <span>{t('checkout.total')}</span>
-                  <span>N{finalTotal.toLocaleString()}</span>
+                  <span>N{checkoutFinalTotal.toLocaleString()}</span>
                 </div>
               </div>
 
@@ -548,7 +649,7 @@ export function Checkout() {
                   ? t('checkout.processing')
                   : authLoading
                     ? t('checkout.checkingLogin')
-                    : `${t('checkout.placeOrder')} - N${finalTotal.toLocaleString()}`}
+                    : `${t('checkout.placeOrder')} - N${checkoutFinalTotal.toLocaleString()}`}
               </Button>
 
               <p className="text-xs text-stone-500 text-center mt-4">

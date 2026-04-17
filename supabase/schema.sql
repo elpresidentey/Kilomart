@@ -348,6 +348,23 @@ create policy "Sellers can update order status"
   to authenticated
   using (seller_id = auth.uid());
 
+create policy "Users can view payments they are party to"
+  on payments for select
+  to authenticated
+  using (payer_id = auth.uid() or payee_id = auth.uid());
+
+create policy "Buyers can create payments for their orders"
+  on payments for insert
+  to authenticated
+  with check (
+    payer_id = auth.uid()
+    and exists (
+      select 1 from orders o
+      where o.id = order_id
+      and o.buyer_id = auth.uid()
+    )
+  );
+
 -- Reviews policies
 create policy "Anyone can view approved reviews"
   on reviews for select
