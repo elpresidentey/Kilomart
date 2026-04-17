@@ -281,7 +281,7 @@ create policy "Users can view own profile"
 create policy "Admins can view all profiles"
   on users for select
   to authenticated
-  using (exists (select 1 from users where id = auth.uid() and role = 'admin'));
+  using (coalesce(auth.jwt() -> 'user_metadata' ->> 'role', '') = 'admin');
 
 create policy "Users can update own profile"
   on users for update
@@ -292,8 +292,8 @@ create policy "Users can update own profile"
 create policy "Admins can manage profiles"
   on users for all
   to authenticated
-  using (exists (select 1 from users where id = auth.uid() and role = 'admin'))
-  with check (exists (select 1 from users where id = auth.uid() and role = 'admin'));
+  using (coalesce(auth.jwt() -> 'user_metadata' ->> 'role', '') = 'admin')
+  with check (coalesce(auth.jwt() -> 'user_metadata' ->> 'role', '') = 'admin');
 
 -- Categories policies
 create policy "Anyone can view active categories"
