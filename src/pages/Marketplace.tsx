@@ -106,8 +106,10 @@ export function Marketplace() {
       selectedProduct === ALL_PRODUCTS ||
       (cat != null && cat === selectedProduct) ||
       listing.product_name.toLowerCase().includes(selectedProduct.toLowerCase())
+    const normalizedLocation = listing.location.toLowerCase()
     const matchesLocation =
-      selectedLocation === ALL_LOCATIONS || listing.location === selectedLocation
+      selectedLocation === ALL_LOCATIONS ||
+      normalizedLocation.includes(selectedLocation.toLowerCase())
     const matchesGrade =
       selectedGrade === 'all' || listing.quality_grade === selectedGrade
 
