@@ -2,10 +2,10 @@ import type { ReactNode } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { cn } from '../lib/utils'
+import { useI18n } from '../i18n/useI18n'
 import { PageTransition } from './PageTransition'
 import { Button } from './ui/Button'
 import {
-  Leaf,
   Store,
   Package,
   User,
@@ -20,10 +20,12 @@ import {
   LayoutDashboard,
   ClipboardList,
   ChevronDown,
+  Globe,
 } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { useCartStore, cartUnitsCount } from '../stores/cartStore'
 import { canAccessBuyerOrders } from '../lib/roles'
+import type { Language } from '../i18n/strings'
 
 interface LayoutProps {
   children: ReactNode
@@ -34,6 +36,11 @@ export function Layout({ children, cartItemCount }: LayoutProps) {
   const storeCartCount = useCartStore((s) => cartUnitsCount(s.cart))
   const resolvedCartCount = cartItemCount ?? storeCartCount
   const { user, signOut } = useAuth()
+  const { language, setLanguage, t } = useI18n()
+  function parseLanguage(raw: string): Language {
+    if (raw === 'en' || raw === 'ha' || raw === 'yo' || raw === 'ig') return raw
+    return 'en'
+  }
   const location = useLocation()
   const navigate = useNavigate()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -78,26 +85,26 @@ export function Layout({ children, cartItemCount }: LayoutProps) {
   const navigation = user
     ? user.role === 'farmer'
       ? [
-          { name: 'Home', href: '/', icon: Home },
-          { name: 'Dashboard', href: '/dashboard', icon: Store },
-          { name: 'My Listings', href: '/listings', icon: Package },
-          { name: 'Orders', href: '/farmer/orders', icon: ClipboardList },
-          { name: 'Profile', href: '/profile', icon: User },
+          { name: t('nav.home'), href: '/', icon: Home },
+          { name: t('nav.dashboard'), href: '/dashboard', icon: Store },
+          { name: t('nav.myListings'), href: '/listings', icon: Package },
+          { name: t('nav.orders'), href: '/farmer/orders', icon: ClipboardList },
+          { name: t('nav.profile'), href: '/profile', icon: User },
         ]
       : [
-          { name: 'Home', href: '/', icon: Home },
-          { name: 'Marketplace', href: '/marketplace', icon: Store },
+          { name: t('nav.home'), href: '/', icon: Home },
+          { name: t('nav.marketplace'), href: '/marketplace', icon: Store },
           ...(user.role === 'buyer'
-            ? [{ name: 'Dashboard', href: '/buyer', icon: LayoutDashboard }]
+            ? [{ name: t('nav.dashboard'), href: '/buyer', icon: LayoutDashboard }]
             : []),
           ...(canAccessBuyerOrders(user.role)
-            ? [{ name: 'Orders', href: '/orders', icon: Package }]
+            ? [{ name: t('nav.orders'), href: '/orders', icon: Package }]
             : []),
-          { name: 'Profile', href: '/profile', icon: User },
+          { name: t('nav.profile'), href: '/profile', icon: User },
         ]
     : [
-        { name: 'Home', href: '/', icon: Home },
-        { name: 'Marketplace', href: '/marketplace', icon: Store },
+        { name: t('nav.home'), href: '/', icon: Home },
+        { name: t('nav.marketplace'), href: '/marketplace', icon: Store },
       ]
 
   const submitHeaderSearch = (e: React.FormEvent) => {
@@ -124,15 +131,28 @@ export function Layout({ children, cartItemCount }: LayoutProps) {
             <div className="flex items-center gap-6">
               <span className="flex items-center gap-1.5">
                 <Phone className="w-3.5 h-3.5" />
-                +234 800 123 4567
+                {t('topbar.contactPhone')}
               </span>
               <span className="flex items-center gap-1.5">
                 <MapPin className="w-3.5 h-3.5" />
-                Lagos, Nigeria
+                {t('topbar.location')}
               </span>
             </div>
             <div className="flex items-center gap-4">
-              <span>Free delivery on orders over ₦50,000</span>
+              <span>{t('topbar.freeDelivery')}</span>
+              <label className="inline-flex items-center gap-2 text-stone-300">
+                <Globe className="w-3.5 h-3.5" />
+                <select
+                  value={language}
+                  onChange={(e) => setLanguage(parseLanguage(e.target.value))}
+                  className="bg-stone-900 border border-stone-700 rounded px-2 py-1 text-xs text-stone-100"
+                >
+                  <option value="en">English</option>
+                  <option value="ha">Hausa</option>
+                  <option value="yo">Yoruba</option>
+                  <option value="ig">Igbo</option>
+                </select>
+              </label>
             </div>
           </div>
         </div>
@@ -144,17 +164,13 @@ export function Layout({ children, cartItemCount }: LayoutProps) {
               {/* Logo */}
               <Link
                 to="/"
-                className="flex items-center gap-2 lg:gap-3 rounded-xl tap-highlight-none motion-safe:transition-transform motion-safe:duration-200 motion-safe:active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
+                className="flex items-center gap-2 lg:gap-3 rounded-xl tap-highlight-none motion-safe:transition-transform motion-safe:duration-200 motion-safe:active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
               >
-                <div className="w-10 h-10 lg:w-12 lg:h-12 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/20 motion-safe:transition-transform motion-safe:duration-200 motion-safe:hover:scale-105 motion-safe:hover:rotate-[-2deg]">
-                  <Leaf className="w-5 h-5 lg:w-6 lg:h-6 text-white" />
-                </div>
-                <div className="hidden sm:block">
-                  <span className="text-xl lg:text-2xl font-bold text-stone-900">
-                    Kilo<span className="text-emerald-600">Market</span>
-                  </span>
-                  <p className="text-xs text-stone-500 hidden lg:block">Farm Fresh • Fair Prices</p>
-                </div>
+                <img
+                  src="/logo-farmers-market.png"
+                  alt="Farmers Market logo"
+                  className="h-11 w-auto sm:h-12 lg:h-14"
+                />
               </Link>
 
               {/* Search Bar - Desktop */}
@@ -167,8 +183,8 @@ export function Layout({ children, cartItemCount }: LayoutProps) {
                     type="search"
                     value={headerSearch}
                     onChange={(e) => setHeaderSearch(e.target.value)}
-                    placeholder="Search for rice, vegetables, fruits..."
-                    className="w-full pl-10 pr-4 py-2.5 bg-stone-50 border border-stone-200 rounded-full text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/80 focus-visible:border-emerald-200/50 transition-all duration-200"
+                    placeholder={t('search.placeholder')}
+                    className="w-full pl-10 pr-4 py-2.5 bg-stone-50 border border-stone-200 rounded-full text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/80 focus-visible:border-primary-200/50 transition-all duration-200"
                   />
                   <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400 pointer-events-none" />
                 </div>
@@ -188,9 +204,9 @@ export function Layout({ children, cartItemCount }: LayoutProps) {
                         className={cn(
                           'relative flex items-center gap-1 px-2.5 lg:px-3 py-1.5 rounded-lg text-sm font-medium tap-highlight-none',
                           'motion-safe:transition-all motion-safe:duration-200 motion-safe:active:scale-[0.98]',
-                          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2',
+                          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2',
                           isActive(item.href)
-                            ? 'bg-emerald-50 text-emerald-700 shadow-sm'
+                            ? 'bg-primary-50 text-primary-700 shadow-sm'
                             : 'text-stone-600 hover:bg-stone-50 hover:text-stone-900'
                         )}
                       >
@@ -219,9 +235,9 @@ export function Layout({ children, cartItemCount }: LayoutProps) {
                         className={cn(
                           'relative flex items-center gap-1 px-2.5 lg:px-3 py-1.5 rounded-lg text-sm font-medium tap-highlight-none',
                           'motion-safe:transition-all motion-safe:duration-200 motion-safe:active:scale-[0.98]',
-                          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2',
+                          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2',
                           activeOrders
-                            ? 'bg-emerald-50 text-emerald-700 shadow-sm'
+                            ? 'bg-primary-50 text-primary-700 shadow-sm'
                             : 'text-stone-600 hover:bg-stone-50 hover:text-stone-900'
                         )}
                       >
@@ -231,7 +247,7 @@ export function Layout({ children, cartItemCount }: LayoutProps) {
                             activeOrders && 'motion-safe:scale-110'
                           )}
                         />
-                        Orders
+                        {t('nav.ordersDropdown')}
                         <ChevronDown
                           className={cn(
                             'w-4 h-4 ml-0.5 motion-safe:transition-transform motion-safe:duration-200',
@@ -252,7 +268,7 @@ export function Layout({ children, cartItemCount }: LayoutProps) {
                             onClick={() => setOrdersMenuOpen(false)}
                           >
                             <Package className="w-4 h-4" />
-                            My Orders
+                            {t('nav.myOrders')}
                           </Link>
                           <Link
                             to="/orders?status=pending"
@@ -261,7 +277,7 @@ export function Layout({ children, cartItemCount }: LayoutProps) {
                             onClick={() => setOrdersMenuOpen(false)}
                           >
                             <ClipboardList className="w-4 h-4" />
-                            Pending Orders
+                            {t('nav.pendingOrders')}
                           </Link>
                         </div>
                       )}
@@ -287,11 +303,11 @@ export function Layout({ children, cartItemCount }: LayoutProps) {
                 {/* Cart - visible to all users */}
                 <Link
                   to="/cart"
-                  className="relative p-2 rounded-lg text-stone-600 hover:text-emerald-600 motion-safe:transition-colors motion-safe:duration-200 hover:bg-stone-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 tap-highlight-none"
+                  className="relative p-2 rounded-lg text-stone-600 hover:text-primary-600 motion-safe:transition-colors motion-safe:duration-200 hover:bg-stone-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 tap-highlight-none"
                 >
                   <ShoppingCart className="w-5 h-5 lg:w-6 lg:h-6" />
                   {resolvedCartCount > 0 && (
-                    <span className="absolute -top-1 -right-1 min-w-[1.25rem] h-5 px-1 bg-emerald-600 text-white text-xs font-bold rounded-full flex items-center justify-center shadow-md ring-2 ring-white motion-safe:transition-transform motion-safe:duration-200">
+                    <span className="absolute -top-1 -right-1 min-w-[1.25rem] h-5 px-1 bg-primary-600 text-white text-xs font-bold rounded-full flex items-center justify-center shadow-md ring-2 ring-white motion-safe:transition-transform motion-safe:duration-200">
                       {resolvedCartCount > 9 ? '9+' : resolvedCartCount}
                     </span>
                   )}
@@ -300,9 +316,9 @@ export function Layout({ children, cartItemCount }: LayoutProps) {
                 {user ? (
                   <>
                     <div className="hidden sm:flex items-center gap-3 pl-2 lg:pl-4 border-l border-stone-200">
-                      <Link to="/profile" className="flex items-center gap-2 text-stone-600 hover:text-emerald-600 transition-colors">
-                        <div className="w-9 h-9 rounded-full bg-gradient-to-br from-emerald-100 to-emerald-50 flex items-center justify-center border border-emerald-200">
-                          <User className="w-4 h-4 text-emerald-700" />
+                      <Link to="/profile" className="flex items-center gap-2 text-stone-600 hover:text-primary-600 transition-colors">
+                        <div className="w-9 h-9 rounded-full bg-gradient-to-br from-primary-100 to-primary-50 flex items-center justify-center border border-primary-200">
+                          <User className="w-4 h-4 text-primary-700" />
                         </div>
                         <span className="font-medium text-sm hidden lg:block">{user.full_name?.split(' ')[0]}</span>
                       </Link>
@@ -322,12 +338,12 @@ export function Layout({ children, cartItemCount }: LayoutProps) {
                   <div className="hidden md:flex items-center gap-2">
                     <Link to="/login">
                       <Button variant="ghost" size="sm" className="text-stone-600">
-                        Sign In
+                        {t('nav.signIn')}
                       </Button>
                     </Link>
                     <Link to="/signup">
-                      <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700 text-white">
-                        Get Started
+                      <Button size="sm" className="bg-primary-600 hover:bg-primary-700 text-white">
+                        {t('nav.getStarted')}
                       </Button>
                     </Link>
                   </div>
@@ -338,7 +354,7 @@ export function Layout({ children, cartItemCount }: LayoutProps) {
                   type="button"
                   aria-expanded={mobileMenuOpen}
                   aria-controls="mobile-nav"
-                  className="md:hidden p-2 rounded-lg text-stone-600 hover:bg-stone-100 motion-safe:transition-colors tap-highlight-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
+                  className="md:hidden p-2 rounded-lg text-stone-600 hover:bg-stone-100 motion-safe:transition-colors tap-highlight-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
                   onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                 >
                   <span className="relative block w-6 h-6">
@@ -379,13 +395,30 @@ export function Layout({ children, cartItemCount }: LayoutProps) {
                   type="search"
                   value={headerSearch}
                   onChange={(e) => setHeaderSearch(e.target.value)}
-                  placeholder="Search products..."
+                  placeholder={t('search.placeholderMobile')}
                   ref={mobileSearchRef}
-                  className="w-full pl-10 pr-4 py-3 bg-stone-50 border border-stone-200 rounded-lg text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/80 transition-all duration-200"
+                  className="w-full pl-10 pr-4 py-3 bg-stone-50 border border-stone-200 rounded-lg text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/80 transition-all duration-200"
                 />
                 <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400 pointer-events-none" />
               </div>
             </form>
+
+            <div className="px-4 py-3 border-b border-stone-100">
+              <label className="flex items-center gap-3 rounded-xl bg-stone-50 px-4 py-3 text-sm text-stone-700">
+                <Globe className="w-5 h-5 text-primary-600 shrink-0" />
+                <span className="font-medium">{t('topbar.language')}</span>
+                <select
+                  value={language}
+                  onChange={(e) => setLanguage(parseLanguage(e.target.value))}
+                  className="ml-auto min-w-0 flex-1 max-w-[10rem] rounded-lg border border-stone-200 bg-white px-3 py-2 text-sm text-stone-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/80"
+                >
+                  <option value="en">English</option>
+                  <option value="ha">Hausa</option>
+                  <option value="yo">Yoruba</option>
+                  <option value="ig">Igbo</option>
+                </select>
+              </label>
+            </div>
 
             <nav className="px-4 py-3 space-y-1">
               {navigation.map((item) => {
@@ -401,7 +434,7 @@ export function Layout({ children, cartItemCount }: LayoutProps) {
                         'flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium tap-highlight-none',
                         'motion-safe:transition-all motion-safe:duration-200 motion-safe:active:scale-[0.99]',
                         isActive(item.href)
-                          ? 'bg-emerald-50 text-emerald-700'
+                          ? 'bg-primary-50 text-primary-700'
                           : 'text-stone-600 hover:bg-stone-50'
                       )}
                       onClick={() => setMobileMenuOpen(false)}
@@ -422,12 +455,12 @@ export function Layout({ children, cartItemCount }: LayoutProps) {
                       className={cn(
                         'flex w-full items-center justify-between gap-3 px-4 py-3 rounded-xl text-sm font-medium tap-highlight-none',
                         'motion-safe:transition-all motion-safe:duration-200 motion-safe:active:scale-[0.99]',
-                        activeOrders ? 'bg-emerald-50 text-emerald-700' : 'text-stone-600 hover:bg-stone-50'
+                        activeOrders ? 'bg-primary-50 text-primary-700' : 'text-stone-600 hover:bg-stone-50'
                       )}
                     >
                       <span className="flex items-center gap-3">
                         <Package className="w-5 h-5" />
-                        Orders
+                        {t('nav.ordersDropdown')}
                       </span>
                       <ChevronDown
                         className={cn(
@@ -444,14 +477,14 @@ export function Layout({ children, cartItemCount }: LayoutProps) {
                           className="block px-4 py-2 rounded-lg text-sm text-stone-600 hover:bg-stone-50"
                           onClick={() => setMobileMenuOpen(false)}
                         >
-                          My Orders
+                          {t('nav.myOrders')}
                         </Link>
                         <Link
                           to="/orders?status=pending"
                           className="block px-4 py-2 rounded-lg text-sm text-stone-600 hover:bg-stone-50"
                           onClick={() => setMobileMenuOpen(false)}
                         >
-                          Pending Orders
+                          {t('nav.pendingOrders')}
                         </Link>
                       </div>
                     )}
@@ -462,12 +495,12 @@ export function Layout({ children, cartItemCount }: LayoutProps) {
                 <div className="pt-3 border-t border-stone-100 space-y-2">
                   <Link to="/login" onClick={() => setMobileMenuOpen(false)}>
                     <Button variant="outline" className="w-full justify-center">
-                      Sign In
+                      {t('nav.signIn')}
                     </Button>
                   </Link>
                   <Link to="/signup" onClick={() => setMobileMenuOpen(false)}>
-                    <Button className="w-full justify-center bg-emerald-600 hover:bg-emerald-700">
-                      Get Started
+                    <Button className="w-full justify-center bg-primary-600 hover:bg-primary-700">
+                      {t('nav.getStarted')}
                     </Button>
                   </Link>
                 </div>
@@ -482,7 +515,7 @@ export function Layout({ children, cartItemCount }: LayoutProps) {
                   className="flex w-full items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-stone-600 hover:bg-stone-50 motion-safe:transition-colors"
                 >
                   <LogOut className="w-5 h-5" />
-                  Sign Out
+                  {t('nav.signOut')}
                 </button>
               )}
             </nav>

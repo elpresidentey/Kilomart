@@ -1,10 +1,10 @@
-# KiloMarket - Agricultural Marketplace Platform
+# Farmers Market - Agricultural Marketplace Platform
 
 A digital platform that connects farmers, wholesalers, retailers, and consumers through a standardized per-kilogram marketplace, supported by storage and logistics infrastructure.
 
 ## Features
 
-- **Standardized Pricing**: All produce listed with per-kilogram (₦/kg) pricing
+- **Standardized Pricing**: All produce listed with per-kilogram (â‚¦/kg) pricing
 - **Farmer Dashboard**: Manage inventory, create listings, track earnings
 - **Buyer Marketplace**: Browse, filter, and purchase produce
 - **Order Management**: Track orders from purchase to delivery
@@ -23,26 +23,26 @@ A digital platform that connects farmers, wholesalers, retailers, and consumers 
 
 ```
 src/
-├── components/       # React components
-│   ├── ui/          # Reusable UI components (Button, Card, Input, Badge)
-│   ├── Layout.tsx   # Navigation layout
-│   └── ProduceCard.tsx
-├── pages/           # Page components
-│   ├── Login.tsx
-│   ├── Signup.tsx
-│   ├── Marketplace.tsx
-│   ├── FarmerDashboard.tsx
-│   ├── BuyerOrders.tsx
-│   └── CreateListing.tsx
-├── hooks/           # Custom React hooks
-│   └── useAuth.ts   # Authentication hook
-├── lib/             # Utility functions
-│   ├── supabase.ts  # Supabase client
-│   └── utils.ts     # Helper functions
-├── types/           # TypeScript types
-│   └── index.ts
-├── App.tsx          # Main app with routing
-└── main.tsx         # Entry point
+â”œâ”€â”€ components/       # React components
+â”‚   â”œâ”€â”€ ui/          # Reusable UI components (Button, Card, Input, Badge)
+â”‚   â”œâ”€â”€ Layout.tsx   # Navigation layout
+â”‚   â””â”€â”€ ProduceCard.tsx
+â”œâ”€â”€ pages/           # Page components
+â”‚   â”œâ”€â”€ Login.tsx
+â”‚   â”œâ”€â”€ Signup.tsx
+â”‚   â”œâ”€â”€ Marketplace.tsx
+â”‚   â”œâ”€â”€ FarmerDashboard.tsx
+â”‚   â”œâ”€â”€ BuyerOrders.tsx
+â”‚   â””â”€â”€ CreateListing.tsx
+â”œâ”€â”€ hooks/           # Custom React hooks
+â”‚   â””â”€â”€ useAuth.ts   # Authentication hook
+â”œâ”€â”€ lib/             # Utility functions
+â”‚   â”œâ”€â”€ supabase.ts  # Supabase client
+â”‚   â””â”€â”€ utils.ts     # Helper functions
+â”œâ”€â”€ types/           # TypeScript types
+â”‚   â””â”€â”€ index.ts
+â”œâ”€â”€ App.tsx          # Main app with routing
+â””â”€â”€ main.tsx         # Entry point
 ```
 
 ## Getting Started
@@ -58,7 +58,7 @@ src/
 1. Clone the repository:
 ```bash
 git clone <repository-url>
-cd kilomarket
+cd project-folder
 ```
 
 2. Install dependencies:

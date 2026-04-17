@@ -1,5 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Cabin:wght@400;500;600;700&family=Cabin+Condensed:wght@500;600;700&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -7,6 +5,7 @@
 @layer base {
   html {
     @apply motion-safe:scroll-smooth;
+    font-family: "Segoe UI", system-ui, Roboto, Helvetica, Arial, sans-serif;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -16,8 +15,15 @@
     @apply font-sans bg-stone-50 text-stone-900 leading-relaxed;
   }
 
+  button,
+  input,
+  select,
+  textarea {
+    font: inherit;
+  }
+
   ::selection {
-    @apply bg-emerald-200/80 text-emerald-950;
+    @apply bg-primary-200/80 text-primary-950;
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -52,7 +58,7 @@
   }
 
   .link-emerald {
-    @apply text-emerald-700 underline-offset-2 transition-colors duration-200 hover:text-emerald-800 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 rounded-sm;
+    @apply text-primary-700 underline-offset-2 transition-colors duration-200 hover:text-primary-800 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 rounded-sm;
   }
 
   .tap-highlight-none {

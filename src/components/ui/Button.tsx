@@ -1,6 +1,7 @@
 import { cn } from '../../lib/utils'
 import type { ButtonHTMLAttributes, ReactNode } from 'react'
 import { forwardRef } from 'react'
+import { useI18n } from '../../i18n/useI18n'
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger'
@@ -11,6 +12,7 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant = 'primary', size = 'md', isLoading, children, disabled, ...props }, ref) => {
+    const { t } = useI18n()
     const variants: Record<string, string> = {
       primary:
         'bg-primary-700 text-white hover:bg-primary-800 focus-visible:ring-primary-500 shadow-sm hover:shadow-md motion-safe:hover:-translate-y-px',
@@ -65,7 +67,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
                 d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
               />
             </svg>
-            Loading...
+            {t('button.loading')}
           </>
         ) : (
           children

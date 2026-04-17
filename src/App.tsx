@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { AuthProvider, useAuth } from './hooks/useAuth'
 import { LandingPage } from './pages/LandingPage'
+import { I18nProvider } from './i18n/I18nProvider'
 import { Marketplace } from './pages/Marketplace'
 import { Login } from './pages/Login'
 import { AuthCallback } from './pages/AuthCallback'
@@ -12,6 +13,7 @@ import { BuyerDashboard } from './pages/BuyerDashboard'
 import { BuyerOrders } from './pages/BuyerOrders'
 import { ListingDetail } from './pages/ListingDetail'
 import { CreateListing } from './pages/CreateListing'
+import { EditListing } from './pages/EditListing'
 import { Profile } from './pages/Profile'
 import { Checkout } from './pages/Checkout'
 import { useCart } from './hooks/useCart'
@@ -143,6 +145,14 @@ function AppRoutes() {
           }
         />
         <Route
+          path="/listings/:id/edit"
+          element={
+            <ProtectedRoute allowedRoles={['farmer']}>
+              <EditListing />
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="/listings"
           element={
             <ProtectedRoute allowedRoles={['farmer']}>
@@ -178,9 +188,11 @@ function AppRoutes() {
 function App() {
   return (
     <BrowserRouter>
-      <AuthProvider>
-        <AppRoutes />
-      </AuthProvider>
+      <I18nProvider>
+        <AuthProvider>
+          <AppRoutes />
+        </AuthProvider>
+      </I18nProvider>
     </BrowserRouter>
   )
 }

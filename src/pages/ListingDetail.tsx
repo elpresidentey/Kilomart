@@ -5,7 +5,8 @@ import { Button, Card, Badge } from '../components/ui'
 import { supabase } from '../lib/supabase'
 import type { CartItem, ProduceListing } from '../types'
 import { ArrowLeft, MapPin, Package, Minus, Plus, ShoppingCart, Check } from 'lucide-react'
-import { fallbackOnImageError, sanitizeImageUrl, FALLBACK_IMAGE_SRC } from '../lib/image'
+import { fallbackOnImageError, getProductImageSrc } from '../lib/image'
+import { useI18n } from '../i18n/useI18n'
 
 interface ListingDetailProps {
   onAddToCart: (item: CartItem) => void
@@ -13,6 +14,7 @@ interface ListingDetailProps {
 }
 
 export function ListingDetail({ onAddToCart, cartItemCount }: ListingDetailProps) {
+  const { language } = useI18n()
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const [listing, setListing] = useState<ProduceListing | null>(null)
@@ -20,6 +22,62 @@ export function ListingDetail({ onAddToCart, cartItemCount }: ListingDetailProps
   const [notFound, setNotFound] = useState(false)
   const [quantity, setQuantity] = useState(1)
   const [added, setAdded] = useState(false)
+  const copy =
+    language === 'ha'
+      ? {
+          notFoundTitle: 'Ba a sami kaya ba',
+          notFoundBody: 'Wata kila an cire wannan kaya ko ba ya samuwa yanzu.',
+          backToMarketplace: 'Koma kasuwa',
+          back: 'Baya',
+          perKg: '/kg',
+          minLabel: 'min',
+          quantity: 'Yawa (kg)',
+          total: 'Jimla',
+          added: 'An saka a kati',
+          add: 'Saka a kati',
+          viewCart: 'Duba kati',
+        }
+      : language === 'yo'
+        ? {
+            notFoundTitle: 'A ko ri akojopo yi',
+            notFoundBody: 'A le ti y? ?jà yi kuro tabi ko si m?.',
+            backToMarketplace: 'Pada si oja',
+            back: 'Pada',
+            perKg: '/kg',
+            minLabel: 'min',
+            quantity: 'Iye (kg)',
+            total: 'Lapapo',
+            added: 'Ti wa ninu kati',
+            add: 'Fi si kati',
+            viewCart: 'Wo kati',
+          }
+        : language === 'ig'
+          ? {
+              notFoundTitle: 'Ach?tagh? ndep?ta a',
+              notFoundBody: 'O nwere ike ?b? na ewep?r? ngwaah?a a ma ? b? na ? nagh? ad?.',
+              backToMarketplace: 'Laghachi n’ah?a',
+              back: 'Laa az?',
+              perKg: '/kg',
+              minLabel: 'min',
+              quantity: 'Onu ogugu (kg)',
+              total: 'Nchikota',
+              added: 'Etinyela na kati',
+              add: 'Tinye na kati',
+              viewCart: 'Lee kati',
+            }
+          : {
+              notFoundTitle: 'Listing not found',
+              notFoundBody: 'This product may have been removed or is no longer available.',
+              backToMarketplace: 'Back to marketplace',
+              back: 'Back',
+              perKg: '/kg',
+              minLabel: 'min',
+              quantity: 'Quantity (kg)',
+              total: 'Total',
+              added: 'Added to cart',
+              add: 'Add to cart',
+              viewCart: 'View cart',
+            }
 
   useEffect(() => {
     if (!id) {
@@ -77,7 +135,7 @@ export function ListingDetail({ onAddToCart, cartItemCount }: ListingDetailProps
     }).format(price)
 
   const qualityColors = {
-    A: { bg: 'bg-emerald-100', text: 'text-emerald-700', label: 'Grade A' },
+    A: { bg: 'bg-primary-100', text: 'text-primary-700', label: 'Grade A' },
     B: { bg: 'bg-blue-100', text: 'text-blue-700', label: 'Grade B' },
     C: { bg: 'bg-amber-100', text: 'text-amber-700', label: 'Grade C' },
     D: { bg: 'bg-stone-100', text: 'text-stone-700', label: 'Grade D' },
@@ -114,9 +172,9 @@ export function ListingDetail({ onAddToCart, cartItemCount }: ListingDetailProps
       <Layout cartItemCount={cartItemCount}>
         <div className="max-w-lg mx-auto py-16 text-center">
           <Package className="w-16 h-16 text-stone-300 mx-auto mb-4" />
-          <h1 className="text-xl font-bold text-stone-900 mb-2">Listing not found</h1>
-          <p className="text-stone-500 mb-6">This product may have been removed or is no longer available.</p>
-          <Button onClick={() => navigate('/marketplace')}>Back to marketplace</Button>
+          <h1 className="text-xl font-bold text-stone-900 mb-2">{copy.notFoundTitle}</h1>
+          <p className="text-stone-500 mb-6">{copy.notFoundBody}</p>
+          <Button onClick={() => navigate('/marketplace')}>{copy.backToMarketplace}</Button>
         </div>
       </Layout>
     )
@@ -135,21 +193,17 @@ export function ListingDetail({ onAddToCart, cartItemCount }: ListingDetailProps
           className="flex items-center gap-2 text-stone-600 hover:text-stone-900 mb-6 rounded-lg tap-highlight-none motion-safe:transition-colors motion-safe:active:scale-[0.98]"
         >
           <ArrowLeft className="w-4 h-4" />
-          Back
+          {copy.back}
         </button>
 
         <div className="grid md:grid-cols-2 gap-8 items-start">
           <div className="rounded-2xl bg-stone-100 aspect-square overflow-hidden flex items-center justify-center">
-            {listing.images?.[0] ? (
-              <img
-                src={sanitizeImageUrl(listing.images[0]) ?? FALLBACK_IMAGE_SRC}
-                alt={listing.product_name}
-                onError={fallbackOnImageError}
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <Package className="w-24 h-24 text-stone-300" />
-            )}
+            <img
+              src={getProductImageSrc(listing.images?.[0], listing.product_name)}
+              alt={listing.product_name}
+              onError={fallbackOnImageError}
+              className="w-full h-full object-cover"
+            />
           </div>
 
           <div className="space-y-4">
@@ -170,10 +224,10 @@ export function ListingDetail({ onAddToCart, cartItemCount }: ListingDetailProps
             </div>
             <p className="text-3xl font-bold text-primary-700">
               {formatPrice(listing.price_per_kg)}
-              <span className="text-base font-normal text-stone-500">/kg</span>
+              <span className="text-base font-normal text-stone-500">{copy.perKg}</span>
             </p>
             <p className="text-sm text-stone-500">
-              {listing.available_quantity.toLocaleString()} kg available · Min. order {minQ} kg
+              {listing.available_quantity.toLocaleString()} kg · {copy.minLabel} {minQ} kg
             </p>
             {listing.description && (
               <Card padding="md" className="bg-stone-50 border-stone-100">
@@ -182,7 +236,7 @@ export function ListingDetail({ onAddToCart, cartItemCount }: ListingDetailProps
             )}
 
             <div className="flex items-center justify-between p-3 bg-stone-50 rounded-lg max-w-sm">
-              <span className="text-sm font-medium text-stone-700">Quantity (kg)</span>
+              <span className="text-sm font-medium text-stone-700">{copy.quantity}</span>
               <div className="flex items-center gap-3">
                 <button
                   type="button"
@@ -204,24 +258,24 @@ export function ListingDetail({ onAddToCart, cartItemCount }: ListingDetailProps
               </div>
             </div>
 
-            <p className="text-lg font-semibold text-stone-900">Total: {formatPrice(totalPrice)}</p>
+            <p className="text-lg font-semibold text-stone-900">{copy.total}: {formatPrice(totalPrice)}</p>
 
             <div className="flex flex-wrap gap-3">
-              <Button className="bg-emerald-600 hover:bg-emerald-700" onClick={handleAdd} disabled={added}>
+              <Button className="bg-primary-600 hover:bg-primary-700" onClick={handleAdd} disabled={added}>
                 {added ? (
                   <>
                     <Check className="w-4 h-4 mr-2" />
-                    Added to cart
+                    {copy.added}
                   </>
                 ) : (
                   <>
                     <ShoppingCart className="w-4 h-4 mr-2" />
-                    Add to cart
+                    {copy.add}
                   </>
                 )}
               </Button>
               <Link to="/cart">
-                <Button variant="outline">View cart</Button>
+                <Button variant="outline">{copy.viewCart}</Button>
               </Link>
             </div>
           </div>
@@ -230,3 +284,5 @@ export function ListingDetail({ onAddToCart, cartItemCount }: ListingDetailProps
     </Layout>
   )
 }
+
+

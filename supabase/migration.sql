@@ -1,4 +1,4 @@
--- KiloMarket Database Migration
+-- Farmers Market Database Migration
 -- Run this to add new tables to existing schema
 
 -- ============================================
@@ -390,18 +390,18 @@ create index if not exists idx_conversations_seller on conversations(seller_id);
 
 -- Insert categories (CORE AGRICULTURAL PRODUCE ONLY)
 insert into categories (name, slug, icon, description, sort_order) values
-  ('Rice', 'rice', '🌾', 'All varieties of rice including local and imported', 1),
-  ('Beans', 'beans', '🫘', 'Nigerian beans varieties - honey, iron, olotu', 2),
-  ('Maize', 'maize', '🌽', 'Yellow and white maize for consumption and feed', 3),
-  ('Cassava', 'cassava', '🍠', 'Fresh cassava tubers and cassava products', 4),
-  ('Yam', 'yam', '🍠', 'Puna, water yam, and chinese yam varieties', 5),
-  ('Plantain', 'plantain', '🍌', 'Green and ripe plantain for cooking', 6),
-  ('Vegetables', 'vegetables', '🥬', 'Fresh leafy and root vegetables', 7),
-  ('Fruits', 'fruits', '🍊', 'Tropical and local fruits', 8),
-  ('Poultry', 'poultry', '🐔', 'Chicken, turkey, and eggs', 9),
-  ('Livestock', 'livestock', '🐄', 'Goat, sheep, cattle, and pig', 10),
-  ('Grains', 'grains', '🌾', 'Millet, sorghum, and other grains', 11),
-  ('Oil Seeds', 'oil-seeds', '🌻', 'Groundnut, sesame, and palm products', 12)
+  ('Rice', 'rice', 'ðŸŒ¾', 'All varieties of rice including local and imported', 1),
+  ('Beans', 'beans', 'ðŸ«˜', 'Nigerian beans varieties - honey, iron, olotu', 2),
+  ('Maize', 'maize', 'ðŸŒ½', 'Yellow and white maize for consumption and feed', 3),
+  ('Cassava', 'cassava', 'ðŸ ', 'Fresh cassava tubers and cassava products', 4),
+  ('Yam', 'yam', 'ðŸ ', 'Puna, water yam, and chinese yam varieties', 5),
+  ('Plantain', 'plantain', 'ðŸŒ', 'Green and ripe plantain for cooking', 6),
+  ('Vegetables', 'vegetables', 'ðŸ¥¬', 'Fresh leafy and root vegetables', 7),
+  ('Fruits', 'fruits', 'ðŸŠ', 'Tropical and local fruits', 8),
+  ('Poultry', 'poultry', 'ðŸ”', 'Chicken, turkey, and eggs', 9),
+  ('Livestock', 'livestock', 'ðŸ„', 'Goat, sheep, cattle, and pig', 10),
+  ('Grains', 'grains', 'ðŸŒ¾', 'Millet, sorghum, and other grains', 11),
+  ('Oil Seeds', 'oil-seeds', 'ðŸŒ»', 'Groundnut, sesame, and palm products', 12)
 on conflict (slug) do nothing;
 
 -- ============================================

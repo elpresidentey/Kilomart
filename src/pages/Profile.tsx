@@ -7,13 +7,127 @@ import { Layout } from '../components/Layout'
 import { User, Mail, Phone, MapPin, Calendar, LogOut, Edit2, Check, X, Store, ShieldCheck } from 'lucide-react'
 import type { User as UserType } from '../types'
 import { fallbackOnImageError, sanitizeImageUrl, FALLBACK_IMAGE_SRC } from '../lib/image'
+import { useI18n } from '../i18n/useI18n'
 
 export function Profile() {
   const navigate = useNavigate()
   const { user, signOut } = useAuth()
+  const { t } = useI18n()
   const [isEditing, setIsEditing] = useState(false)
   const [formData, setFormData] = useState<Partial<UserType>>({})
   const [saving, setSaving] = useState(false)
+  const copy =
+    t('nav.home') === 'Gida'
+      ? {
+          title: 'Bayanan martaba',
+          subtitle: 'Sarrafa saitunan asusunka',
+          backHome: 'Komawa gida',
+          logout: 'Fita',
+          memberSince: 'Mamba tun',
+          cancel: 'Soke',
+          save: 'Ajiye',
+          editProfile: 'Gyara bayanan martaba',
+          contactInfo: 'Bayanan tuntuɓa',
+          fullName: 'Cikakken suna',
+          email: 'Imel',
+          phone: 'Waya',
+          location: 'Wuri',
+          joined: 'Ranar shiga',
+          notProvided: 'Ba a bayar ba',
+          about: 'Game da kai',
+          noBio: 'Babu takaitaccen bayani. Danna "Gyara bayanan martaba" don ƙara.',
+          quickActions: 'Ayyuka masu sauri',
+          goDashboard: 'Je zuwa dashboard',
+          myOrders: 'Umarnina',
+          browseMarketplace: 'Bude kasuwa',
+          farmerRole: 'Manomi / Mai sayarwa',
+          buyerRole: 'Mai siya',
+          warehouseRole: 'Manajan ma’ajiya',
+          logisticsRole: 'Abokin jigila',
+        }
+      : t('nav.home') === 'Ilé'
+        ? {
+            title: 'Profaili mi',
+            subtitle: 'Ṣakoso awọn eto akọọlẹ rẹ',
+            backHome: 'Pada si ile',
+            logout: 'Jade',
+            memberSince: 'Ọmọ ẹgbẹ lati',
+            cancel: 'Fagilee',
+            save: 'Fipamọ',
+            editProfile: 'Ṣatunkọ profaili',
+            contactInfo: 'Alaye ibaraẹnisọrọ',
+            fullName: 'Orukọ kikun',
+            email: 'Imeeli',
+            phone: 'Foonu',
+            location: 'Ibi',
+            joined: 'Darapọ',
+            notProvided: 'Ko pese',
+            about: 'Nipa',
+            noBio: 'Ko si bio. Tẹ "Ṣatunkọ profaili" lati fi kun.',
+            quickActions: 'Igbese yarayara',
+            goDashboard: 'Lọ si dashboard',
+            myOrders: 'Awọn aṣẹ mi',
+            browseMarketplace: 'Bude ọja',
+            farmerRole: 'Agbe / Olutaja',
+            buyerRole: 'Onira',
+            warehouseRole: 'Oluṣakoso ile-itaja',
+            logisticsRole: 'Alabaṣepọ eekaderi',
+          }
+        : t('nav.home') === 'Ụlọ'
+          ? {
+              title: 'Profaịlụ m',
+              subtitle: 'Jikwaa ntọala akaụntụ gị',
+              backHome: 'Laghachi n’ụlọ',
+              logout: 'Pụọ',
+              memberSince: 'Onye otu kemgbe',
+              cancel: 'Kagbuo',
+              save: 'Chekwaa',
+              editProfile: 'Dezie profaịlụ',
+              contactInfo: 'Ozi kọntaktị',
+              fullName: 'Aha zuru ezu',
+              email: 'Email',
+              phone: 'Ekwentị',
+              location: 'Ebe',
+              joined: 'Soro na',
+              notProvided: 'Enyebeghị',
+              about: 'Banyere',
+              noBio: 'Enweghị bio. Pịa "Dezie profaịlụ" iji tinye otu.',
+              quickActions: 'Ihe omume ọsọ ọsọ',
+              goDashboard: 'Gaa dashboard',
+              myOrders: 'Orders m',
+              browseMarketplace: 'Gaa ahịa',
+              farmerRole: 'Onye ọrụ ugbo / Onye na-ere',
+              buyerRole: 'Onye na-azụ',
+              warehouseRole: 'Onye njikwa ụlọ nkwakọba',
+              logisticsRole: 'Onye mmekọ logistic',
+            }
+          : {
+              title: 'My Profile',
+              subtitle: 'Manage your account settings',
+              backHome: 'Back to Home',
+              logout: 'Logout',
+              memberSince: 'Member since',
+              cancel: 'Cancel',
+              save: 'Save',
+              editProfile: 'Edit Profile',
+              contactInfo: 'Contact Information',
+              fullName: 'Full Name',
+              email: 'Email',
+              phone: 'Phone',
+              location: 'Location',
+              joined: 'Joined',
+              notProvided: 'Not provided',
+              about: 'About',
+              noBio: 'No bio provided. Click "Edit Profile" to add one.',
+              quickActions: 'Quick Actions',
+              goDashboard: 'Go to Dashboard',
+              myOrders: 'My Orders',
+              browseMarketplace: 'Browse Marketplace',
+              farmerRole: 'Farmer / Seller',
+              buyerRole: 'Buyer',
+              warehouseRole: 'Warehouse Manager',
+              logisticsRole: 'Logistics Partner',
+            }
 
   useEffect(() => {
     if (user) {
@@ -52,9 +166,9 @@ export function Profile() {
       <Layout>
         <div className="min-h-[60vh] flex items-center justify-center">
           <Card className="w-full max-w-md" padding="lg">
-            <p className="text-center text-stone-600">Please log in to view your profile</p>
+            <p className="text-center text-stone-600">{t('profile.loginRequired')}</p>
             <Button className="w-full mt-4" onClick={() => navigate('/login')}>
-              Go to Login
+              {t('profile.goToLogin')}
             </Button>
           </Card>
         </div>
@@ -63,14 +177,14 @@ export function Profile() {
   }
 
   const roleLabels: Record<string, string> = {
-    farmer: 'Farmer / Seller',
-    buyer: 'Buyer',
-    warehouse_manager: 'Warehouse Manager',
-    logistics: 'Logistics Partner',
+    farmer: copy.farmerRole,
+    buyer: copy.buyerRole,
+    warehouse_manager: copy.warehouseRole,
+    logistics: copy.logisticsRole,
   }
 
   const roleColors: Record<string, string> = {
-    farmer: 'bg-emerald-100 text-emerald-700',
+    farmer: 'bg-primary-100 text-primary-700',
     buyer: 'bg-blue-100 text-blue-700',
     warehouse_manager: 'bg-amber-100 text-amber-700',
     logistics: 'bg-purple-100 text-purple-700',
@@ -83,23 +197,23 @@ export function Profile() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-stone-900">My Profile</h1>
-            <p className="text-stone-500">Manage your account settings</p>
+            <h1 className="text-2xl font-bold text-stone-900">{copy.title}</h1>
+            <p className="text-stone-500">{copy.subtitle}</p>
           </div>
           <div className="flex gap-3">
             <Button variant="outline" onClick={() => navigate('/')}>
-              Back to Home
+              {copy.backHome}
             </Button>
             <Button variant="danger" onClick={handleLogout}>
               <LogOut className="w-4 h-4 mr-2" />
-              Logout
+              {copy.logout}
             </Button>
           </div>
         </div>
 
         {/* Profile Overview */}
         <Card className="relative overflow-hidden">
-          <div className="absolute top-0 left-0 right-0 h-24 bg-gradient-to-r from-primary-600 to-emerald-600" />
+          <div className="absolute top-0 left-0 right-0 h-24 bg-gradient-to-r from-primary-600 to-primary-600" />
           <div className="relative pt-16 px-6 pb-6">
             <div className="flex items-end gap-6">
               <div className="w-24 h-24 rounded-full bg-white flex items-center justify-center shadow-lg border-4 border-white">
@@ -127,7 +241,7 @@ export function Profile() {
                     {roleLabels[user.role] || user.role}
                   </span>
                   <span className="text-stone-500">•</span>
-                  <span className="text-stone-500">Member since {new Date(user.created_at || '').toLocaleDateString()}</span>
+                  <span className="text-stone-500">{copy.memberSince} {new Date(user.created_at || '').toLocaleDateString()}</span>
                 </div>
               </div>
               <div className="mb-2">
@@ -135,17 +249,17 @@ export function Profile() {
                   <div className="flex gap-2">
                     <Button variant="outline" size="sm" onClick={() => setIsEditing(false)}>
                       <X className="w-4 h-4 mr-1" />
-                      Cancel
+                      {copy.cancel}
                     </Button>
                     <Button size="sm" onClick={handleSave} isLoading={saving}>
                       <Check className="w-4 h-4 mr-1" />
-                      Save
+                      {copy.save}
                     </Button>
                   </div>
                 ) : (
                   <Button variant="outline" size="sm" onClick={() => setIsEditing(true)}>
                     <Edit2 className="w-4 h-4 mr-1" />
-                    Edit Profile
+                    {copy.editProfile}
                   </Button>
                 )}
               </div>
@@ -156,32 +270,32 @@ export function Profile() {
         {/* Profile Details */}
         <div className="grid md:grid-cols-2 gap-6">
           <Card padding="lg">
-            <h3 className="text-lg font-semibold text-stone-900 mb-4">Contact Information</h3>
+            <h3 className="text-lg font-semibold text-stone-900 mb-4">{copy.contactInfo}</h3>
             <div className="space-y-4">
               {isEditing ? (
                 <>
                   <Input
-                    label="Full Name"
+                    label={copy.fullName}
                     value={formData.full_name || ''}
                     onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
                   />
                   <Input
-                    label="Email"
+                    label={copy.email}
                     type="email"
                     value={user.email}
                     disabled
                   />
                   <Input
-                    label="Phone"
+                    label={copy.phone}
                     value={formData.phone || ''}
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    placeholder="Add your phone number"
+                    placeholder={t('profile.phonePlaceholder')}
                   />
                   <Input
-                    label="Location"
+                    label={copy.location}
                     value={formData.location || ''}
                     onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                    placeholder="Add your location"
+                    placeholder={t('profile.locationPlaceholder')}
                   />
                 </>
               ) : (
@@ -191,7 +305,7 @@ export function Profile() {
                       <User className="w-5 h-5 text-stone-500" />
                     </div>
                     <div>
-                      <p className="text-sm text-stone-500">Full Name</p>
+                      <p className="text-sm text-stone-500">{copy.fullName}</p>
                       <p className="font-medium text-stone-900">{user.full_name}</p>
                     </div>
                   </div>
@@ -200,7 +314,7 @@ export function Profile() {
                       <Mail className="w-5 h-5 text-stone-500" />
                     </div>
                     <div>
-                      <p className="text-sm text-stone-500">Email</p>
+                      <p className="text-sm text-stone-500">{copy.email}</p>
                       <p className="font-medium text-stone-900">{user.email}</p>
                     </div>
                   </div>
@@ -209,8 +323,8 @@ export function Profile() {
                       <Phone className="w-5 h-5 text-stone-500" />
                     </div>
                     <div>
-                      <p className="text-sm text-stone-500">Phone</p>
-                      <p className="font-medium text-stone-900">{user.phone || 'Not provided'}</p>
+                      <p className="text-sm text-stone-500">{copy.phone}</p>
+                      <p className="font-medium text-stone-900">{user.phone || copy.notProvided}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
@@ -218,8 +332,8 @@ export function Profile() {
                       <MapPin className="w-5 h-5 text-stone-500" />
                     </div>
                     <div>
-                      <p className="text-sm text-stone-500">Location</p>
-                      <p className="font-medium text-stone-900">{user.location || 'Not provided'}</p>
+                      <p className="text-sm text-stone-500">{copy.location}</p>
+                      <p className="font-medium text-stone-900">{user.location || copy.notProvided}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
@@ -227,7 +341,7 @@ export function Profile() {
                       <Calendar className="w-5 h-5 text-stone-500" />
                     </div>
                     <div>
-                      <p className="text-sm text-stone-500">Joined</p>
+                      <p className="text-sm text-stone-500">{copy.joined}</p>
                       <p className="font-medium text-stone-900">{new Date(user.created_at || '').toLocaleDateString()}</p>
                     </div>
                   </div>
@@ -237,17 +351,17 @@ export function Profile() {
           </Card>
 
           <Card padding="lg">
-            <h3 className="text-lg font-semibold text-stone-900 mb-4">About</h3>
+            <h3 className="text-lg font-semibold text-stone-900 mb-4">{copy.about}</h3>
             {isEditing ? (
               <textarea
                 value={formData.bio || ''}
                 onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
-                placeholder="Tell us about yourself..."
+                placeholder={t('profile.bioPlaceholder')}
                 className="w-full h-48 p-3 border border-stone-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 resize-none"
               />
             ) : (
               <p className="text-stone-600 leading-relaxed">
-                {user.bio || 'No bio provided. Click "Edit Profile" to add one.'}
+                {user.bio || copy.noBio}
               </p>
             )}
           </Card>
@@ -255,20 +369,20 @@ export function Profile() {
 
         {/* Quick Actions */}
         <Card padding="lg">
-          <h3 className="text-lg font-semibold text-stone-900 mb-4">Quick Actions</h3>
+          <h3 className="text-lg font-semibold text-stone-900 mb-4">{copy.quickActions}</h3>
           <div className="flex flex-wrap gap-3">
             {user.role === 'farmer' && (
               <Button onClick={() => navigate('/dashboard')} variant="outline">
-                Go to Dashboard
+                {copy.goDashboard}
               </Button>
             )}
             {user.role === 'buyer' && (
               <Button onClick={() => navigate('/orders')} variant="outline">
-                My Orders
+                {copy.myOrders}
               </Button>
             )}
             <Button onClick={() => navigate('/marketplace')} variant="outline">
-              Browse Marketplace
+              {copy.browseMarketplace}
             </Button>
           </div>
         </Card>

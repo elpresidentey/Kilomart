@@ -14,8 +14,11 @@ import {
   MoreVertical,
 } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { repairText } from '../i18n/repairText'
+import { useI18n } from '../i18n/useI18n'
 
 export function FarmerDashboard() {
+  const { language, t } = useI18n()
   const { user } = useAuth()
   const [listings, setListings] = useState<ProduceListing[]>([])
   const [orders, setOrders] = useState<Order[]>([])
@@ -26,6 +29,76 @@ export function FarmerDashboard() {
     totalEarnings: 0,
   })
   const [loading, setLoading] = useState(true)
+  const statusLabel = (status: string) => {
+    const key = `status.${status}`
+    const translated = t(key)
+    return translated === key ? status.replace(/_/g, ' ') : translated
+  }
+  const copy = repairText(
+    language === 'ha'
+      ? {
+          title: 'Dashboard na Manomi',
+          subtitle: 'Sarrafa amfanin gona da bibiyar tallace-tallace',
+          newListing: 'Sabon jeri',
+          totalListings: 'Jimlar jerin kaya',
+          activeListings: 'Jerin da ke aiki',
+          totalSales: 'Jimlar tallace-tallace',
+          totalEarnings: 'Jimlar kudin shiga',
+          recentListings: 'Sabbin jerin kaya',
+          viewAll: 'Duba duka',
+          noListings: 'Babu jeri tukuna',
+          createFirst: 'Kirkiri jerinka na farko',
+          recentOrders: 'Sabbin umarni',
+          noOrders: 'Babu umarni tukuna',
+        }
+      : language === 'yo'
+        ? {
+            title: 'Dashboard Agbe',
+            subtitle: 'Ṣakoso ọja rẹ ki o tọpa tita',
+            newListing: 'Akojọ tuntun',
+            totalListings: 'Lapapọ akojọ',
+            activeListings: 'Akojọ to n ṣiṣẹ',
+            totalSales: 'Lapapọ tita',
+            totalEarnings: 'Lapapọ owo-wiwọle',
+            recentListings: 'Awọn akojọ to ṣẹṣẹ',
+            viewAll: 'Wo gbogbo',
+            noListings: 'Ko si akojọ sibẹsibẹ',
+            createFirst: 'Ṣẹda akojọ akọkọ rẹ',
+            recentOrders: 'Awọn aṣẹ to ṣẹṣẹ',
+            noOrders: 'Ko si aṣẹ sibẹsibẹ',
+          }
+        : language === 'ig'
+          ? {
+              title: 'Dashboard Onye Ọrụ Ugbo',
+              subtitle: 'Jikwaa ngwaahịa gị ma soro ire ahịa',
+              newListing: 'Ndepụta ọhụrụ',
+              totalListings: 'Ngụkọta ndepụta',
+              activeListings: 'Ndepụta na-arụ ọrụ',
+              totalSales: 'Ngụkọta ahịa',
+              totalEarnings: 'Ngụkọta ego',
+              recentListings: 'Ndepụta ọhụrụ',
+              viewAll: 'Lee ha niile',
+              noListings: 'Enweghị ndepụta ugbu a',
+              createFirst: 'Mepụta ndepụta mbụ gị',
+              recentOrders: 'Orders ọhụrụ',
+              noOrders: 'Enweghị orders ugbu a',
+            }
+          : {
+              title: 'Farmer Dashboard',
+              subtitle: 'Manage your produce and track sales',
+              newListing: 'New Listing',
+              totalListings: 'Total Listings',
+              activeListings: 'Active Listings',
+              totalSales: 'Total Sales',
+              totalEarnings: 'Total Earnings',
+              recentListings: 'Recent Listings',
+              viewAll: 'View All',
+              noListings: 'No listings yet',
+              createFirst: 'Create Your First Listing',
+              recentOrders: 'Recent Orders',
+              noOrders: 'No orders yet',
+            },
+  )
 
   useEffect(() => {
     if (user) {
@@ -91,13 +164,13 @@ export function FarmerDashboard() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-stone-900">Farmer Dashboard</h1>
-            <p className="text-stone-500">Manage your produce and track sales</p>
+            <h1 className="text-2xl font-bold text-stone-900">{copy.title}</h1>
+            <p className="text-stone-500">{copy.subtitle}</p>
           </div>
           <Link to="/listings/new">
             <Button>
               <Plus className="w-4 h-4 mr-2" />
-              New Listing
+              {copy.newListing}
             </Button>
           </Link>
         </div>
@@ -107,7 +180,7 @@ export function FarmerDashboard() {
           <Card padding="md">
             <div className="flex items-start justify-between">
               <div>
-                <p className="text-sm text-stone-500 mb-1">Total Listings</p>
+                <p className="text-sm text-stone-500 mb-1">{copy.totalListings}</p>
                 <p className="text-2xl font-bold text-stone-900">
                   {stats.totalListings}
                 </p>
@@ -121,7 +194,7 @@ export function FarmerDashboard() {
           <Card padding="md">
             <div className="flex items-start justify-between">
               <div>
-                <p className="text-sm text-stone-500 mb-1">Active Listings</p>
+                <p className="text-sm text-stone-500 mb-1">{copy.activeListings}</p>
                 <p className="text-2xl font-bold text-stone-900">
                   {stats.activeListings}
                 </p>
@@ -135,7 +208,7 @@ export function FarmerDashboard() {
           <Card padding="md">
             <div className="flex items-start justify-between">
               <div>
-                <p className="text-sm text-stone-500 mb-1">Total Sales</p>
+                <p className="text-sm text-stone-500 mb-1">{copy.totalSales}</p>
                 <p className="text-2xl font-bold text-stone-900">
                   {stats.totalSales}
                 </p>
@@ -149,7 +222,7 @@ export function FarmerDashboard() {
           <Card padding="md">
             <div className="flex items-start justify-between">
               <div>
-                <p className="text-sm text-stone-500 mb-1">Total Earnings</p>
+                <p className="text-sm text-stone-500 mb-1">{copy.totalEarnings}</p>
                 <p className="text-2xl font-bold text-primary-700">
                   {formatCurrency(stats.totalEarnings)}
                 </p>
@@ -164,9 +237,9 @@ export function FarmerDashboard() {
         {/* Recent Listings */}
         <Card padding="lg">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-lg font-semibold text-stone-900">Recent Listings</h2>
+            <h2 className="text-lg font-semibold text-stone-900">{copy.recentListings}</h2>
             <Button variant="ghost" size="sm">
-              View All
+              {copy.viewAll}
             </Button>
           </div>
 
@@ -208,12 +281,12 @@ export function FarmerDashboard() {
                       variant={
                         listing.status === 'active'
                           ? 'success'
-                          : listing.status === 'sold'
+                          : listing.status === 'sold' || listing.status === 'sold_out'
                           ? 'default'
                           : 'warning'
                       }
                     >
-                      {listing.status}
+                      {statusLabel(listing.status)}
                     </Badge>
                     <button className="p-2 hover:bg-stone-100 rounded-lg">
                       <MoreVertical className="w-4 h-4 text-stone-400" />
@@ -224,11 +297,11 @@ export function FarmerDashboard() {
             </div>
           ) : (
             <div className="text-center py-8">
-              <p className="text-stone-500 mb-4">No listings yet</p>
+              <p className="text-stone-500 mb-4">{copy.noListings}</p>
               <Link to="/listings/new">
                 <Button>
                   <Plus className="w-4 h-4 mr-2" />
-                  Create Your First Listing
+                  {copy.createFirst}
                 </Button>
               </Link>
             </div>
@@ -238,10 +311,10 @@ export function FarmerDashboard() {
         {/* Recent Orders */}
         <Card padding="lg">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-lg font-semibold text-stone-900">Recent Orders</h2>
+            <h2 className="text-lg font-semibold text-stone-900">{copy.recentOrders}</h2>
             <Link to="/farmer/orders">
               <Button variant="ghost" size="sm">
-                View All
+                {copy.viewAll}
               </Button>
             </Link>
           </div>
@@ -281,7 +354,7 @@ export function FarmerDashboard() {
                             : 'info'
                         }
                       >
-                        {order.status}
+                        {statusLabel(order.status)}
                       </Badge>
                     </div>
                   </div>
@@ -290,7 +363,7 @@ export function FarmerDashboard() {
             </div>
           ) : (
             <div className="text-center py-8">
-              <p className="text-stone-500">No orders yet</p>
+              <p className="text-stone-500">{copy.noOrders}</p>
             </div>
           )}
         </Card>

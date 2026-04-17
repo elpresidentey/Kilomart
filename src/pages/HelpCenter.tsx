@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { Layout } from '../components/Layout'
 import { Card } from '../components/ui'
 import { ArrowLeft, BookOpen, ShoppingCart, Truck, Shield, MessageCircle } from 'lucide-react'
+import { useI18n } from '../i18n/useI18n'
 
 const LINKS = [
   {
@@ -11,7 +12,7 @@ const LINKS = [
     icon: ShoppingCart,
   },
   {
-    title: 'Why KiloMarket?',
+    title: 'Why Farmers Market?',
     description: 'Farm-fresh quality, fair kg pricing, and verified farmers.',
     to: '/#features',
     icon: Shield,
@@ -31,6 +32,7 @@ const LINKS = [
 ] as const
 
 export function HelpCenter() {
+  const { t } = useI18n()
   return (
     <Layout>
       <div className="max-w-3xl mx-auto py-10">
@@ -39,16 +41,16 @@ export function HelpCenter() {
           className="inline-flex items-center gap-2 text-stone-600 hover:text-stone-900 mb-8 text-sm font-medium"
         >
           <ArrowLeft className="w-4 h-4" />
-          Back to home
+          {t('static.backHome')}
         </Link>
 
         <div className="flex items-center gap-3 mb-6">
-          <div className="p-3 bg-emerald-100 rounded-xl text-emerald-800">
+          <div className="p-3 bg-primary-100 rounded-xl text-primary-800">
             <MessageCircle className="w-8 h-8" />
           </div>
           <div>
-            <h1 className="text-3xl font-bold text-stone-900">Help center</h1>
-            <p className="text-stone-600">Quick answers and links to more detail on the homepage.</p>
+            <h1 className="text-3xl font-bold text-stone-900">{t('help.title')}</h1>
+            <p className="text-stone-600">{t('help.subtitle')}</p>
           </div>
         </div>
 
@@ -57,7 +59,7 @@ export function HelpCenter() {
             <Link key={item.title} to={item.to}>
               <Card
                 padding="lg"
-                className="flex gap-4 items-start hover:border-emerald-200 hover:shadow-md transition-all cursor-pointer"
+                className="flex gap-4 items-start hover:border-primary-200 hover:shadow-md transition-all cursor-pointer"
               >
                 <div className="p-2 bg-stone-100 rounded-lg text-stone-700">
                   <item.icon className="w-6 h-6" />
@@ -72,9 +74,9 @@ export function HelpCenter() {
         </div>
 
         <Card padding="lg" className="bg-stone-50 border-stone-200">
-          <p className="text-sm text-stone-700 mb-3">Still stuck?</p>
-          <Link to="/contact" className="text-emerald-700 font-semibold hover:underline">
-            Contact support →
+          <p className="text-sm text-stone-700 mb-3">{t('help.stillStuck')}</p>
+          <Link to="/contact" className="text-primary-700 font-semibold hover:underline">
+            {t('help.contactSupport')} →
           </Link>
         </Card>
       </div>

@@ -1,5 +1,15 @@
 import type { Order } from '../types'
 
+export function getDeliveryContact(
+  addr: Order['delivery_address'] | null | undefined
+): { contactName?: string; phone?: string } {
+  if (!addr || typeof addr === 'string') return {}
+  return {
+    contactName: addr.contact_name,
+    phone: addr.phone,
+  }
+}
+
 export function formatDeliveryAddress(
   addr: Order['delivery_address'] | null | undefined
 ): string {

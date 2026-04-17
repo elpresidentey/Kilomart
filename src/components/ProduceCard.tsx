@@ -2,8 +2,9 @@ import { useState, type CSSProperties } from 'react'
 import { Link } from 'react-router-dom'
 import { Card, Button } from './ui'
 import type { ProduceListing } from '../types'
-import { MapPin, Package, ShoppingCart, Check, Plus, Minus } from 'lucide-react'
-import { fallbackOnImageError, sanitizeImageUrl, FALLBACK_IMAGE_SRC } from '../lib/image'
+import { MapPin, ShoppingCart, Check, Plus, Minus } from 'lucide-react'
+import { fallbackOnImageError, getProductImageSrc } from '../lib/image'
+import { useI18n } from '../i18n/useI18n'
 
 interface ProduceCardProps {
   listing: ProduceListing
@@ -13,8 +14,53 @@ interface ProduceCardProps {
 }
 
 export function ProduceCard({ listing, onAddToCart, listIndex }: ProduceCardProps) {
+  const { language } = useI18n()
   const [quantity, setQuantity] = useState(listing.min_order_kg || 1)
   const [isAdded, setIsAdded] = useState(false)
+  const copy =
+    language === 'ha'
+      ? {
+          lowStock: 'Kadan a sito',
+          perKg: '/kg',
+          kgAvailable: 'kg akwai',
+          quantityKg: 'Yawa (kg):',
+          total: 'Jimla:',
+          added: 'An kara!',
+          addToCart: 'Saka a kati',
+          viewLabel: `Duba ${listing.product_name}`,
+        }
+      : language === 'yo'
+        ? {
+            lowStock: 'Ko po ni stock',
+            perKg: '/kg',
+            kgAvailable: 'kg wa',
+            quantityKg: 'Iye (kg):',
+            total: 'Lapapo:',
+            added: 'Ti wa ninu kati!',
+            addToCart: 'Fi si kati',
+            viewLabel: `Wo ${listing.product_name}`,
+          }
+        : language === 'ig'
+          ? {
+              lowStock: 'Stock di ala',
+              perKg: '/kg',
+              kgAvailable: 'kg di',
+              quantityKg: 'Ogu (kg):',
+              total: 'Ngụkọta:',
+              added: 'Etinyela!',
+              addToCart: 'Tinye na kati',
+              viewLabel: `Lee ${listing.product_name}`,
+            }
+          : {
+              lowStock: 'Low Stock',
+              perKg: '/kg',
+              kgAvailable: 'kg avail.',
+              quantityKg: 'Quantity (kg):',
+              total: 'Total:',
+              added: 'Added!',
+              addToCart: 'Add to Cart',
+              viewLabel: `View ${listing.product_name}`,
+            }
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('en-NG', {
@@ -26,7 +72,7 @@ export function ProduceCard({ listing, onAddToCart, listIndex }: ProduceCardProp
   }
 
   const qualityColors = {
-    A: { bg: 'bg-emerald-100', text: 'text-emerald-700', label: 'Grade A' },
+    A: { bg: 'bg-primary-100', text: 'text-primary-700', label: 'Grade A' },
     B: { bg: 'bg-blue-100', text: 'text-blue-700', label: 'Grade B' },
     C: { bg: 'bg-amber-100', text: 'text-amber-700', label: 'Grade C' },
     D: { bg: 'bg-stone-100', text: 'text-stone-700', label: 'Grade D' },
@@ -79,18 +125,14 @@ export function ProduceCard({ listing, onAddToCart, listIndex }: ProduceCardProp
         <Link
           to={`/listing/${listing.id}`}
           className="absolute inset-0 flex items-center justify-center z-0"
-          aria-label={`View ${listing.product_name}`}
+          aria-label={copy.viewLabel}
         >
-          {listing.images?.[0] ? (
-            <img
-              src={sanitizeImageUrl(listing.images[0]) ?? FALLBACK_IMAGE_SRC}
-              alt=""
-              onError={fallbackOnImageError}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-            />
-          ) : (
-            <Package className="w-16 h-16 text-stone-300 group-hover:scale-110 transition-transform duration-300" />
-          )}
+          <img
+            src={getProductImageSrc(listing.images?.[0], listing.product_name)}
+            alt=""
+            onError={fallbackOnImageError}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+          />
         </Link>
         
         {/* Quality Badge */}
@@ -103,7 +145,7 @@ export function ProduceCard({ listing, onAddToCart, listIndex }: ProduceCardProp
         {/* Stock Badge */}
         {listing.available_quantity < 100 && (
           <div className="absolute top-3 right-3 z-10 bg-red-100 text-red-700 px-2 py-1 rounded-md text-xs font-semibold pointer-events-none">
-            Low Stock
+            {copy.lowStock}
           </div>
         )}
       </div>
@@ -112,7 +154,7 @@ export function ProduceCard({ listing, onAddToCart, listIndex }: ProduceCardProp
       <div className="p-4">
         {/* Product Name */}
         <h3 className="font-semibold text-stone-900 text-base leading-snug mb-1 line-clamp-2 min-h-[2.5rem]">
-          <Link to={`/listing/${listing.id}`} className="hover:text-emerald-700 transition-colors">
+          <Link to={`/listing/${listing.id}`} className="hover:text-primary-700 transition-colors">
             {listing.product_name}
           </Link>
         </h3>
@@ -129,16 +171,16 @@ export function ProduceCard({ listing, onAddToCart, listIndex }: ProduceCardProp
             <span className="text-xl font-bold text-primary-700">
               {formatPrice(listing.price_per_kg)}
             </span>
-            <span className="text-sm text-stone-500">/kg</span>
+            <span className="text-sm text-stone-500">{copy.perKg}</span>
           </div>
           <span className="text-xs text-stone-400">
-            {listing.available_quantity.toLocaleString()} kg avail.
+            {listing.available_quantity.toLocaleString()} {copy.kgAvailable}
           </span>
         </div>
 
         {/* Quantity Selector */}
         <div className="flex items-center justify-between mb-4 p-2 bg-stone-50 rounded-lg">
-          <span className="text-sm text-stone-600 font-medium">Quantity (kg):</span>
+          <span className="text-sm text-stone-600 font-medium">{copy.quantityKg}</span>
           <div className="flex items-center gap-3">
             <button
               type="button"
@@ -162,7 +204,7 @@ export function ProduceCard({ listing, onAddToCart, listIndex }: ProduceCardProp
 
         {/* Total Price */}
         <div className="flex items-center justify-between mb-3">
-          <span className="text-sm text-stone-500">Total:</span>
+          <span className="text-sm text-stone-500">{copy.total}</span>
           <span className="text-lg font-bold text-stone-900">{formatPrice(totalPrice)}</span>
         </div>
 
@@ -176,12 +218,12 @@ export function ProduceCard({ listing, onAddToCart, listIndex }: ProduceCardProp
           {isAdded ? (
             <>
               <Check className="w-4 h-4 mr-2" />
-              Added!
+              {copy.added}
             </>
           ) : (
             <>
               <ShoppingCart className="w-4 h-4 mr-2" />
-              Add to Cart
+              {copy.addToCart}
             </>
           )}
         </Button>

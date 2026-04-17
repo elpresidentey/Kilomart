@@ -10,19 +10,19 @@
 -- Insert into auth.users (this will trigger profile creation)
 insert into auth.users (id, email, encrypted_password, email_confirmed_at, created_at, updated_at, raw_user_meta_data)
 values 
-  ('550e8400-e29b-41d4-a716-446655440001', 'farmer1@kilomarket.ng', crypt('password123', gen_salt('bf')), now(), now(), now(), '{"full_name": "Alhaji Ibrahim Danladi", "role": "farmer", "location": "Kano, Kano State", "phone": "+2348012345678"}'),
-  ('550e8400-e29b-41d4-a716-446655440002', 'farmer2@kilomarket.ng', crypt('password123', gen_salt('bf')), now(), now(), now(), '{"full_name": "Mama Nkechi Okafor", "role": "farmer", "location": "Enugu, Enugu State", "phone": "+2348023456789"}'),
-  ('550e8400-e29b-41d4-a716-446655440003', 'farmer3@kilomarket.ng', crypt('password123', gen_salt('bf')), now(), now(), now(), '{"full_name": "Chief Oluwaseun Adeyemi", "role": "farmer", "location": "Ibadan, Oyo State", "phone": "+2348034567890"}'),
-  ('550e8400-e29b-41d4-a716-446655440004', 'farmer4@kilomarket.ng', crypt('password123', gen_salt('bf')), now(), now(), now(), '{"full_name": "Hajiya Amina Bello", "role": "farmer", "location": "Zaria, Kaduna State", "phone": "+2348045678901"}')
+  ('550e8400-e29b-41d4-a716-446655440001', 'farmer1@farmersmarket.ng', crypt('password123', gen_salt('bf')), now(), now(), now(), '{"full_name": "Alhaji Ibrahim Danladi", "role": "farmer", "location": "Kano, Kano State", "phone": "+2348012345678"}'),
+  ('550e8400-e29b-41d4-a716-446655440002', 'farmer2@farmersmarket.ng', crypt('password123', gen_salt('bf')), now(), now(), now(), '{"full_name": "Mama Nkechi Okafor", "role": "farmer", "location": "Enugu, Enugu State", "phone": "+2348023456789"}'),
+  ('550e8400-e29b-41d4-a716-446655440003', 'farmer3@farmersmarket.ng', crypt('password123', gen_salt('bf')), now(), now(), now(), '{"full_name": "Chief Oluwaseun Adeyemi", "role": "farmer", "location": "Ibadan, Oyo State", "phone": "+2348034567890"}'),
+  ('550e8400-e29b-41d4-a716-446655440004', 'farmer4@farmersmarket.ng', crypt('password123', gen_salt('bf')), now(), now(), now(), '{"full_name": "Hajiya Amina Bello", "role": "farmer", "location": "Zaria, Kaduna State", "phone": "+2348045678901"}')
 on conflict (id) do nothing;
 
 -- Ensure public.users records exist (in case trigger didn't work)
 insert into public.users (id, email, full_name, role, location, phone, is_verified)
 values 
-  ('550e8400-e29b-41d4-a716-446655440001', 'farmer1@kilomarket.ng', 'Alhaji Ibrahim Danladi', 'farmer', 'Kano, Kano State', '+2348012345678', true),
-  ('550e8400-e29b-41d4-a716-446655440002', 'farmer2@kilomarket.ng', 'Mama Nkechi Okafor', 'farmer', 'Enugu, Enugu State', '+2348023456789', true),
-  ('550e8400-e29b-41d4-a716-446655440003', 'farmer3@kilomarket.ng', 'Chief Oluwaseun Adeyemi', 'farmer', 'Ibadan, Oyo State', '+2348034567890', true),
-  ('550e8400-e29b-41d4-a716-446655440004', 'farmer4@kilomarket.ng', 'Hajiya Amina Bello', 'farmer', 'Zaria, Kaduna State', '+2348045678901', true)
+  ('550e8400-e29b-41d4-a716-446655440001', 'farmer1@farmersmarket.ng', 'Alhaji Ibrahim Danladi', 'farmer', 'Kano, Kano State', '+2348012345678', true),
+  ('550e8400-e29b-41d4-a716-446655440002', 'farmer2@farmersmarket.ng', 'Mama Nkechi Okafor', 'farmer', 'Enugu, Enugu State', '+2348023456789', true),
+  ('550e8400-e29b-41d4-a716-446655440003', 'farmer3@farmersmarket.ng', 'Chief Oluwaseun Adeyemi', 'farmer', 'Ibadan, Oyo State', '+2348034567890', true),
+  ('550e8400-e29b-41d4-a716-446655440004', 'farmer4@farmersmarket.ng', 'Hajiya Amina Bello', 'farmer', 'Zaria, Kaduna State', '+2348045678901', true)
 on conflict (id) do update set 
   full_name = excluded.full_name,
   role = excluded.role,

@@ -11,13 +11,13 @@ const CHANNELS: Record<
 > = {
   facebook: {
     title: 'Facebook',
-    description: 'Follow KiloMarket on Facebook for deals, farmer stories, and marketplace updates.',
+    description: 'Follow Farmers Market on Facebook for deals, farmer stories, and marketplace updates.',
     url: 'https://www.facebook.com',
     cta: 'Open Facebook',
   },
   x: {
     title: 'X (Twitter)',
-    description: 'Get quick updates, tips, and announcements from KiloMarket on X.',
+    description: 'Get quick updates, tips, and announcements from Farmers Market on X.',
     url: 'https://twitter.com',
     cta: 'Open X',
   },
@@ -51,7 +51,7 @@ export function SocialChannel() {
           Back to home
         </Link>
 
-        <h1 className="text-3xl font-bold text-stone-900 mb-2">KiloMarket on {info.title}</h1>
+        <h1 className="text-3xl font-bold text-stone-900 mb-2">Farmers Market on {info.title}</h1>
         <p className="text-stone-600 text-sm leading-relaxed mb-8">{info.description}</p>
 
         <a href={info.url} target="_blank" rel="noopener noreferrer" className="inline-flex">

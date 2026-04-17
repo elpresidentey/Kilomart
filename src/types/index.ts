@@ -26,7 +26,7 @@ export interface ProduceListing {
   location: string
   description?: string
   images?: string[]
-  status: 'active' | 'sold' | 'withdrawn'
+  status: 'active' | 'sold' | 'sold_out' | 'withdrawn' | 'suspended'
   created_at: string
   updated_at: string
   seller?: User

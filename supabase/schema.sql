@@ -1,4 +1,4 @@
--- KiloMarket Database Schema - Complete Version
+-- Farmers Market Database Schema - Complete Version
 -- Run this in your Supabase SQL Editor
 
 -- Enable UUID extension
@@ -273,15 +273,27 @@ alter table conversations enable row level security;
 alter table messages enable row level security;
 
 -- Users policies
-create policy "Users can view all profiles"
+create policy "Users can view own profile"
   on users for select
-  to authenticated, anon
-  using (true);
+  to authenticated
+  using (auth.uid() = id);
+
+create policy "Admins can view all profiles"
+  on users for select
+  to authenticated
+  using (exists (select 1 from users where id = auth.uid() and role = 'admin'));
 
 create policy "Users can update own profile"
   on users for update
   to authenticated
-  using (auth.uid() = id);
+  using (auth.uid() = id)
+  with check (auth.uid() = id);
+
+create policy "Admins can manage profiles"
+  on users for all
+  to authenticated
+  using (exists (select 1 from users where id = auth.uid() and role = 'admin'))
+  with check (exists (select 1 from users where id = auth.uid() and role = 'admin'));
 
 -- Categories policies
 create policy "Anyone can view active categories"
@@ -501,18 +513,18 @@ create index idx_conversations_seller on conversations(seller_id);
 
 -- Insert categories
 insert into categories (name, slug, icon, description, sort_order) values
-  ('Rice', 'rice', '🌾', 'All varieties of rice including local and imported', 1),
-  ('Beans', 'beans', '🫘', 'Nigerian beans varieties - honey, iron, olotu', 2),
-  ('Maize', 'maize', '🌽', 'Yellow and white maize for consumption and feed', 3),
-  ('Cassava', 'cassava', '🍠', 'Fresh cassava tubers and cassava products', 4),
-  ('Yam', 'yam', '🍠', 'Puna, water yam, and chinese yam varieties', 5),
-  ('Plantain', 'plantain', '🍌', 'Green and ripe plantain for cooking', 6),
-  ('Vegetables', 'vegetables', '🥬', 'Leafy greens and vegetables', 7),
-  ('Fruits', 'fruits', '🍊', 'Seasonal and perennial fruits', 8),
-  ('Poultry', 'poultry', '🐔', 'Chicken, turkey, and eggs', 9),
-  ('Livestock', 'livestock', '🐄', 'Goat, sheep, cattle, and pig', 10),
-  ('Grains', 'grains', '🌾', 'Millet, sorghum, and other grains', 11),
-  ('Oil Seeds', 'oil-seeds', '🌻', 'Groundnut, sesame, and palm products', 12);
+  ('Rice', 'rice', 'ðŸŒ¾', 'All varieties of rice including local and imported', 1),
+  ('Beans', 'beans', 'ðŸ«˜', 'Nigerian beans varieties - honey, iron, olotu', 2),
+  ('Maize', 'maize', 'ðŸŒ½', 'Yellow and white maize for consumption and feed', 3),
+  ('Cassava', 'cassava', 'ðŸ ', 'Fresh cassava tubers and cassava products', 4),
+  ('Yam', 'yam', 'ðŸ ', 'Puna, water yam, and chinese yam varieties', 5),
+  ('Plantain', 'plantain', 'ðŸŒ', 'Green and ripe plantain for cooking', 6),
+  ('Vegetables', 'vegetables', 'ðŸ¥¬', 'Leafy greens and vegetables', 7),
+  ('Fruits', 'fruits', 'ðŸŠ', 'Seasonal and perennial fruits', 8),
+  ('Poultry', 'poultry', 'ðŸ”', 'Chicken, turkey, and eggs', 9),
+  ('Livestock', 'livestock', 'ðŸ„', 'Goat, sheep, cattle, and pig', 10),
+  ('Grains', 'grains', 'ðŸŒ¾', 'Millet, sorghum, and other grains', 11),
+  ('Oil Seeds', 'oil-seeds', 'ðŸŒ»', 'Groundnut, sesame, and palm products', 12);
 
 -- ============================================
 -- VIEWS (for easier querying)

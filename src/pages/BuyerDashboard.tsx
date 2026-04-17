@@ -8,23 +8,26 @@ import { orderLineTotal } from '../lib/orderDisplay'
 import { POPULAR_CATEGORY_LINKS } from '../data/marketplaceFilters'
 import { ShoppingBag, Clock, Package, MapPin, Search, ChevronRight, Store, CreditCard, Heart, TrendingUp, Star } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { repairText } from '../i18n/repairText'
+import { useI18n } from '../i18n/useI18n'
 
 const STATUS_CONFIG: Record<
   string,
   { label: string; variant: 'warning' | 'info' | 'success' | 'error' | 'default'; color: string }
 > = {
-  pending: { label: 'Pending', variant: 'warning', color: 'text-amber-600 bg-amber-50' },
-  confirmed: { label: 'Confirmed', variant: 'info', color: 'text-blue-600 bg-blue-50' },
-  paid: { label: 'Paid', variant: 'info', color: 'text-blue-600 bg-blue-50' },
-  processing: { label: 'Processing', variant: 'info', color: 'text-blue-600 bg-blue-50' },
-  shipped: { label: 'Shipped', variant: 'info', color: 'text-blue-600 bg-blue-50' },
-  delivered: { label: 'Delivered', variant: 'success', color: 'text-emerald-600 bg-emerald-50' },
-  completed: { label: 'Completed', variant: 'success', color: 'text-emerald-600 bg-emerald-50' },
-  cancelled: { label: 'Cancelled', variant: 'error', color: 'text-red-600 bg-red-50' },
-  refunded: { label: 'Refunded', variant: 'error', color: 'text-red-600 bg-red-50' },
+  pending: { label: 'status.pending', variant: 'warning', color: 'text-amber-600 bg-amber-50' },
+  confirmed: { label: 'status.confirmed', variant: 'info', color: 'text-blue-600 bg-blue-50' },
+  paid: { label: 'status.paid', variant: 'info', color: 'text-blue-600 bg-blue-50' },
+  processing: { label: 'status.processing', variant: 'info', color: 'text-blue-600 bg-blue-50' },
+  shipped: { label: 'status.shipped', variant: 'info', color: 'text-blue-600 bg-blue-50' },
+  delivered: { label: 'status.delivered', variant: 'success', color: 'text-primary-600 bg-primary-50' },
+  completed: { label: 'status.completed', variant: 'success', color: 'text-primary-600 bg-primary-50' },
+  cancelled: { label: 'status.cancelled', variant: 'error', color: 'text-red-600 bg-red-50' },
+  refunded: { label: 'status.refunded', variant: 'error', color: 'text-red-600 bg-red-50' },
 }
 
 export function BuyerDashboard() {
+  const { language, t } = useI18n()
   const { user } = useAuth()
   const [orders, setOrders] = useState<Order[]>([])
   const [recentProducts, setRecentProducts] = useState<ProduceListing[]>([])
@@ -35,6 +38,111 @@ export function BuyerDashboard() {
     totalSpent: 0,
     favoritesCount: 0
   })
+  const copy = repairText(
+    language === 'ha'
+      ? {
+          title: 'Dashboard dina',
+          welcome: 'Barka da dawowa',
+          welcomeSuffix: 'Sarrafa umarninka kuma gano sabbin kayan gona.',
+          browseMarket: 'Bude kasuwa',
+          myOrders: 'Umarnina',
+          totalOrders: 'Jimlar umarni',
+          activeOrders: 'Umarni masu aiki',
+          totalSpent: 'Jimlar kashe kudi',
+          favorites: 'Abubuwan so',
+          recentOrders: 'Sabbin umarni',
+          viewAll: 'Duba duka',
+          noOrders: 'Babu umarni tukuna',
+          startShopping: 'Fara siyayya',
+          freshArrivals: 'Sabbin kaya',
+          noProducts: 'Babu kaya yanzu',
+          quickActions: 'Ayyuka masu sauri',
+          searchProducts: 'Nemo kayayyaki',
+          viewOrders: 'Duba umarni',
+          myFavorites: 'Abubuwan da nake so',
+          updateAddress: 'Sabunta adireshi',
+          popularCategories: 'Rukuni masu shahara',
+          proTip: 'Shawara',
+          tipText: 'Sayi da yawa domin rage kudin isarwa. Manoma da yawa na bayar da rangwame idan oda ya wuce 100kg.',
+        }
+      : language === 'yo'
+        ? {
+            title: 'Dashboard mi',
+            welcome: 'Kaabo pada',
+            welcomeSuffix: 'Ṣakoso awọn aṣẹ rẹ ki o si wa ọja tuntun.',
+            browseMarket: 'Bude oja',
+            myOrders: 'Awọn aṣẹ mi',
+            totalOrders: 'Lapapọ aṣẹ',
+            activeOrders: 'Aṣẹ to n ṣiṣẹ',
+            totalSpent: 'Lapapọ inawo',
+            favorites: 'Ayanfẹ',
+            recentOrders: 'Awọn aṣẹ to ṣẹṣẹ',
+            viewAll: 'Wo gbogbo',
+            noOrders: 'Ko si aṣẹ sibẹsibẹ',
+            startShopping: 'Bẹrẹ rira',
+            freshArrivals: 'Awọn ọja tuntun',
+            noProducts: 'Ko si ọja wa',
+            quickActions: 'Igbese yarayara',
+            searchProducts: 'Wa ọja',
+            viewOrders: 'Wo awọn aṣẹ',
+            myFavorites: 'Awọn ayanfẹ mi',
+            updateAddress: 'Ṣatunkọ adirẹsi',
+            popularCategories: 'Ẹka olokiki',
+            proTip: 'Imọran',
+            tipText: 'Ra ni opoiye lati fi owo ifijiṣẹ pamọ. Pupọ agbe nfunni ni ẹdinwo fun aṣẹ ju 100kg lọ.',
+          }
+        : language === 'ig'
+          ? {
+              title: 'Dashboard m',
+              welcome: 'Nnọọ ọzọ',
+              welcomeSuffix: 'Jikwaa orders gị ma chọpụta ngwaahịa ọhụrụ.',
+              browseMarket: 'Gaa ahịa',
+              myOrders: 'Orders m',
+              totalOrders: 'Ngụkọta orders',
+              activeOrders: 'Orders na-arụ ọrụ',
+              totalSpent: 'Ngụkọta ego e mefuru',
+              favorites: 'Ihe masịrị m',
+              recentOrders: 'Orders ọhụrụ',
+              viewAll: 'Lee ha niile',
+              noOrders: 'Enweghị orders ugbu a',
+              startShopping: 'Bido ịzụ ahịa',
+              freshArrivals: 'Ngwaahịa ọhụrụ',
+              noProducts: 'Enweghị ngwaahịa dị',
+              quickActions: 'Ihe omume ọsọ ọsọ',
+              searchProducts: 'Chọọ ngwaahịa',
+              viewOrders: 'Lee orders',
+              myFavorites: 'Ihe masịrị m',
+              updateAddress: 'Melite adreesị',
+              popularCategories: 'Ụdị ama ama',
+              proTip: 'Ndụmọdụ',
+              tipText: 'Zụta n’ọtụtụ ka i chekwaa ego nnyefe. Ọtụtụ ndị ọrụ ugbo na-enye ego mbelata maka orders karịrị 100kg.',
+            }
+          : {
+              title: 'My Dashboard',
+              welcome: 'Welcome back',
+              welcomeSuffix: 'Manage your orders and discover fresh produce.',
+              browseMarket: 'Browse Market',
+              myOrders: 'My Orders',
+              totalOrders: 'Total Orders',
+              activeOrders: 'Active Orders',
+              totalSpent: 'Total Spent',
+              favorites: 'Favorites',
+              recentOrders: 'Recent Orders',
+              viewAll: 'View All',
+              noOrders: 'No orders yet',
+              startShopping: 'Start Shopping',
+              freshArrivals: 'Fresh Arrivals',
+              noProducts: 'No products available',
+              quickActions: 'Quick Actions',
+              searchProducts: 'Search Products',
+              viewOrders: 'View Orders',
+              myFavorites: 'My Favorites',
+              updateAddress: 'Update Address',
+              popularCategories: 'Popular Categories',
+              proTip: 'Pro Tip',
+              tipText: 'Buy in bulk to save on delivery fees. Most farmers offer discounts for orders above 100kg.',
+            },
+  )
 
   useEffect(() => {
     if (user) {
@@ -102,20 +210,20 @@ export function BuyerDashboard() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-stone-900">My Dashboard</h1>
-            <p className="text-stone-500">Welcome back{user?.full_name ? `, ${user.full_name.split(' ')[0]}` : ''}! Manage your orders and discover fresh produce.</p>
+            <h1 className="text-2xl font-bold text-stone-900">{copy.title}</h1>
+            <p className="text-stone-500">{copy.welcome}{user?.full_name ? `, ${user.full_name.split(' ')[0]}` : ''}! {copy.welcomeSuffix}</p>
           </div>
           <div className="flex gap-3">
             <Link to="/marketplace">
               <Button variant="outline">
                 <Search className="w-4 h-4 mr-2" />
-                Browse Market
+                {copy.browseMarket}
               </Button>
             </Link>
             <Link to="/orders">
               <Button>
                 <ShoppingBag className="w-4 h-4 mr-2" />
-                My Orders
+                {copy.myOrders}
               </Button>
             </Link>
           </div>
@@ -126,7 +234,7 @@ export function BuyerDashboard() {
           <Card padding="md">
             <div className="flex items-start justify-between">
               <div>
-                <p className="text-sm text-stone-500 mb-1">Total Orders</p>
+                <p className="text-sm text-stone-500 mb-1">{copy.totalOrders}</p>
                 <p className="text-2xl font-bold text-stone-900">{stats.totalOrders}</p>
               </div>
               <div className="p-2 bg-primary-100 rounded-lg">
@@ -138,7 +246,7 @@ export function BuyerDashboard() {
           <Card padding="md">
             <div className="flex items-start justify-between">
               <div>
-                <p className="text-sm text-stone-500 mb-1">Active Orders</p>
+                <p className="text-sm text-stone-500 mb-1">{copy.activeOrders}</p>
                 <p className="text-2xl font-bold text-blue-600">{stats.activeOrders}</p>
               </div>
               <div className="p-2 bg-blue-100 rounded-lg">
@@ -150,7 +258,7 @@ export function BuyerDashboard() {
           <Card padding="md">
             <div className="flex items-start justify-between">
               <div>
-                <p className="text-sm text-stone-500 mb-1">Total Spent</p>
+                <p className="text-sm text-stone-500 mb-1">{copy.totalSpent}</p>
                 <p className="text-2xl font-bold text-stone-900">{formatCurrency(stats.totalSpent)}</p>
               </div>
               <div className="p-2 bg-amber-100 rounded-lg">
@@ -162,7 +270,7 @@ export function BuyerDashboard() {
           <Card padding="md">
             <div className="flex items-start justify-between">
               <div>
-                <p className="text-sm text-stone-500 mb-1">Favorites</p>
+                <p className="text-sm text-stone-500 mb-1">{copy.favorites}</p>
                 <p className="text-2xl font-bold text-stone-900">{stats.favoritesCount}</p>
               </div>
               <div className="p-2 bg-red-100 rounded-lg">
@@ -177,10 +285,10 @@ export function BuyerDashboard() {
           <div className="lg:col-span-2 space-y-4">
             <Card padding="lg">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-lg font-semibold text-stone-900">Recent Orders</h2>
+                <h2 className="text-lg font-semibold text-stone-900">{copy.recentOrders}</h2>
                 <Link to="/orders">
                   <Button variant="ghost" size="sm">
-                    View All
+                    {copy.viewAll}
                     <ChevronRight className="w-4 h-4 ml-1" />
                   </Button>
                 </Link>
@@ -217,7 +325,7 @@ export function BuyerDashboard() {
                             (STATUS_CONFIG[order.status] ?? STATUS_CONFIG.pending).color
                           }`}
                         >
-                          {(STATUS_CONFIG[order.status] ?? STATUS_CONFIG.pending).label}
+                          {t((STATUS_CONFIG[order.status] ?? STATUS_CONFIG.pending).label)}
                         </span>
                         <p className="text-xs text-stone-400 mt-1">{new Date(order.created_at).toLocaleDateString()}</p>
                       </div>
@@ -227,9 +335,9 @@ export function BuyerDashboard() {
               ) : (
                 <div className="text-center py-8">
                   <Package className="w-12 h-12 text-stone-300 mx-auto mb-4" />
-                  <p className="text-stone-500 mb-4">No orders yet</p>
+                  <p className="text-stone-500 mb-4">{copy.noOrders}</p>
                   <Link to="/marketplace">
-                    <Button>Start Shopping</Button>
+                    <Button>{copy.startShopping}</Button>
                   </Link>
                 </div>
               )}
@@ -238,10 +346,10 @@ export function BuyerDashboard() {
             {/* Recently Added Products */}
             <Card padding="lg">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-lg font-semibold text-stone-900">Fresh Arrivals</h2>
+                <h2 className="text-lg font-semibold text-stone-900">{copy.freshArrivals}</h2>
                 <Link to="/marketplace">
                   <Button variant="ghost" size="sm">
-                    View All
+                    {copy.viewAll}
                     <ChevronRight className="w-4 h-4 ml-1" />
                   </Button>
                 </Link>
@@ -268,7 +376,7 @@ export function BuyerDashboard() {
               ) : (
                 <div className="text-center py-8">
                   <Store className="w-12 h-12 text-stone-300 mx-auto mb-4" />
-                  <p className="text-stone-500">No products available</p>
+                  <p className="text-stone-500">{copy.noProducts}</p>
                 </div>
               )}
             </Card>
@@ -278,28 +386,28 @@ export function BuyerDashboard() {
           <div className="space-y-6">
             {/* Quick Actions */}
             <Card padding="lg">
-              <h2 className="text-lg font-semibold text-stone-900 mb-4">Quick Actions</h2>
+              <h2 className="text-lg font-semibold text-stone-900 mb-4">{copy.quickActions}</h2>
               <div className="space-y-3">
                 <Link to="/marketplace">
                   <Button variant="outline" className="w-full justify-start">
                     <Search className="w-4 h-4 mr-2" />
-                    Search Products
+                    {copy.searchProducts}
                   </Button>
                 </Link>
                 <Link to="/orders">
                   <Button variant="outline" className="w-full justify-start">
                     <ShoppingBag className="w-4 h-4 mr-2" />
-                    View Orders
+                    {copy.viewOrders}
                   </Button>
                 </Link>
                 <Button variant="outline" className="w-full justify-start">
                   <Heart className="w-4 h-4 mr-2" />
-                  My Favorites
+                    {copy.myFavorites}
                 </Button>
                 <Link to="/profile">
                   <Button variant="outline" className="w-full justify-start">
                     <MapPin className="w-4 h-4 mr-2" />
-                    Update Address
+                    {copy.updateAddress}
                   </Button>
                 </Link>
               </div>
@@ -307,7 +415,7 @@ export function BuyerDashboard() {
 
             {/* Trending Categories */}
             <Card padding="lg">
-              <h2 className="text-lg font-semibold text-stone-900 mb-4">Popular Categories</h2>
+              <h2 className="text-lg font-semibold text-stone-900 mb-4">{copy.popularCategories}</h2>
               <div className="space-y-2">
                 {POPULAR_CATEGORY_LINKS.map((category) => (
                   <Link 
@@ -323,15 +431,15 @@ export function BuyerDashboard() {
             </Card>
 
             {/* Tips Card */}
-            <Card padding="lg" className="bg-gradient-to-br from-primary-50 to-emerald-50 border-primary-100">
+            <Card padding="lg" className="bg-gradient-to-br from-primary-50 to-primary-50 border-primary-100">
               <div className="flex items-start gap-3">
                 <div className="p-2 bg-primary-100 rounded-lg">
                   <Star className="w-5 h-5 text-primary-700" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-stone-900">Pro Tip</h3>
+                  <h3 className="font-semibold text-stone-900">{copy.proTip}</h3>
                   <p className="text-sm text-stone-600 mt-1">
-                    Buy in bulk to save on delivery fees. Most farmers offer discounts for orders above 100kg.
+                    {copy.tipText}
                   </p>
                 </div>
               </div>

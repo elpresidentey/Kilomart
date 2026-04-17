@@ -46,16 +46,17 @@ export default {
       },
       colors: {
         primary: {
-          50: '#f0fdf4',
-          100: '#dcfce7',
-          200: '#bbf7d0',
-          300: '#86efac',
-          400: '#4ade80',
-          500: '#16a34a',
-          600: '#15803d',
-          700: '#166534',
-          800: '#14532d',
-          900: '#052e16',
+          50: '#ecfdf7',
+          100: '#d1faeb',
+          200: '#a7f4d7',
+          300: '#6fe7be',
+          400: '#34d39e',
+          500: '#08a170',
+          600: '#078b62',
+          700: '#0a704f',
+          800: '#0c5941',
+          900: '#0c4a37',
+          950: '#05291f',
         },
         earth: {
           50: '#faf8f5',
@@ -71,8 +72,8 @@ export default {
         },
       },
       fontFamily: {
-        sans: ['Cabin', 'system-ui', 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', 'sans-serif'],
-        display: ['"Cabin Condensed"', 'Cabin', 'system-ui', 'sans-serif'],
+        sans: ['"Segoe UI"', 'system-ui', 'Roboto', 'Helvetica', 'Arial', 'sans-serif'],
+        display: ['"Segoe UI"', 'system-ui', 'Roboto', 'Helvetica', 'Arial', 'sans-serif'],
       },
       letterSpacing: {
         tighter: '-0.02em',

@@ -4,11 +4,13 @@ import { Button, Card, Input } from '../components/ui'
 import { useAuth } from '../hooks/useAuth'
 import { Leaf } from 'lucide-react'
 import { safeRedirectPath } from '../lib/redirect'
+import { useI18n } from '../i18n/useI18n'
 
 export function Login() {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const { signIn } = useAuth()
+  const { t } = useI18n()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -46,26 +48,26 @@ export function Login() {
           <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-primary-100 text-primary-700 mb-4">
             <Leaf className="w-6 h-6" />
           </div>
-          <h1 className="text-2xl font-bold text-stone-900">Welcome back</h1>
-          <p className="text-stone-500 mt-1">Sign in to access your account</p>
+          <h1 className="text-2xl font-bold text-stone-900">{t('auth.login.title')}</h1>
+          <p className="text-stone-500 mt-1">{t('auth.login.subtitle')}</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <Input
-            label="Email"
+            label={t('auth.emailLabel')}
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="Enter your email"
+            placeholder={t('auth.login.emailPlaceholder')}
             required
           />
           
           <Input
-            label="Password"
+            label={t('auth.passwordLabel')}
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            placeholder="Enter your password"
+            placeholder={t('auth.login.passwordPlaceholder')}
             required
           />
 
@@ -78,12 +80,12 @@ export function Login() {
             className="w-full"
             isLoading={isLoading}
           >
-            Sign In
+            {t('auth.login.submit')}
           </Button>
         </form>
 
         <p className="text-center text-sm text-stone-500 mt-6">
-          Don't have an account?{' '}
+          {t('auth.login.noAccount')}{' '}
           <Link
             to={
               searchParams.get('redirect')
@@ -92,7 +94,7 @@ export function Login() {
             }
             className="text-primary-700 font-medium hover:underline"
           >
-            Sign up
+            {t('auth.login.signUp')}
           </Link>
         </p>
       </Card>

@@ -7,30 +7,19 @@ import { useCartStore } from '../stores/cartStore'
 import type { ProduceListing } from '../types'
 import { Search, Filter, MapPin, SlidersHorizontal } from 'lucide-react'
 import { useSearchParams } from 'react-router-dom'
+import { useI18n } from '../i18n/useI18n'
 import {
   MARKETPLACE_PRODUCT_FILTERS,
   parseCategorySearchParam,
 } from '../data/marketplaceFilters'
 
-const LOCATIONS = [
-  'All Locations',
-  'Lagos',
-  'Ibadan',
-  'Abeokuta',
-  'Ilorin',
-  'Akure',
-  'Osogbo',
-]
-
-const QUALITY_GRADES = [
-  { value: 'all', label: 'All Grades' },
-  { value: 'A', label: 'Grade A - Premium' },
-  { value: 'B', label: 'Grade B - Standard' },
-  { value: 'C', label: 'Grade C - Fair' },
-]
+const LOCATIONS = ['Lagos', 'Ibadan', 'Abeokuta', 'Ilorin', 'Akure', 'Osogbo']
+const ALL_LOCATIONS = 'all'
+const ALL_PRODUCTS = 'All Products'
 
 export function Marketplace() {
   const addToCart = useCartStore((s) => s.addToCart)
+  const { t } = useI18n()
   const [searchParams] = useSearchParams()
   const qFromUrl = searchParams.get('q') || ''
   const [loading, setLoading] = useState(true)
@@ -42,10 +31,21 @@ export function Marketplace() {
   void featuredProducts; void setFeaturedProducts // reference to avoid unused warning
   const trustBadges: string[] = []
   void trustBadges // reference to avoid unused warning
-  const [selectedProduct, setSelectedProduct] = useState('All Products')
-  const [selectedLocation, setSelectedLocation] = useState('All Locations')
+  const [selectedProduct, setSelectedProduct] = useState(ALL_PRODUCTS)
+  const [selectedLocation, setSelectedLocation] = useState(ALL_LOCATIONS)
   const [selectedGrade, setSelectedGrade] = useState('all')
   const [showFilters, setShowFilters] = useState(false)
+
+  const locations = [
+    { value: ALL_LOCATIONS, label: t('marketplace.allLocations') },
+    ...LOCATIONS.map((loc) => ({ value: loc, label: loc })),
+  ]
+  const qualityGrades = [
+    { value: 'all', label: t('marketplace.allGrades') },
+    { value: 'A', label: 'Grade A - Premium' },
+    { value: 'B', label: 'Grade B - Standard' },
+    { value: 'C', label: 'Grade C - Fair' },
+  ]
 
   const handleAddToCart = (listing: ProduceListing, quantity: number) => {
     addToCart({
@@ -103,11 +103,11 @@ export function Marketplace() {
       .includes(searchQuery.toLowerCase())
     const cat = listing.category?.name
     const matchesProduct =
-      selectedProduct === 'All Products' ||
+      selectedProduct === ALL_PRODUCTS ||
       (cat != null && cat === selectedProduct) ||
       listing.product_name.toLowerCase().includes(selectedProduct.toLowerCase())
     const matchesLocation =
-      selectedLocation === 'All Locations' || listing.location === selectedLocation
+      selectedLocation === ALL_LOCATIONS || listing.location === selectedLocation
     const matchesGrade =
       selectedGrade === 'all' || listing.quality_grade === selectedGrade
 
@@ -120,8 +120,8 @@ export function Marketplace() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-stone-900">Marketplace</h1>
-            <p className="text-stone-500">Browse fresh produce at fair prices</p>
+            <h1 className="text-2xl font-bold text-stone-900">{t('marketplace.title')}</h1>
+            <p className="text-stone-500">{t('marketplace.subtitle')}</p>
           </div>
           <div className="flex items-center gap-2">
             <Button
@@ -130,7 +130,7 @@ export function Marketplace() {
               className="sm:hidden"
             >
               <SlidersHorizontal className="w-4 h-4 mr-2" />
-              Filters
+              {t('marketplace.filters')}
             </Button>
           </div>
         </div>
@@ -143,7 +143,7 @@ export function Marketplace() {
             <Input
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search for rice, beans, vegetables..."
+              placeholder={t('marketplace.searchPlaceholder')}
               className="pl-10"
             />
           </div>
@@ -176,9 +176,9 @@ export function Marketplace() {
                   onChange={(e) => setSelectedLocation(e.target.value)}
                   className="px-3 py-2 border border-stone-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
                 >
-                  {LOCATIONS.map((loc) => (
-                    <option key={loc} value={loc}>
-                      {loc}
+                  {locations.map((loc) => (
+                    <option key={loc.value} value={loc.value}>
+                      {loc.label}
                     </option>
                   ))}
                 </select>
@@ -191,7 +191,7 @@ export function Marketplace() {
                   onChange={(e) => setSelectedGrade(e.target.value)}
                   className="px-3 py-2 border border-stone-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
                 >
-                  {QUALITY_GRADES.map((grade) => (
+                  {qualityGrades.map((grade) => (
                     <option key={grade.value} value={grade.value}>
                       {grade.label}
                     </option>
@@ -200,7 +200,9 @@ export function Marketplace() {
               </div>
 
               <div className="flex items-center gap-2 text-sm text-stone-500">
-                <span>{filteredListings.length} listings found</span>
+                <span>
+                  {filteredListings.length} {t('marketplace.listingsFound')}
+                </span>
               </div>
             </div>
           </div>
@@ -239,9 +241,7 @@ export function Marketplace() {
             <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-stone-100 mb-6">
               <Search className="w-10 h-10 text-stone-400" />
             </div>
-            <h3 className="text-xl font-semibold text-stone-900 mb-2">
-              No listings found
-            </h3>
+            <h3 className="text-xl font-semibold text-stone-900 mb-2">No listings found</h3>
             <p className="text-stone-500 max-w-md mx-auto">
               Try adjusting your search or filters to find what you're looking for.
             </p>

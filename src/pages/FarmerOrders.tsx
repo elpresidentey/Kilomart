@@ -2,10 +2,11 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { Layout } from '../components/Layout'
 import { Card, Button, Badge } from '../components/ui'
 import { supabase } from '../lib/supabase'
-import { formatDeliveryAddress, orderLineTotal } from '../lib/orderDisplay'
+import { formatDeliveryAddress, getDeliveryContact, orderLineTotal } from '../lib/orderDisplay'
 import { useAuth } from '../hooks/useAuth'
 import type { Order, OrderStatus } from '../types'
 import { Package, MapPin, RefreshCw } from 'lucide-react'
+import { useI18n } from '../i18n/useI18n'
 
 const STATUS_OPTIONS: OrderStatus[] = [
   'pending',
@@ -21,6 +22,7 @@ const STATUS_OPTIONS: OrderStatus[] = [
 
 export function FarmerOrders() {
   const { user } = useAuth()
+  const { t } = useI18n()
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
   const [updatingId, setUpdatingId] = useState<string | null>(null)
@@ -37,7 +39,7 @@ export function FarmerOrders() {
       setLoading(true)
       const { data, error } = await supabase
         .from('orders')
-        .select('*, listing:produce_listings(*), buyer:users!orders_buyer_id_fkey(id, full_name, phone)')
+        .select('*, listing:produce_listings(*)')
         .eq('seller_id', user.id)
         .order('created_at', { ascending: false })
 
@@ -116,7 +118,7 @@ export function FarmerOrders() {
       setOrders((prev) => prev.map((o) => (o.id === orderId ? { ...o, status } : o)))
     } catch (e) {
       console.error(e)
-      alert('Could not update status. Check your connection and try again.')
+      alert(t('farmerOrders.updateStatusError'))
     } finally {
       setUpdatingId(null)
     }
@@ -142,28 +144,28 @@ export function FarmerOrders() {
       <div className="space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-stone-900">Incoming orders</h1>
-            <p className="text-stone-500">Update status as you confirm, pack, and ship</p>
+            <h1 className="text-2xl font-bold text-stone-900">{t('farmerOrders.title')}</h1>
+            <p className="text-stone-500">{t('farmerOrders.subtitle')}</p>
           </div>
           <Button variant="outline" size="sm" onClick={() => fetchOrders()} disabled={loading}>
             <RefreshCw className="w-4 h-4 mr-2" />
-            Refresh
+            {t('common.refresh')}
           </Button>
         </div>
 
         {(newOrderIds.length > 0 || statusChangedOrderIds.length > 0) && (
           <div
-            className="rounded-lg border border-emerald-200 bg-emerald-50/60 p-3 text-sm text-emerald-900 motion-safe:animate-fade-in motion-reduce:animate-none"
+            className="rounded-lg border border-primary-200 bg-primary-50/60 p-3 text-sm text-primary-900 motion-safe:animate-fade-in motion-reduce:animate-none"
             role="status"
             aria-live="polite"
           >
             {newOrderIds.length > 0 ? (
               <span className="font-medium">
-                New transaction received for your listings ({newOrderIds.length}).
+                {t('farmerOrders.newTransaction')} ({newOrderIds.length}).
               </span>
             ) : (
               <span className="font-medium">
-                Order status updated ({statusChangedOrderIds.length}).
+                {t('farmerOrders.statusUpdated')} ({statusChangedOrderIds.length}).
               </span>
             )}
           </div>
@@ -178,25 +180,28 @@ export function FarmerOrders() {
         ) : orders.length === 0 ? (
           <Card className="text-center py-14" padding="lg">
             <Package className="w-12 h-12 text-stone-300 mx-auto mb-4" />
-            <p className="text-stone-600">No orders for your listings yet.</p>
+            <p className="text-stone-600">{t('farmerOrders.noOrders')}</p>
           </Card>
         ) : (
           <div className="space-y-4">
-            {orders.map((order) => (
-              <Card
-                key={order.id}
-                padding="lg"
-                className={[
-                  newOrderIds.includes(order.id)
-                    ? 'border-emerald-400/60 ring-1 ring-emerald-200 bg-emerald-50/30 animate-pulse'
-                    : '',
-                  !newOrderIds.includes(order.id) && statusChangedOrderIds.includes(order.id)
-                    ? 'border-amber-300/60 ring-1 ring-amber-200 bg-amber-50/40 animate-pulse'
-                    : '',
-                ]
-                  .filter(Boolean)
-                  .join(' ')}
-              >
+            {orders.map((order) => {
+              const deliveryContact = getDeliveryContact(order.delivery_address)
+
+              return (
+                <Card
+                  key={order.id}
+                  padding="lg"
+                  className={[
+                    newOrderIds.includes(order.id)
+                      ? 'border-primary-400/60 ring-1 ring-primary-200 bg-primary-50/30 animate-pulse'
+                      : '',
+                    !newOrderIds.includes(order.id) && statusChangedOrderIds.includes(order.id)
+                      ? 'border-amber-300/60 ring-1 ring-amber-200 bg-amber-50/40 animate-pulse'
+                      : '',
+                  ]
+                    .filter(Boolean)
+                    .join(' ')}
+                >
                 <div className="flex flex-col lg:flex-row lg:items-start gap-4 justify-between">
                   <div className="space-y-2 min-w-0">
                     <div className="flex flex-wrap items-center gap-2">
@@ -208,8 +213,11 @@ export function FarmerOrders() {
                       </Badge>
                     </div>
                     <p className="text-sm text-stone-500">
-                      Buyer: {order.buyer?.full_name || 'Customer'}
+                      Buyer: {deliveryContact.contactName || 'Customer'}
                     </p>
+                    {deliveryContact.phone && (
+                      <p className="text-sm text-stone-500">Phone: {deliveryContact.phone}</p>
+                    )}
                     <p className="text-sm text-stone-500">{formatDate(order.created_at)}</p>
                     <p className="text-sm text-stone-700">
                       {order.quantity_kg} kg · {formatCurrency(orderLineTotal(order))}
@@ -220,7 +228,7 @@ export function FarmerOrders() {
                     </div>
                   </div>
                   <div className="flex flex-col sm:flex-row lg:flex-col gap-2 lg:items-end flex-shrink-0">
-                    <label className="text-xs text-stone-500">Order status</label>
+                    <label className="text-xs text-stone-500">{t('farmerOrders.orderStatusLabel')}</label>
                     <select
                       className="px-3 py-2 border border-stone-200 rounded-lg text-sm bg-white min-w-[180px]"
                       value={order.status}
@@ -234,12 +242,13 @@ export function FarmerOrders() {
                       ))}
                     </select>
                     {updatingId === order.id && (
-                      <span className="text-xs text-stone-400">Saving…</span>
+                      <span className="text-xs text-stone-400">{t('farmerOrders.saving')}</span>
                     )}
                   </div>
                 </div>
-              </Card>
-            ))}
+                </Card>
+              )
+            })}
           </div>
         )}
       </div>

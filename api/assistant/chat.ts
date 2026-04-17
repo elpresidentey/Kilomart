@@ -1,5 +1,6 @@
 type ChatBody = {
   message?: string
+  language?: 'en' | 'ha' | 'yo' | 'ig'
   history?: Array<{ role: 'user' | 'assistant'; content: string }>
 }
 
@@ -18,15 +19,19 @@ export default async function handler(req: any, res: any) {
 
   const body = (req.body || {}) as ChatBody
   const message = (body.message || '').trim()
+  const language = body.language || 'en'
+  const languageLabel =
+    language === 'ha' ? 'Hausa' : language === 'yo' ? 'Yoruba' : language === 'ig' ? 'Igbo' : 'English'
   if (!message) {
     res.status(400).json({ error: 'Message is required' })
     return
   }
 
   const systemPrompt = [
-    'You are KiloMarket Assistant, a concise support bot for a Nigerian produce marketplace.',
-    'Help users with: what KiloMarket does, onboarding, login/signup, email confirmation, browsing marketplace, cart/checkout, payments, order tracking, and seller listings.',
+    'You are Farmers Market Assistant, a concise support bot for a Nigerian produce marketplace.',
+    'Help users with: what Farmers Market does, onboarding, login/signup, email confirmation, browsing marketplace, cart/checkout, payments, order tracking, and seller listings.',
     'Keep answers short and practical with 1-4 clear steps.',
+    `Always respond in ${languageLabel}.`,
     'Do not invent account/order/payment status. If user needs account-specific help, tell them to check Orders/Profile or contact support via /contact.',
     'If user asks unrelated harmful or sensitive advice, decline briefly and redirect to app-related help.',
   ].join(' ')

@@ -6,6 +6,8 @@ import { useAuth } from '../hooks/useAuth'
 import { supabase } from '../lib/supabase'
 import { useCartStore, cartUnitsCount } from '../stores/cartStore'
 import { ArrowLeft, MapPin, Phone, User, CreditCard, Truck, CheckCircle } from 'lucide-react'
+import { repairText } from '../i18n/repairText'
+import { useI18n } from '../i18n/useI18n'
 
 export function Checkout() {
   const navigate = useNavigate()
@@ -13,6 +15,7 @@ export function Checkout() {
   const cart = useCartStore((s) => s.cart)
   const clearCart = useCartStore((s) => s.clearCart)
   const { user, loading: authLoading } = useAuth()
+  const { t, language } = useI18n()
   const [loading, setLoading] = useState(false)
   const [orderComplete, setOrderComplete] = useState(false)
   const [orderNumber, setOrderNumber] = useState('')
@@ -32,6 +35,94 @@ export function Checkout() {
   const deliveryFee = 1500
   const finalTotal = totalAmount + deliveryFee
   const callbackBase = typeof window !== 'undefined' ? window.location.origin : ''
+  const apiBase = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/$/, '')
+  const initializeUrl = `${apiBase}/api/paystack/initialize`
+  const verifyUrl = `${apiBase}/api/paystack/verify`
+  const [debugHint, setDebugHint] = useState<string | null>(null)
+  async function safeJson(r: Response): Promise<any> {
+    const text = await r.text()
+    if (!text) return null
+    try {
+      return JSON.parse(text)
+    } catch {
+      return null
+    }
+  }
+  const copy = repairText(
+    language === 'ha'
+      ? {
+          loginToOrder: 'Don Allah shiga kafin yin oda',
+          fillDelivery: 'Don Allah cika dukkan bayanan isarwa da ake bukata',
+          verifyPayment: 'Ba a iya tabbatar da biyan kudi ba',
+          payNotSuccessful: 'Biyan kudi bai yi nasara ba',
+          initPaystack: 'Ba a iya fara biyan Paystack ba',
+          orderFailed: 'An kasa yin oda. Don Allah sake gwadawa.',
+          cartEmptyTitle: 'Katin ka babu komai',
+          cartEmptyBody: 'Saka wasu kayayyaki domin ci gaba da checkout',
+          browseMarketplace: 'Bude kasuwa',
+          orderPlaced: 'An yi oda cikin nasara!',
+          orderCall: 'Za a kira ka don tabbatarwa cikin awa 24',
+          viewOrders: 'Duba umarni',
+          continueShopping: 'Ci gaba da siyayya',
+        }
+      : language === 'yo'
+        ? {
+            loginToOrder: 'Jowo wÃ¡Â»Âle ki o to paÃ¡Â¹Â£Ã¡ÂºÂ¹',
+            fillDelivery: 'Jowo kun gbogbo alaye ifijiÃ¡Â¹Â£Ã¡ÂºÂ¹ to nilo',
+            verifyPayment: 'Ko le jÃ¡ÂºÂ¹risi isanwo',
+            payNotSuccessful: 'Isanwo ko Ã¡Â¹Â£aÃ¡Â¹Â£eyÃ¡Â»Âri',
+            initPaystack: 'Ko le bÃ¡ÂºÂ¹rÃ¡ÂºÂ¹ isanwo Paystack',
+            orderFailed: 'Ko Ã¡Â¹Â£ee paÃ¡Â¹Â£Ã¡ÂºÂ¹. Jowo tun gbiyanju.',
+            cartEmptyTitle: 'Kati rÃ¡ÂºÂ¹ Ã¡Â¹Â£ofo',
+            cartEmptyBody: 'Fi diÃ¡ÂºÂ¹ Ã¡Â»Âja kun lati tÃ¡ÂºÂ¹siwaju si checkout',
+            browseMarketplace: 'Bude oja',
+            orderPlaced: 'A ti fi aÃ¡Â¹Â£Ã¡ÂºÂ¹ ranÃ¡Â¹Â£Ã¡ÂºÂ¹ ni aÃ¡Â¹Â£eyÃ¡Â»Âri!',
+            orderCall: 'A o pe Ã¡Â»Â fun ÃƒÂ¬mÃƒÂºdÃƒÂ¡jÃƒÂº laarin wakati 24',
+            viewOrders: 'Wo awÃ¡Â»Ân aÃ¡Â¹Â£Ã¡ÂºÂ¹',
+            continueShopping: 'Tesiwaju rira',
+          }
+        : language === 'ig'
+          ? {
+              loginToOrder: 'Biko banye tupu itinye order',
+              fillDelivery: 'Biko juputa ozi nnyefe niile a choro',
+              verifyPayment: 'Enweghi ike nyochaa ugwo',
+              payNotSuccessful: 'Ugwo adighi nke oma',
+              initPaystack: 'Enweghi ike ibido ugwo Paystack',
+              orderFailed: 'Enweghi ike itinye order. Biko nwaa ozo.',
+              cartEmptyTitle: 'Kati gi di nÃ¢â‚¬â„¢efu',
+              cartEmptyBody: 'Tinye ufodu ngwaahÃ¡Â»â€¹a ka i gaa nÃ¢â‚¬â„¢ihu checkout',
+              browseMarketplace: 'Gaa ahia',
+              orderPlaced: 'Etinyere order nke oma!',
+              orderCall: 'A ga-akpo gi maka nkwenye nÃ¢â‚¬â„¢ime awa 24',
+              viewOrders: 'Lee orders',
+              continueShopping: 'Gaa nÃ¢â‚¬â„¢ihu Ã¡Â»â€¹zÃ¡Â»Â¥ ahÃ¡Â»â€¹a',
+            }
+          : {
+              loginToOrder: 'Please log in to place an order',
+              fillDelivery: 'Please fill in all required delivery information',
+              verifyPayment: 'Could not verify payment',
+              payNotSuccessful: 'Payment was not successful',
+              initPaystack: 'Could not initialize Paystack payment',
+              orderFailed: 'Failed to place order. Please try again.',
+              cartEmptyTitle: 'Your cart is empty',
+              cartEmptyBody: 'Add some products to proceed with checkout',
+              browseMarketplace: 'Browse Marketplace',
+              orderPlaced: 'Order Placed Successfully!',
+              orderCall: 'You will receive a confirmation call within 24 hours',
+              viewOrders: 'View Orders',
+              continueShopping: 'Continue Shopping',
+            },
+  )
+  const missingEmailMessage =
+    repairText(
+      language === 'ha'
+      ? 'Ba a sami imel na asusu ba. Da fatan za a sake shiga sannan a gwada.'
+      : language === 'yo'
+        ? 'A ko ri imeeli akanti. Jowo wole si i lekansi ki o tun gbiyanju.'
+        : language === 'ig'
+          ? 'Achotaghi email akauntu. Biko banye ozo ma nwalee ozo.'
+          : 'No account email found. Please sign out and sign in again.',
+    )
 
   const deliveryPayload = useMemo(
     () => ({
@@ -49,7 +140,7 @@ export function Checkout() {
   }
 
   const createOrdersAndPayments = async (providerReference?: string) => {
-    if (!user) throw new Error('Please log in to place an order')
+    if (!user) throw new Error(copy.loginToOrder)
     const orderNumbers: string[] = []
 
     for (const item of cart) {
@@ -112,16 +203,17 @@ export function Checkout() {
       try {
         setLoading(true)
         setError(null)
-        const r = await fetch(`/api/paystack/verify?reference=${encodeURIComponent(reference)}`)
-        const data = await r.json()
-        if (!r.ok) throw new Error(data?.error || 'Could not verify payment')
-        if (data.status !== 'success') throw new Error('Payment was not successful')
+        setDebugHint(null)
+        const r = await fetch(`${verifyUrl}?reference=${encodeURIComponent(reference)}`)
+        const data = await safeJson(r)
+        if (!r.ok) throw new Error(data?.error || copy.verifyPayment)
+        if (!data || data.status !== 'success') throw new Error(copy.payNotSuccessful)
 
         await createOrdersAndPayments(reference)
         sessionStorage.setItem(marker, '1')
         setSearchParams({}, { replace: true })
       } catch (e: any) {
-        setError(e?.message || 'Could not verify payment')
+        setError(e?.message || copy.verifyPayment)
       } finally {
         setLoading(false)
       }
@@ -136,36 +228,51 @@ export function Checkout() {
     }
 
     if (!user) {
-      setError('Please log in to place an order')
+      setError(copy.loginToOrder)
       return
     }
     
     if (!deliveryInfo.fullName || !deliveryInfo.phone || !deliveryInfo.address) {
-      setError('Please fill in all required delivery information')
+      setError(copy.fillDelivery)
+      setDebugHint(null)
       return
     }
     
     setError(null)
+    setDebugHint(null)
     setLoading(true)
     try {
       if (paymentMethod === 'paystack') {
+        const {
+          data: { user: authUser },
+        } = await supabase.auth.getUser()
+        const payerEmail = authUser?.email || user.email
+        if (!payerEmail) {
+          throw new Error(missingEmailMessage)
+        }
+
         const callbackUrl = callbackBase ? `${callbackBase}/checkout` : '/checkout'
-        const resp = await fetch('/api/paystack/initialize', {
+        const resp = await fetch(initializeUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            email: user.email,
+            email: payerEmail,
             amountKobo: Math.round(finalTotal * 100),
             callbackUrl,
             metadata: {
               buyer_id: user.id,
-              checkout_source: 'kilomarket_web',
+              checkout_source: 'farmersmarket_web',
             },
           }),
         })
-        const payload = await resp.json()
-        if (!resp.ok || !payload.authorization_url) {
-          throw new Error(payload?.error || 'Could not initialize Paystack payment')
+        const payload = await safeJson(resp)
+        if (!resp.ok) {
+          setDebugHint(`Init URL: ${initializeUrl} | HTTP ${resp.status}`)
+          throw new Error(payload?.error || `${copy.initPaystack} (HTTP ${resp.status})`)
+        }
+        if (!payload?.authorization_url) {
+          setDebugHint(`Init URL: ${initializeUrl} | Missing authorization_url`)
+          throw new Error(payload?.error || `${copy.initPaystack}: invalid API response`)
         }
         window.location.href = payload.authorization_url as string
         return
@@ -174,7 +281,7 @@ export function Checkout() {
       await createOrdersAndPayments()
     } catch (error: any) {
       console.error('Order failed:', error)
-      setError(error?.message || error?.error_description || 'Failed to place order. Please try again.')
+      setError(error?.message || error?.error_description || copy.orderFailed)
     } finally {
       setLoading(false)
     }
@@ -187,10 +294,10 @@ export function Checkout() {
           <div className="w-20 h-20 bg-stone-100 rounded-full flex items-center justify-center mx-auto mb-6">
             <CreditCard className="w-10 h-10 text-stone-400" />
           </div>
-          <h2 className="text-2xl font-bold text-stone-900 mb-2">Your cart is empty</h2>
-          <p className="text-stone-600 mb-6">Add some products to proceed with checkout</p>
+          <h2 className="text-2xl font-bold text-stone-900 mb-2">{copy.cartEmptyTitle}</h2>
+          <p className="text-stone-600 mb-6">{copy.cartEmptyBody}</p>
           <Button onClick={() => navigate('/marketplace')}>
-            Browse Marketplace
+            {copy.browseMarketplace}
           </Button>
         </div>
       </Layout>
@@ -201,18 +308,18 @@ export function Checkout() {
     return (
       <Layout cartItemCount={0}>
         <div className="max-w-2xl mx-auto py-16 text-center">
-          <div className="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <CheckCircle className="w-10 h-10 text-emerald-600" />
+          <div className="w-20 h-20 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <CheckCircle className="w-10 h-10 text-primary-600" />
           </div>
-          <h2 className="text-2xl font-bold text-stone-900 mb-2">Order Placed Successfully!</h2>
+          <h2 className="text-2xl font-bold text-stone-900 mb-2">{copy.orderPlaced}</h2>
           <p className="text-stone-600 mb-2">Order #{orderNumber}</p>
-          <p className="text-stone-500 mb-8">You will receive a confirmation call within 24 hours</p>
+          <p className="text-stone-500 mb-8">{copy.orderCall}</p>
           <div className="flex gap-4 justify-center">
             <Button onClick={() => navigate('/orders')} variant="outline">
-              View Orders
+              {copy.viewOrders}
             </Button>
             <Button onClick={() => navigate('/marketplace')}>
-              Continue Shopping
+              {copy.continueShopping}
             </Button>
           </div>
         </div>
@@ -228,10 +335,10 @@ export function Checkout() {
           className="flex items-center gap-2 text-stone-600 hover:text-stone-900 mb-6"
         >
           <ArrowLeft className="w-4 h-4" />
-          Back to Marketplace
+          {t('checkout.backToMarketplace')}
         </button>
 
-        <h1 className="text-2xl font-bold text-stone-900 mb-8">Checkout</h1>
+        <h1 className="text-2xl font-bold text-stone-900 mb-8">{t('checkout.title')}</h1>
 
         <div className="grid lg:grid-cols-2 gap-8">
           {/* Delivery Information */}
@@ -239,15 +346,15 @@ export function Checkout() {
             <div className="bg-white rounded-xl border border-stone-200 p-6">
               <div className="flex items-center gap-3 mb-6">
                 <div className="w-10 h-10 bg-stone-100 rounded-lg flex items-center justify-center">
-                  <MapPin className="w-5 h-5 text-emerald-600" />
+                  <MapPin className="w-5 h-5 text-primary-600" />
                 </div>
-                <h2 className="text-lg font-semibold text-stone-900">Delivery Information</h2>
+                <h2 className="text-lg font-semibold text-stone-900">{t('checkout.deliveryInfoTitle')}</h2>
               </div>
 
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-stone-700 mb-1">
-                    Full Name
+                    {t('checkout.fullNameLabel')}
                   </label>
                   <div className="relative">
                     <User className="w-5 h-5 text-stone-400 absolute left-3 top-1/2 -translate-y-1/2" />
@@ -257,14 +364,14 @@ export function Checkout() {
                       value={deliveryInfo.fullName}
                       onChange={handleInputChange}
                       className="w-full pl-10 pr-4 py-2 border border-stone-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                      placeholder="Enter your full name"
+                      placeholder={t('checkout.fullNamePlaceholder')}
                     />
                   </div>
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-stone-700 mb-1">
-                    Phone Number
+                    {t('checkout.phoneLabel')}
                   </label>
                   <div className="relative">
                     <Phone className="w-5 h-5 text-stone-400 absolute left-3 top-1/2 -translate-y-1/2" />
@@ -274,14 +381,14 @@ export function Checkout() {
                       value={deliveryInfo.phone}
                       onChange={handleInputChange}
                       className="w-full pl-10 pr-4 py-2 border border-stone-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                      placeholder="+234 800 000 0000"
+                      placeholder={t('checkout.phonePlaceholder')}
                     />
                   </div>
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-stone-700 mb-1">
-                    Delivery Address
+                    {t('checkout.addressLabel')}
                   </label>
                   <textarea
                     name="address"
@@ -289,14 +396,14 @@ export function Checkout() {
                     onChange={handleInputChange}
                     rows={3}
                     className="w-full px-4 py-2 border border-stone-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                    placeholder="Street address, landmark, etc."
+                    placeholder={t('checkout.addressPlaceholder')}
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-stone-700 mb-1">
-                      City
+                      {t('checkout.cityLabel')}
                     </label>
                     <input
                       type="text"
@@ -304,12 +411,12 @@ export function Checkout() {
                       value={deliveryInfo.city}
                       onChange={handleInputChange}
                       className="w-full px-4 py-2 border border-stone-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                      placeholder="City"
+                      placeholder={t('checkout.cityPlaceholder')}
                     />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-stone-700 mb-1">
-                      State
+                      {t('checkout.stateLabel')}
                     </label>
                     <input
                       type="text"
@@ -317,7 +424,7 @@ export function Checkout() {
                       value={deliveryInfo.state}
                       onChange={handleInputChange}
                       className="w-full px-4 py-2 border border-stone-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                      placeholder="State"
+                      placeholder={t('checkout.statePlaceholder')}
                     />
                   </div>
                 </div>
@@ -327,15 +434,15 @@ export function Checkout() {
             <div className="bg-white rounded-xl border border-stone-200 p-6">
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-10 h-10 bg-stone-100 rounded-lg flex items-center justify-center">
-                  <CreditCard className="w-5 h-5 text-emerald-600" />
+                  <CreditCard className="w-5 h-5 text-primary-600" />
                 </div>
-                <h2 className="text-lg font-semibold text-stone-900">Payment</h2>
+                <h2 className="text-lg font-semibold text-stone-900">{t('checkout.paymentTitle')}</h2>
               </div>
               <p className="text-sm text-stone-500 mb-4">
-                Choose your payment option. Paystack card flow is verified server-side before orders are created.
+                {t('checkout.paymentSubtitle')}
               </p>
               <div className="space-y-3">
-                <label className="flex items-start gap-3 cursor-pointer p-3 rounded-lg border border-stone-200 has-[:checked]:border-emerald-500 has-[:checked]:bg-emerald-50/50">
+                <label className="flex items-start gap-3 cursor-pointer p-3 rounded-lg border border-stone-200 has-[:checked]:border-primary-500 has-[:checked]:bg-primary-50/50">
                   <input
                     type="radio"
                     name="pay"
@@ -344,11 +451,11 @@ export function Checkout() {
                     onChange={() => setPaymentMethod('paystack')}
                   />
                   <span>
-                    <span className="font-medium text-stone-900">Paystack (card / transfer)</span>
-                    <span className="block text-sm text-stone-500">Secure online payment and instant verification</span>
+                    <span className="font-medium text-stone-900">{t('checkout.paystackTitle')}</span>
+                    <span className="block text-sm text-stone-500">{t('checkout.paystackSub')}</span>
                   </span>
                 </label>
-                <label className="flex items-start gap-3 cursor-pointer p-3 rounded-lg border border-stone-200 has-[:checked]:border-emerald-500 has-[:checked]:bg-emerald-50/50">
+                <label className="flex items-start gap-3 cursor-pointer p-3 rounded-lg border border-stone-200 has-[:checked]:border-primary-500 has-[:checked]:bg-primary-50/50">
                   <input
                     type="radio"
                     name="pay"
@@ -357,11 +464,11 @@ export function Checkout() {
                     onChange={() => setPaymentMethod('cash_on_delivery')}
                   />
                   <span>
-                    <span className="font-medium text-stone-900">Cash on delivery</span>
-                    <span className="block text-sm text-stone-500">Pay when your order arrives</span>
+                    <span className="font-medium text-stone-900">{t('checkout.codTitle')}</span>
+                    <span className="block text-sm text-stone-500">{t('checkout.codSub')}</span>
                   </span>
                 </label>
-                <label className="flex items-start gap-3 cursor-pointer p-3 rounded-lg border border-stone-200 has-[:checked]:border-emerald-500 has-[:checked]:bg-emerald-50/50">
+                <label className="flex items-start gap-3 cursor-pointer p-3 rounded-lg border border-stone-200 has-[:checked]:border-primary-500 has-[:checked]:bg-primary-50/50">
                   <input
                     type="radio"
                     name="pay"
@@ -370,9 +477,9 @@ export function Checkout() {
                     onChange={() => setPaymentMethod('bank_transfer')}
                   />
                   <span>
-                    <span className="font-medium text-stone-900">Bank transfer</span>
+                    <span className="font-medium text-stone-900">{t('checkout.bankTitle')}</span>
                     <span className="block text-sm text-stone-500">
-                      You will receive payment details from the seller or support
+                      {t('checkout.bankSub')}
                     </span>
                   </span>
                 </label>
@@ -385,9 +492,9 @@ export function Checkout() {
             <div className="bg-white rounded-xl border border-stone-200 p-6">
               <div className="flex items-center gap-3 mb-6">
                 <div className="w-10 h-10 bg-stone-100 rounded-lg flex items-center justify-center">
-                  <Truck className="w-5 h-5 text-emerald-600" />
+                  <Truck className="w-5 h-5 text-primary-600" />
                 </div>
-                <h2 className="text-lg font-semibold text-stone-900">Order Summary</h2>
+                <h2 className="text-lg font-semibold text-stone-900">{t('checkout.orderSummaryTitle')}</h2>
               </div>
 
               <div className="space-y-4 mb-6">
@@ -395,10 +502,10 @@ export function Checkout() {
                   <div key={item.id} className="flex justify-between items-center py-3 border-b border-stone-100">
                     <div>
                       <p className="font-medium text-stone-900">{item.name}</p>
-                      <p className="text-sm text-stone-500">{item.quantity} kg × ₦{item.price.toLocaleString()}</p>
+                      <p className="text-sm text-stone-500">{item.quantity} kg x N{item.price.toLocaleString()}</p>
                     </div>
                     <p className="font-semibold text-stone-900">
-                      ₦{(item.price * item.quantity).toLocaleString()}
+                      N{(item.price * item.quantity).toLocaleString()}
                     </p>
                   </div>
                 ))}
@@ -406,47 +513,50 @@ export function Checkout() {
 
               <div className="space-y-3 border-t border-stone-200 pt-4">
                 <div className="flex justify-between text-stone-600">
-                  <span>Subtotal</span>
-                  <span>₦{totalAmount.toLocaleString()}</span>
+                  <span>{t('checkout.subtotal')}</span>
+                  <span>N{totalAmount.toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between text-stone-600">
                   <span className="flex items-center gap-2">
                     <Truck className="w-4 h-4" />
-                    Delivery Fee
+                    {t('checkout.deliveryFee')}
                   </span>
-                  <span>₦{deliveryFee.toLocaleString()}</span>
+                  <span>N{deliveryFee.toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between text-lg font-bold text-stone-900 pt-3 border-t border-stone-200">
-                  <span>Total</span>
-                  <span>₦{finalTotal.toLocaleString()}</span>
+                  <span>{t('checkout.total')}</span>
+                  <span>N{finalTotal.toLocaleString()}</span>
                 </div>
               </div>
 
               {error && (
                 <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
                   <p className="text-sm text-red-600">{error}</p>
+                  {debugHint && (
+                    <p className="text-xs text-red-700/80 mt-2 break-all">{debugHint}</p>
+                  )}
                 </div>
               )}
 
               <Button
                 onClick={placeOrder}
                 disabled={loading || authLoading}
-                className="w-full mt-6 bg-emerald-600 hover:bg-emerald-700"
+                className="w-full mt-6 bg-primary-600 hover:bg-primary-700"
                 size="lg"
               >
                 {loading
-                  ? 'Processing...'
+                  ? t('checkout.processing')
                   : authLoading
-                    ? 'Checking login...'
-                    : `Place order — ₦${finalTotal.toLocaleString()}`}
+                    ? t('checkout.checkingLogin')
+                    : `${t('checkout.placeOrder')} - N${finalTotal.toLocaleString()}`}
               </Button>
 
               <p className="text-xs text-stone-500 text-center mt-4">
                 {paymentMethod === 'cash_on_delivery'
-                  ? 'You selected cash on delivery. Have the exact amount or confirm transfer with the rider.'
+                  ? t('checkout.noteCod')
                   : paymentMethod === 'bank_transfer'
-                  ? 'You selected bank transfer. Complete payment using details shared by the seller.'
-                  : 'You selected Paystack. You will be redirected securely to complete payment.'}
+                  ? t('checkout.noteBank')
+                  : t('checkout.notePaystack')}
               </p>
             </div>
           </div>

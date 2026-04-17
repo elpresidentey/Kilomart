@@ -5,11 +5,13 @@ import { useAuth } from '../hooks/useAuth'
 import { Leaf } from 'lucide-react'
 import type { User } from '../types'
 import { safeRedirectPath } from '../lib/redirect'
+import { useI18n } from '../i18n/useI18n'
 
 export function Signup() {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const { signUp } = useAuth()
+  const { t } = useI18n()
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -40,7 +42,7 @@ export function Signup() {
       setIsLoading(false)
     } else if (data?.user?.identities?.length === 0) {
       // Email confirmation required
-      setSuccessMessage('Account created! Please check your email to confirm your account before signing in.')
+      setSuccessMessage(t('auth.signup.successEmailConfirm'))
       setIsLoading(false)
     } else {
       // Auto-confirmed (or user already exists)
@@ -55,85 +57,85 @@ export function Signup() {
           <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-primary-100 text-primary-700 mb-4">
             <Leaf className="w-6 h-6" />
           </div>
-          <h1 className="text-2xl font-bold text-stone-900">Create account</h1>
-          <p className="text-stone-500 mt-1">Join KiloMarket today</p>
+          <h1 className="text-2xl font-bold text-stone-900">{t('auth.signup.title')}</h1>
+          <p className="text-stone-500 mt-1">{t('auth.signup.subtitle')}</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <Input
-            label="Full Name"
+            label={t('auth.fullNameLabel')}
             value={formData.fullName}
             onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-            placeholder="Enter your full name"
+            placeholder={t('auth.signup.fullNamePlaceholder')}
             required
           />
           
           <Input
-            label="Email"
+            label={t('auth.emailLabel')}
             type="email"
             value={formData.email}
             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-            placeholder="Enter your email"
+            placeholder={t('auth.signup.emailPlaceholder')}
             required
           />
           
           <Input
-            label="Phone Number"
+            label={t('auth.phoneLabel')}
             type="tel"
             value={formData.phone}
             onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-            placeholder="Enter your phone number"
+            placeholder={t('auth.signup.phonePlaceholder')}
             required
           />
           
           <Input
-            label="Location"
+            label={t('auth.locationLabel')}
             value={formData.location}
             onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-            placeholder="e.g., Lagos, Nigeria"
+            placeholder={t('auth.signup.locationPlaceholder')}
             required
           />
 
           <div>
             <label className="block text-sm font-medium text-stone-700 mb-1.5">
-              Account Type
+              {t('auth.signup.accountTypeLabel')}
             </label>
             <select
               value={formData.role}
               onChange={(e) => setFormData({ ...formData, role: e.target.value as User['role'] })}
               className="block w-full px-3 py-2.5 border border-stone-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
             >
-              <option value="buyer">Buyer (I want to purchase produce)</option>
-              <option value="farmer">Farmer (I want to sell produce)</option>
+              <option value="buyer">{t('auth.signup.buyerOption')}</option>
+              <option value="farmer">{t('auth.signup.farmerOption')}</option>
             </select>
           </div>
           
           <Input
-            label="Password"
+            label={t('auth.passwordLabel')}
             type="password"
             value={formData.password}
             onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-            placeholder="Create a password (min 6 characters)"
+            placeholder={t('auth.signup.passwordPlaceholder')}
             minLength={6}
             required
           />
 
           {successMessage && (
-            <div className="bg-emerald-50 border border-emerald-200 text-emerald-700 p-4 rounded-lg">
+            <div className="bg-primary-50 border border-primary-200 text-primary-700 p-4 rounded-lg">
               <p className="font-medium">{successMessage}</p>
-              <div className="mt-3 rounded-md bg-white/70 border border-emerald-200 p-3 text-sm">
-                <p className="font-semibold mb-1">Confirmation email steps:</p>
+              <div className="mt-3 rounded-md bg-white/70 border border-primary-200 p-3 text-sm">
+                <p className="font-semibold mb-1">{t('auth.signup.confirmStepsTitle')}</p>
                 <ol className="list-decimal pl-4 space-y-1">
-                  <li>Open the email from KiloMarket/Supabase.</li>
-                  <li>Click the "Confirm your email" button.</li>
-                  <li>You will be redirected back to KiloMarket onboarding.</li>
+                  <li>{t('auth.signup.confirmStep1')}</li>
+                  <li>{t('auth.signup.confirmStep2')}</li>
+                  <li>{t('auth.signup.confirmStep3')}</li>
                 </ol>
               </div>
               <p className="text-sm mt-2">
                 <Link to="/login" className="text-primary-700 font-medium hover:underline">
-                  Click here to sign in
+                  {t('auth.signup.signInLink')}
                 </Link>{' '}
-                once you've confirmed your email.
+                {t('auth.signup.signInAfterConfirm')}
               </p>
             </div>
           )}
@@ -147,14 +149,14 @@ export function Signup() {
             className="w-full"
             isLoading={isLoading}
           >
-            Create Account
+            {t('auth.signup.submit')}
           </Button>
         </form>
 
         <p className="text-center text-sm text-stone-500 mt-6">
-          Already have an account?{' '}
+          {t('auth.signup.haveAccount')}{' '}
           <Link to="/login" className="text-primary-700 font-medium hover:underline">
-            Sign in
+            {t('auth.signup.signIn')}
           </Link>
         </p>
       </Card>
