@@ -75,7 +75,7 @@ export function AuthCallback() {
 
         // PKCE / server-side flow: exchange ?code= for a session
         if (code) {
-          const { error } = await supabase.auth.exchangeCodeForSession(window.location.href)
+          const { error } = await supabase.auth.exchangeCodeForSession(code)
           if (cancelled) return
           if (error) {
             setStatus('error')

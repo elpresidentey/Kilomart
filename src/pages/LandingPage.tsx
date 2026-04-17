@@ -597,17 +597,17 @@ export function LandingPage() {
         </div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.15fr)] gap-10 lg:gap-14 items-center">
+          <div className="grid lg:grid-cols-[minmax(0,0.92fr)_minmax(0,1.18fr)] gap-10 lg:gap-14 items-center">
             {/* Left Content */}
-            <div className="space-y-6 max-w-xl">
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-stone-900 leading-tight">
+            <div className="space-y-5 lg:space-y-4 max-w-lg">
+              <h1 className="text-4xl sm:text-[3.2rem] lg:text-[3.7rem] font-bold text-stone-900 leading-[1.05]">
                 {copy.heroTitleTop}
                 <span className="block text-transparent bg-clip-text bg-gradient-to-r from-primary-600 to-primary-600">
                   {copy.heroTitleBottom}
                 </span>
               </h1>
 
-              <p className="text-lg text-stone-600 leading-relaxed max-w-lg">
+              <p className="text-base sm:text-lg text-stone-600 leading-relaxed max-w-xl">
                 {copy.heroSub}
               </p>
 
@@ -628,12 +628,12 @@ export function LandingPage() {
               </div>
 
               {/* Trust Badges */}
-              <div className="flex items-center gap-4 pt-3">
+              <div className="flex items-center gap-4 pt-2">
                 <div className="flex -space-x-3">
                   {[1, 2, 3, 4].map((i) => (
                     <div
                       key={i}
-                      className="w-10 h-10 rounded-full bg-gradient-to-br from-stone-200 to-stone-300 border-2 border-white flex items-center justify-center"
+                      className="w-9 h-9 rounded-full bg-gradient-to-br from-stone-200 to-stone-300 border-2 border-white flex items-center justify-center"
                     >
                       <Users className="w-4 h-4 text-stone-500" />
                     </div>
@@ -646,7 +646,7 @@ export function LandingPage() {
             {/* Right Content - Hero Video */}
             <div className="relative w-full">
               <div className="relative bg-gradient-to-br from-primary-100 to-primary-50 rounded-3xl p-3 lg:p-4 shadow-xl">
-                <div className="aspect-video rounded-2xl overflow-hidden bg-stone-900">
+                <div className="aspect-[4/3] sm:aspect-[16/11] lg:aspect-[5/4] rounded-2xl overflow-hidden bg-stone-900">
                   {!heroVideoError ? (
                     <video
                       className="w-full h-full object-cover"

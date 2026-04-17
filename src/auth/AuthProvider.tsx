@@ -7,6 +7,7 @@ import {
   useState,
   type ReactNode,
 } from 'react'
+import type { User as SupabaseAuthUser } from '@supabase/supabase-js'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import type { User } from '../types'
@@ -34,6 +35,20 @@ async function sessionStillValidFor(userId: string): Promise<boolean> {
   return Boolean(session?.user && session.user.id === userId)
 }
 
+function buildFallbackUser(authUser: SupabaseAuthUser): User {
+  const meta = authUser.user_metadata ?? {}
+
+  return {
+    id: authUser.id,
+    email: authUser.email ?? '',
+    full_name: meta.full_name ?? meta.name ?? authUser.email ?? 'User',
+    phone: meta.phone ?? '',
+    role: (meta.role as User['role']) ?? 'buyer',
+    location: meta.location ?? '',
+    avatar_url: meta.avatar_url ?? '',
+  }
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const navigate = useNavigate()
   const [user, setUser] = useState<User | null>(null)
@@ -51,7 +66,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       if (error) {
         console.error('Profile fetch error:', error)
-        setUser(null)
+        const {
+          data: { user: authUser },
+        } = await supabase.auth.getUser()
+        setUser(authUser?.id === userId ? buildFallbackUser(authUser) : null)
         return
       }
 
@@ -66,7 +84,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           .maybeSingle()
 
         if (!(await sessionStillValidFor(userId))) return
-        setUser(retryData || null)
+        if (retryData) {
+          setUser(retryData)
+          return
+        }
+
+        const {
+          data: { user: authUser },
+        } = await supabase.auth.getUser()
+        setUser(authUser?.id === userId ? buildFallbackUser(authUser) : null)
         return
       }
 
