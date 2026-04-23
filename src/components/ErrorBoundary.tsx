@@ -1,4 +1,4 @@
-import { Component, type ReactNode, type ErrorInfo } from 'react'
+import { Component, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 
 interface Props {
@@ -20,7 +20,7 @@ export class ErrorBoundary extends Component<Props, State> {
     return { hasError: true, error }
   }
 
-  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+  componentDidCatch(error: Error, errorInfo: { componentStack?: string }) {
     console.error('ErrorBoundary caught an error:', error, errorInfo)
   }
 
