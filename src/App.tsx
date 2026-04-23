@@ -28,6 +28,7 @@ import { Press } from './pages/Press'
 import { Partners } from './pages/Partners'
 import { SocialChannel } from './pages/SocialChannel'
 import { Operations } from './pages/Operations'
+import type { ReactNode } from 'react'
 import type { User } from './types'
 
 function ProtectedRoute({
@@ -35,7 +36,7 @@ function ProtectedRoute({
   allowedRoles,
   denyRoles,
 }: {
-  children: React.ReactNode
+  children: ReactNode
   allowedRoles?: User['role'][]
   /** If set, users with one of these roles are sent home (e.g. farmers must not use buyer /orders). */
   denyRoles?: User['role'][]

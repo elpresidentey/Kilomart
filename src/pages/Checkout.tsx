@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, type ChangeEvent } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { Layout } from '../components/Layout'
 import { Button } from '../components/ui'
@@ -179,7 +179,7 @@ export function Checkout() {
   const checkoutFinalTotal =
     snapshot?.paymentMethod === 'paystack' && cart.length === 0 ? snapshot.finalTotal : finalTotal
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setDeliveryInfo({ ...deliveryInfo, [e.target.name]: e.target.value })
   }
 

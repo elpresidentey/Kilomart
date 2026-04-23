@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type FormEvent } from 'react'
+import { useEffect, useMemo, useState, type ChangeEvent, type FormEvent } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { Layout } from '../components/Layout'
 import { Card, Input, Button } from '../components/ui'
@@ -133,7 +133,7 @@ export function EditListing() {
     }
   }
 
-  function handleFileSelection(e: React.ChangeEvent<HTMLInputElement>) {
+  function handleFileSelection(e: ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files || [])
     if (files.length === 0) return
 

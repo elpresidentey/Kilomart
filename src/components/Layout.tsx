@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import type { FormEvent, ReactNode } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { cn } from '../lib/utils'
@@ -117,7 +117,7 @@ export function Layout({ children, cartItemCount }: LayoutProps) {
         { name: t('nav.marketplace'), href: '/marketplace', icon: Store },
       ]
 
-  const submitHeaderSearch = (e: React.FormEvent) => {
+  const submitHeaderSearch = (e: FormEvent) => {
     e.preventDefault()
     const q = headerSearch.trim()
     navigate(q ? `/marketplace?q=${encodeURIComponent(q)}` : '/marketplace')
