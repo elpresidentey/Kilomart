@@ -78,9 +78,13 @@ export function Checkout() {
   const deliveryFee = 1500
   const finalTotal = totalAmount + deliveryFee
   const callbackBase = typeof window !== 'undefined' ? window.location.origin : ''
-  const apiBase = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/$/, '')
-  const initializeUrl = `${apiBase}/api/paystack/initialize`
-  const verifyUrl = `${apiBase}/api/paystack/verify`
+  const apiBase =
+    (import.meta.env.VITE_API_BASE_URL || '').replace(/\/$/, '') ||
+    (typeof window !== 'undefined' && !['localhost', '127.0.0.1'].includes(window.location.hostname)
+      ? window.location.origin
+      : '')
+  const initializeUrl = apiBase ? `${apiBase}/api/paystack/initialize` : '/api/paystack/initialize'
+  const verifyUrl = apiBase ? `${apiBase}/api/paystack/verify` : '/api/paystack/verify'
   const [debugHint, setDebugHint] = useState<string | null>(null)
   async function safeJson(r: Response): Promise<any> {
     const text = await r.text()
@@ -186,6 +190,32 @@ export function Checkout() {
     providerReference?: string
   ) => {
     if (!user) throw new Error(copy.loginToOrder)
+    const {
+      data: { user: authUser },
+    } = await supabase.auth.getUser()
+
+    const profilePayload = {
+      id: user.id,
+      email: user.email || authUser?.email || '',
+      full_name:
+        user.full_name?.trim() ||
+        authUser?.user_metadata?.full_name ||
+        authUser?.user_metadata?.name ||
+        authUser?.email?.split('@')[0] ||
+        'User',
+      phone: user.phone || authUser?.user_metadata?.phone || '',
+      role: user.role || 'buyer',
+      location: user.location || authUser?.user_metadata?.location || '',
+      avatar_url: user.avatar_url || authUser?.user_metadata?.avatar_url || '',
+    }
+
+    const { error: profileError } = await supabase.from('users').upsert(profilePayload, {
+      onConflict: 'id',
+    })
+    if (profileError) {
+      console.warn('Could not ensure buyer profile exists before order creation:', profileError)
+    }
+
     if (providerReference) {
       const { data: existingPayments, error: existingPaymentsError } = await supabase
         .from('payments')
@@ -543,7 +573,7 @@ export function Checkout() {
                 {t('checkout.paymentSubtitle')}
               </p>
               <div className="space-y-3">
-                <label className="flex items-start gap-3 cursor-pointer p-3 rounded-lg border border-stone-200 has-[:checked]:border-primary-500 has-[:checked]:bg-primary-50/50">
+                <label className="flex items-start gap-3 p-3 rounded-lg border border-stone-200 has-[:checked]:border-primary-500 has-[:checked]:bg-primary-50/50 cursor-pointer">
                   <input
                     type="radio"
                     name="pay"
@@ -554,6 +584,9 @@ export function Checkout() {
                   <span>
                     <span className="font-medium text-stone-900">{t('checkout.paystackTitle')}</span>
                     <span className="block text-sm text-stone-500">{t('checkout.paystackSub')}</span>
+                    <span className="block text-xs text-stone-500 mt-1">
+                      Paystack now uses the current host&apos;s `/api/paystack` routes.
+                    </span>
                   </span>
                 </label>
                 <label className="flex items-start gap-3 cursor-pointer p-3 rounded-lg border border-stone-200 has-[:checked]:border-primary-500 has-[:checked]:bg-primary-50/50">

@@ -18,6 +18,33 @@ create table if not exists categories (
   created_at timestamp with time zone default now()
 );
 
+-- Users policies
+drop policy if exists "Users can view own profile" on users;
+create policy "Users can view own profile"
+  on users for select
+  to authenticated
+  using (auth.uid() = id);
+
+drop policy if exists "Users can update own profile" on users;
+create policy "Users can update own profile"
+  on users for update
+  to authenticated
+  using (auth.uid() = id)
+  with check (auth.uid() = id);
+
+drop policy if exists "Users can create own profile" on users;
+create policy "Users can create own profile"
+  on users for insert
+  to authenticated
+  with check (auth.uid() = id);
+
+drop policy if exists "Admins can manage profiles" on users;
+create policy "Admins can manage profiles"
+  on users for all
+  to authenticated
+  using (coalesce(auth.jwt() -> 'user_metadata' ->> 'role', '') = 'admin')
+  with check (coalesce(auth.jwt() -> 'user_metadata' ->> 'role', '') = 'admin');
+
 -- Cart table (for shopping cart functionality)
 create table if not exists cart_items (
   id uuid default gen_random_uuid() primary key,
@@ -238,6 +265,8 @@ alter table categories enable row level security;
 alter table cart_items enable row level security;
 alter table order_items enable row level security;
 alter table payments enable row level security;
+alter table warehouses enable row level security;
+alter table inventory enable row level security;
 alter table reviews enable row level security;
 alter table notifications enable row level security;
 alter table favorites enable row level security;
@@ -259,6 +288,71 @@ create policy "Admins can manage categories"
   on categories for all
   to authenticated
   using (exists (select 1 from users where id = auth.uid() and role = 'admin'));
+
+-- Warehouse policies
+drop policy if exists "Authenticated users can view active warehouses" on warehouses;
+create policy "Authenticated users can view active warehouses"
+  on warehouses for select
+  to authenticated
+  using (status = 'active');
+
+drop policy if exists "Warehouse teams can manage warehouses" on warehouses;
+create policy "Warehouse teams can manage warehouses"
+  on warehouses for all
+  to authenticated
+  using (
+    exists (
+      select 1
+      from users
+      where id = auth.uid()
+      and role in ('warehouse_manager', 'logistics', 'admin')
+    )
+  )
+  with check (
+    exists (
+      select 1
+      from users
+      where id = auth.uid()
+      and role in ('warehouse_manager', 'logistics', 'admin')
+    )
+  );
+
+drop policy if exists "Warehouse teams can view inventory" on inventory;
+create policy "Warehouse teams can view inventory"
+  on inventory for select
+  to authenticated
+  using (
+    farmer_id = auth.uid()
+    or exists (
+      select 1
+      from users
+      where id = auth.uid()
+      and role in ('warehouse_manager', 'logistics')
+    )
+  );
+
+drop policy if exists "Warehouse teams can manage inventory" on inventory;
+create policy "Warehouse teams can manage inventory"
+  on inventory for all
+  to authenticated
+  using (
+    farmer_id = auth.uid()
+    or exists (
+      select 1
+      from users
+      where id = auth.uid()
+      and role in ('warehouse_manager', 'logistics', 'admin')
+    )
+  )
+  with check (
+    farmer_id = auth.uid()
+    or exists (
+      select 1
+      from users
+      where id = auth.uid()
+      and role in ('warehouse_manager', 'logistics', 'admin')
+    )
+  );
 
 -- Cart policies
 drop policy if exists "Users can view own cart" on cart_items;

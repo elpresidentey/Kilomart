@@ -16,6 +16,7 @@ import {
 const LOCATIONS = ['Lagos', 'Ibadan', 'Abeokuta', 'Ilorin', 'Akure', 'Osogbo']
 const ALL_LOCATIONS = 'all'
 const ALL_PRODUCTS = 'All Products'
+const MARKETPLACE_CACHE_KEY = 'kilomarket.marketplace.listings'
 
 export function Marketplace() {
   const addToCart = useCartStore((s) => s.addToCart)
@@ -24,13 +25,7 @@ export function Marketplace() {
   const qFromUrl = searchParams.get('q') || ''
   const [loading, setLoading] = useState(true)
   const [listings, setListings] = useState<ProduceListing[]>([])
-  const [isLoadingCategories, setIsLoadingCategories] = useState(true)
-  void isLoadingCategories; void setIsLoadingCategories // reference to avoid unused warning
   const [searchQuery, setSearchQuery] = useState(qFromUrl)
-  const [featuredProducts, setFeaturedProducts] = useState([])
-  void featuredProducts; void setFeaturedProducts // reference to avoid unused warning
-  const trustBadges: string[] = []
-  void trustBadges // reference to avoid unused warning
   const [selectedProduct, setSelectedProduct] = useState(ALL_PRODUCTS)
   const [selectedLocation, setSelectedLocation] = useState(ALL_LOCATIONS)
   const [selectedGrade, setSelectedGrade] = useState('all')
@@ -59,6 +54,20 @@ export function Marketplace() {
   }
 
   useEffect(() => {
+    try {
+      const cached = sessionStorage.getItem(MARKETPLACE_CACHE_KEY)
+      if (!cached) return
+      const parsed = JSON.parse(cached) as ProduceListing[]
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        setListings(parsed)
+        setLoading(false)
+      }
+    } catch (error) {
+      console.warn('Could not restore marketplace cache:', error)
+    }
+  }, [])
+
+  useEffect(() => {
     fetchListings()
   }, [])
 
@@ -77,7 +86,20 @@ export function Marketplace() {
       const { data, error } = await supabase
         .from('produce_listings')
         .select(`
-          *,
+          id,
+          seller_id,
+          category_id,
+          product_name,
+          price_per_kg,
+          available_quantity,
+          min_order_kg,
+          quality_grade,
+          location,
+          description,
+          images,
+          status,
+          created_at,
+          updated_at,
           category:categories(name, slug)
         `)
         .eq('status', 'active')
@@ -87,7 +109,24 @@ export function Marketplace() {
         console.error('Supabase error:', error)
         setListings([])
       } else {
-        setListings(data || [])
+        const nextListings: ProduceListing[] = ((data || []) as Array<Record<string, unknown>>).map((row) => {
+          const rawCategory = row.category
+          const category =
+            Array.isArray(rawCategory) && rawCategory.length > 0
+              ? (rawCategory[0] as ProduceListing['category'])
+              : ((rawCategory as ProduceListing['category'] | null) ?? undefined)
+
+          return {
+            ...row,
+            category,
+          } as ProduceListing
+        })
+        setListings(nextListings)
+        try {
+          sessionStorage.setItem(MARKETPLACE_CACHE_KEY, JSON.stringify(nextListings))
+        } catch (cacheError) {
+          console.warn('Could not cache marketplace listings:', cacheError)
+        }
       }
     } catch (err) {
       console.error('Error fetching listings:', err)
@@ -120,7 +159,7 @@ export function Marketplace() {
     <Layout>
       <div className="space-y-6">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="fade-up flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="text-2xl font-bold text-stone-900">{t('marketplace.title')}</h1>
             <p className="text-stone-500">{t('marketplace.subtitle')}</p>
@@ -129,7 +168,7 @@ export function Marketplace() {
             <Button
               variant="secondary"
               onClick={() => setShowFilters(!showFilters)}
-              className="sm:hidden"
+              className="motion-lift motion-press sm:hidden"
             >
               <SlidersHorizontal className="w-4 h-4 mr-2" />
               {t('marketplace.filters')}
@@ -138,7 +177,7 @@ export function Marketplace() {
         </div>
 
         {/* Search and Filters */}
-        <div className="space-y-4">
+        <div className="fade-up fade-up-delay-1 space-y-4">
           {/* Search Bar */}
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-stone-400" />
@@ -146,7 +185,7 @@ export function Marketplace() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder={t('marketplace.searchPlaceholder')}
-              className="pl-10"
+              className="pl-10 shadow-sm"
             />
           </div>
 
@@ -158,7 +197,7 @@ export function Marketplace() {
                 <button
                   key={product}
                   onClick={() => setSelectedProduct(product)}
-                  className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
+                  className={`motion-lift motion-press px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
                     selectedProduct === product
                       ? 'bg-primary-100 text-primary-800'
                       : 'bg-white text-stone-600 hover:bg-stone-100 border border-stone-200'
@@ -212,11 +251,12 @@ export function Marketplace() {
 
         {/* Listings Grid */}
         {loading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          <div className="fade-up fade-up-delay-2 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {[...Array(8)].map((_, i) => (
               <div
                 key={i}
-                className="bg-white rounded-xl border border-stone-100 p-4 overflow-hidden relative"
+                className="motion-safe:animate-fade-in-up bg-white rounded-xl border border-stone-100 p-4 overflow-hidden relative"
+                style={{ animationDelay: `${i * 45}ms` }}
               >
                 <div className="bg-stone-200 h-40 rounded-lg mb-4 relative overflow-hidden">
                   <div className="absolute inset-0 w-full motion-safe:animate-shimmer motion-reduce:animate-none bg-gradient-to-r from-transparent via-white/60 to-transparent" />
@@ -228,7 +268,7 @@ export function Marketplace() {
             ))}
           </div>
         ) : filteredListings.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          <div className="fade-up fade-up-delay-2 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {filteredListings.map((listing, i) => (
               <ProduceCard
                 key={listing.id}
@@ -239,7 +279,7 @@ export function Marketplace() {
             ))}
           </div>
         ) : (
-          <div className="text-center py-16">
+          <div className="fade-up fade-up-delay-2 text-center py-16">
             <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-stone-100 mb-6">
               <Search className="w-10 h-10 text-stone-400" />
             </div>

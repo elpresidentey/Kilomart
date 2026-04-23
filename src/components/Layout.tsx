@@ -21,10 +21,11 @@ import {
   ClipboardList,
   ChevronDown,
   Globe,
+  Warehouse,
 } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { useCartStore, cartUnitsCount } from '../stores/cartStore'
-import { canAccessBuyerOrders } from '../lib/roles'
+import { canAccessBuyerOrders, canAccessOperations } from '../lib/roles'
 import type { Language } from '../i18n/strings'
 
 interface LayoutProps {
@@ -86,11 +87,20 @@ export function Layout({ children, cartItemCount }: LayoutProps) {
     ? user.role === 'farmer'
       ? [
           { name: t('nav.home'), href: '/', icon: Home },
+          { name: t('nav.marketplace'), href: '/marketplace', icon: Store },
           { name: t('nav.dashboard'), href: '/dashboard', icon: Store },
           { name: t('nav.myListings'), href: '/listings', icon: Package },
+          { name: t('nav.operations'), href: '/operations', icon: Warehouse },
           { name: t('nav.orders'), href: '/farmer/orders', icon: ClipboardList },
           { name: t('nav.profile'), href: '/profile', icon: User },
         ]
+      : canAccessOperations(user.role)
+        ? [
+            { name: t('nav.home'), href: '/', icon: Home },
+            { name: t('nav.marketplace'), href: '/marketplace', icon: Store },
+            { name: t('nav.operations'), href: '/operations', icon: Warehouse },
+            { name: t('nav.profile'), href: '/profile', icon: User },
+          ]
       : [
           { name: t('nav.home'), href: '/', icon: Home },
           { name: t('nav.marketplace'), href: '/marketplace', icon: Store },

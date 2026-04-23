@@ -10,6 +10,7 @@ const rawStrings = repairText({
     'nav.marketplace': 'Marketplace',
     'nav.dashboard': 'Dashboard',
     'nav.myListings': 'My Listings',
+    'nav.operations': 'Operations',
     'nav.orders': 'Orders',
     'nav.profile': 'Profile',
     'nav.signIn': 'Sign In',

@@ -8,3 +8,7 @@ export function isFarmerRole(role: User['role'] | null | undefined): boolean {
 export function canAccessBuyerOrders(role: User['role'] | null | undefined): boolean {
   return !isFarmerRole(role)
 }
+
+export function canAccessOperations(role: User['role'] | null | undefined): boolean {
+  return role === 'farmer' || role === 'warehouse_manager' || role === 'logistics'
+}

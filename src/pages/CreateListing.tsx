@@ -30,8 +30,6 @@ export function CreateListing() {
   const [uploadError, setUploadError] = useState('')
 
   const [categories, setCategories] = useState<{id: string, name: string}[]>([])
-  const [isLoadingCategories, setIsLoadingCategories] = useState(true)
-  void isLoadingCategories; void setIsLoadingCategories // reference to avoid unused warning
 
   useEffect(() => {
     fetchCategories()
@@ -44,8 +42,6 @@ export function CreateListing() {
       setCategories(data || [])
     } catch (err) {
       console.error('Error fetching categories:', err)
-    } finally {
-      setIsLoadingCategories(false)
     }
   }
 

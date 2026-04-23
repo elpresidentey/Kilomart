@@ -49,6 +49,34 @@ function buildFallbackUser(authUser: SupabaseAuthUser): User {
   }
 }
 
+function buildProfileFromAuthUser(authUser: SupabaseAuthUser): User {
+  const meta = authUser.user_metadata ?? {}
+  const fullName =
+    (meta.full_name ?? meta.name ?? authUser.email?.split('@')[0] ?? 'User').trim() || 'User'
+
+  return {
+    id: authUser.id,
+    email: authUser.email ?? '',
+    full_name: fullName,
+    phone: meta.phone ?? '',
+    role: (meta.role as User['role']) ?? 'buyer',
+    location: meta.location ?? '',
+    avatar_url: meta.avatar_url ?? '',
+  }
+}
+
+async function ensureProfileRow(authUser: SupabaseAuthUser): Promise<User | null> {
+  const profile = buildProfileFromAuthUser(authUser)
+  const { error } = await supabase.from('users').upsert(profile, { onConflict: 'id' })
+
+  if (error) {
+    console.error('Could not upsert profile row:', error)
+    return null
+  }
+
+  return profile
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const navigate = useNavigate()
   const [user, setUser] = useState<User | null>(null)
@@ -92,7 +120,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const {
           data: { user: authUser },
         } = await supabase.auth.getUser()
-        setUser(authUser?.id === userId ? buildFallbackUser(authUser) : null)
+        if (authUser?.id === userId) {
+          const ensuredProfile = await ensureProfileRow(authUser)
+          setUser(ensuredProfile ?? buildFallbackUser(authUser))
+          return
+        }
+        setUser(null)
         return
       }
 
@@ -165,6 +198,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
 
       if (data?.user) {
+        await ensureProfileRow(data.user)
         await new Promise((resolve) => setTimeout(resolve, 1000))
       }
 

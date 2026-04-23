@@ -353,7 +353,7 @@ export function LandingPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-white shadow-sm">
+      <header className="sticky top-0 z-50 border-b border-stone-200 bg-white/95 shadow-[0_14px_40px_rgba(15,23,42,0.06)] backdrop-blur">
         {/* Top Bar */}
         <div className="bg-stone-900 text-stone-300 text-xs py-2 hidden lg:block">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
@@ -387,16 +387,24 @@ export function LandingPage() {
         </div>
 
         {/* Main Navigation */}
-        <div className="bg-white">
+        <div className="bg-white/90">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center justify-between h-16 lg:h-16">
+            <div className="flex h-16 items-center justify-between gap-3 lg:h-16">
               {/* Logo */}
-              <Link to="/" className="flex items-center gap-2 lg:gap-3">
-                <img
-                  src="/logo-farmers-market.png"
-                  alt="Farmers Market logo"
-                  className="h-11 w-auto sm:h-12 lg:h-14"
-                />
+              <Link
+                to="/"
+                className="group motion-lift motion-press flex items-center gap-3 rounded-full border border-stone-200 bg-white px-2 py-1.5 pr-4 shadow-[0_10px_30px_rgba(15,23,42,0.08)] hover:border-primary-200 hover:shadow-[0_14px_36px_rgba(15,23,42,0.1)]"
+              >
+                <div className="pulse-soft flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-[inset_0_1px_0_rgba(255,255,255,0.8),0_10px_24px_rgba(15,23,42,0.12)] ring-1 ring-primary-200/70 sm:h-11 sm:w-11 lg:h-11 lg:w-11">
+                  <img
+                    src="/logo-farmers-market.png"
+                    alt="Farmers Market logo"
+                    className="h-8 w-8 rounded-full object-contain brightness-[1.2] contrast-[1.08] saturate-[1.18] sm:h-9 sm:w-9 lg:h-9 lg:w-9"
+                  />
+                </div>
+                <span className="hidden min-w-0 whitespace-nowrap text-[0.98rem] font-semibold leading-none tracking-[-0.01em] text-stone-950 sm:block lg:text-base">
+                  Farmers Market
+                </span>
               </Link>
 
               {/* Search Bar - Desktop */}
@@ -407,36 +415,36 @@ export function LandingPage() {
                     value={headerSearch}
                     onChange={(e) => setHeaderSearch(e.target.value)}
                     placeholder={t('search.placeholder')}
-                    className="w-full pl-10 pr-4 py-2.5 bg-stone-50 border border-stone-200 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
+                    className="w-full rounded-full border border-stone-200 bg-stone-50/90 py-3 pl-10 pr-4 text-sm shadow-inner shadow-stone-200/40 transition-all focus:border-transparent focus:outline-none focus:ring-2 focus:ring-primary-500"
                   />
                   <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400" />
                 </div>
               </form>
 
               {/* Desktop Navigation */}
-              <nav className="hidden md:flex items-center gap-0.5">
+              <nav className="hidden md:flex items-center gap-1 rounded-full border border-stone-200/80 bg-stone-50/90 p-1 shadow-sm shadow-stone-900/5">
                 <Link
                   to="/"
-                  className="flex items-center gap-1 px-2.5 lg:px-3 py-1.5 rounded-lg text-sm font-medium transition-all bg-primary-50 text-primary-700"
+                  className="motion-lift hover-underline-soft flex items-center gap-1 rounded-full bg-white px-3 py-2 text-sm font-medium text-primary-700 shadow-sm"
                 >
                   <Home className="w-4 h-4" />
                   <span className="hidden lg:inline">{t('nav.home')}</span>
                 </Link>
                 <a
                   href="#features"
-                  className="flex items-center gap-1 px-2.5 lg:px-3 py-1.5 rounded-lg text-sm font-medium text-stone-600 hover:bg-stone-50 hover:text-stone-900 transition-all"
+                  className="motion-lift hover-underline-soft flex items-center gap-1 rounded-full px-3 py-2 text-sm font-medium text-stone-600 transition-all hover:bg-white hover:text-stone-900"
                 >
                   <span className="hidden lg:inline">{landingUi.navFeatures}</span>
                 </a>
                 <a
                   href="#how-it-works"
-                  className="flex items-center gap-1 px-2.5 lg:px-3 py-1.5 rounded-lg text-sm font-medium text-stone-600 hover:bg-stone-50 hover:text-stone-900 transition-all"
+                  className="motion-lift hover-underline-soft flex items-center gap-1 rounded-full px-3 py-2 text-sm font-medium text-stone-600 transition-all hover:bg-white hover:text-stone-900"
                 >
                   <span className="hidden lg:inline">{landingUi.navHow}</span>
                 </a>
                 <Link
                   to="/marketplace"
-                  className="flex items-center gap-1 px-2.5 lg:px-3 py-1.5 rounded-lg text-sm font-medium text-stone-600 hover:bg-stone-50 hover:text-stone-900 transition-all"
+                  className="motion-lift hover-underline-soft flex items-center gap-1 rounded-full px-3 py-2 text-sm font-medium text-stone-600 transition-all hover:bg-white hover:text-stone-900"
                 >
                   <span className="hidden lg:inline">{t('nav.marketplace')}</span>
                 </Link>
@@ -445,15 +453,15 @@ export function LandingPage() {
               {/* User Actions */}
               <div className="flex items-center gap-2 lg:gap-4">
                 {/* Search Button - Mobile */}
-                <button className="md:hidden p-2 text-stone-600 hover:bg-stone-100 rounded-lg transition-colors">
+                <button className="md:hidden rounded-full border border-stone-200 bg-white p-2 text-stone-600 shadow-sm transition-colors hover:bg-stone-100">
                   <Search className="w-5 h-5" />
                 </button>
 
                 {/* Cart - visible to all users */}
-                <Link to="/cart" className="relative p-2 text-stone-600 hover:text-primary-600 transition-colors">
+                <Link to="/cart" className="motion-lift motion-press relative rounded-full border border-stone-200 bg-white p-2 text-stone-600 shadow-sm transition-colors hover:border-primary-200 hover:text-primary-600">
                   <ShoppingCart className="w-5 h-5 lg:w-6 lg:h-6" />
                   {(cartItemCount ?? 0) > 0 && (
-                    <span className="absolute -top-1 -right-1 w-5 h-5 bg-primary-600 text-white text-xs font-bold rounded-full flex items-center justify-center">
+                    <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-primary-600 text-xs font-bold text-white ring-2 ring-white">
                       {(cartItemCount ?? 0) > 9 ? '9+' : cartItemCount}
                     </span>
                   )}
@@ -462,7 +470,7 @@ export function LandingPage() {
                 {user ? (
                   <>
                     <div className="hidden sm:flex items-center gap-3 pl-2 lg:pl-4 border-l border-stone-200">
-                      <Link to="/profile" className="flex items-center gap-2 text-stone-600 hover:text-primary-600 transition-colors">
+                      <Link to="/profile" className="flex items-center gap-2 rounded-full border border-transparent px-2 py-1 text-stone-600 transition-colors hover:border-primary-100 hover:bg-primary-50/60 hover:text-primary-600">
                         <div className="w-9 h-9 rounded-full bg-gradient-to-br from-primary-100 to-primary-50 flex items-center justify-center border border-primary-200">
                           <User className="w-4 h-4 text-primary-700" />
                         </div>
@@ -495,7 +503,7 @@ export function LandingPage() {
 
                 {/* Mobile Menu Button */}
                 <button
-                  className="md:hidden p-2 rounded-lg text-stone-600 hover:bg-stone-100 transition-colors"
+                  className="md:hidden rounded-full border border-stone-200 bg-white p-2 text-stone-600 shadow-sm transition-colors hover:bg-stone-100"
                   onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                 >
                   {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -507,7 +515,7 @@ export function LandingPage() {
 
         {/* Mobile Navigation */}
         {mobileMenuOpen && (
-          <div className="md:hidden border-t border-stone-100 bg-white shadow-lg">
+          <div className="md:hidden border-t border-stone-100 bg-white/95 shadow-lg backdrop-blur">
             {/* Mobile Search */}
             <form onSubmit={submitHeaderSearch} className="px-4 py-3 border-b border-stone-100">
               <div className="relative">
@@ -589,38 +597,39 @@ export function LandingPage() {
       </header>
 
       {/* Hero Section */}
-      <section className="pt-10 pb-14 lg:pt-12 lg:pb-20 relative overflow-hidden">
+      <section className="relative overflow-hidden pb-14 pt-10 lg:pb-20 lg:pt-12">
         {/* Background Decorations */}
         <div className="absolute inset-0 -z-10">
-          <div className="absolute top-20 left-10 w-72 h-72 bg-primary-200/30 rounded-full blur-3xl" />
-          <div className="absolute bottom-20 right-10 w-96 h-96 bg-primary-200/20 rounded-full blur-3xl" />
+          <div className="absolute left-[-3rem] top-10 h-72 w-72 rounded-full bg-stone-100/80 blur-3xl" />
+          <div className="absolute right-[-4rem] top-24 h-96 w-96 rounded-full bg-stone-100/70 blur-3xl" />
+          <div className="absolute bottom-[-5rem] left-1/3 h-72 w-72 rounded-full bg-stone-100/60 blur-3xl" />
         </div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-[minmax(0,0.92fr)_minmax(0,1.18fr)] gap-10 lg:gap-14 items-center">
             {/* Left Content */}
-            <div className="space-y-5 lg:space-y-4 max-w-lg">
+            <div className="fade-up space-y-5 lg:space-y-4 max-w-lg">
               <h1 className="text-4xl sm:text-[3.2rem] lg:text-[3.7rem] font-bold text-stone-900 leading-[1.05]">
                 {copy.heroTitleTop}
-                <span className="block text-transparent bg-clip-text bg-gradient-to-r from-primary-600 to-primary-600">
+                <span className="block text-primary-700">
                   {copy.heroTitleBottom}
                 </span>
               </h1>
 
-              <p className="text-base sm:text-lg text-stone-600 leading-relaxed max-w-xl">
+              <p className="fade-up fade-up-delay-1 text-base sm:text-lg text-stone-600 leading-relaxed max-w-xl">
                 {copy.heroSub}
               </p>
 
-              <div className="flex flex-col sm:flex-row gap-4">
+              <div className="fade-up fade-up-delay-2 flex flex-col sm:flex-row gap-4">
                 <Link to="/marketplace">
-                  <Button size="lg" className="w-full sm:w-auto group">
+                  <Button size="lg" className="group motion-lift motion-press w-full bg-primary-600 shadow-lg shadow-primary-500/20 sm:w-auto">
                     Explore Marketplace
                     <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
                   </Button>
                 </Link>
                 {!user && (
                   <Link to="/signup">
-                    <Button variant="outline" size="lg" className="w-full sm:w-auto">
+                    <Button variant="outline" size="lg" className="motion-lift motion-press w-full border-stone-300 bg-white/80 sm:w-auto">
                       Start Selling
                     </Button>
                   </Link>
@@ -628,14 +637,14 @@ export function LandingPage() {
               </div>
 
               {/* Trust Badges */}
-              <div className="flex items-center gap-4 pt-2">
+              <div className="fade-up fade-up-delay-3 flex items-center gap-4 pt-2">
                 <div className="flex -space-x-3">
                   {[1, 2, 3, 4].map((i) => (
                     <div
                       key={i}
-                      className="w-9 h-9 rounded-full bg-gradient-to-br from-stone-200 to-stone-300 border-2 border-white flex items-center justify-center"
+                      className="motion-lift flex h-10 w-10 items-center justify-center rounded-full border-2 border-white bg-gradient-to-br from-primary-100 via-white to-amber-100 shadow-sm"
                     >
-                      <Users className="w-4 h-4 text-stone-500" />
+                      <Users className="h-4 w-4 text-primary-700" />
                     </div>
                   ))}
                 </div>
@@ -644,9 +653,9 @@ export function LandingPage() {
             </div>
 
             {/* Right Content - Hero Video */}
-            <div className="relative w-full">
-              <div className="relative bg-gradient-to-br from-primary-100 to-primary-50 rounded-3xl p-3 lg:p-4 shadow-xl">
-                <div className="aspect-[4/3] sm:aspect-[16/11] lg:aspect-[5/4] rounded-2xl overflow-hidden bg-stone-900">
+            <div className="fade-up fade-up-delay-2 relative w-full">
+              <div className="float-soft relative overflow-hidden rounded-[2rem] border border-stone-200/80 bg-white p-3 shadow-[0_28px_80px_rgba(15,23,42,0.14)] lg:p-4">
+                <div className="aspect-[4/3] overflow-hidden rounded-[1.5rem] border border-white/40 bg-stone-900 shadow-inner shadow-stone-950/40 sm:aspect-[16/11] lg:aspect-[5/4]">
                   {!heroVideoError ? (
                     <video
                       className="w-full h-full object-cover"
@@ -676,7 +685,7 @@ export function LandingPage() {
       {/* Categories Section */}
       <section className="py-14 lg:py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-3xl mx-auto mb-10 lg:mb-12">
+          <div className="fade-up text-center max-w-3xl mx-auto mb-10 lg:mb-12">
             <span className="inline-flex items-center gap-2 px-4 py-2 bg-primary-50 rounded-full text-sm font-medium text-primary-700 mb-4">
               <Sprout className="w-4 h-4" />
               Browse by Category
@@ -694,11 +703,29 @@ export function LandingPage() {
               <Link
                 key={category.name}
                 to={category.marketplaceHref}
-                className={`group flex h-full min-h-[11.5rem] flex-col overflow-hidden rounded-2xl border border-stone-200/80 shadow-sm outline-none transition-all duration-300 hover:border-primary-300/80 hover:shadow-lg hover:shadow-primary-100/60 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 ${category.surface} transform-gpu motion-safe:transition-transform motion-safe:duration-200 hover:-translate-y-0.5 motion-safe:active:scale-[0.99]`}
+                className={`group motion-lift motion-press flex h-full min-h-[11.5rem] flex-col overflow-hidden rounded-2xl border border-stone-200/80 shadow-sm outline-none transition-all duration-300 hover:border-primary-300/80 hover:shadow-lg hover:shadow-primary-100/60 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 ${category.surface} transform-gpu motion-safe:transition-transform motion-safe:duration-200 hover:-translate-y-0.5 motion-safe:active:scale-[0.99]`}
               >
                 <div
                   className="flex h-full w-full flex-col p-5 sm:p-6"
                 >
+                  {category.images ? (
+                    <div className="mb-4 grid h-24 grid-cols-[1.4fr_1fr] gap-2 overflow-hidden rounded-2xl">
+                      <img
+                        src={category.images[0]}
+                        alt={`${category.name} preview 1`}
+                        className="h-full w-full rounded-xl object-cover"
+                        loading="lazy"
+                        onError={fallbackOnImageError}
+                      />
+                      <img
+                        src={category.images[1]}
+                        alt={`${category.name} preview 2`}
+                        className="h-full w-full rounded-xl object-cover"
+                        loading="lazy"
+                        onError={fallbackOnImageError}
+                      />
+                    </div>
+                  ) : null}
                   <div
                     className={`mb-4 flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br shadow-md ring-1 ring-white/40 transition-transform duration-200 group-hover:scale-105 group-hover:-translate-y-0.5 ${category.iconGradient}`}
                   >
@@ -717,7 +744,7 @@ export function LandingPage() {
       {/* Features Section */}
       <section id="features" className="py-14 lg:py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-3xl mx-auto mb-10 lg:mb-12">
+          <div className="fade-up text-center max-w-3xl mx-auto mb-10 lg:mb-12">
             <h2 className="text-3xl lg:text-4xl font-bold text-stone-900 mb-4">
               {copy.featuresHeading}
             </h2>
@@ -730,7 +757,7 @@ export function LandingPage() {
             {features.map((feature) => (
               <div
                 key={feature.title}
-                className="group p-6 bg-white rounded-2xl border border-stone-100 hover:border-primary-200 hover:shadow-lg hover:shadow-primary-100/50 transition-all duration-300 h-full"
+                className="group motion-lift p-6 bg-white rounded-2xl border border-stone-100 hover:border-primary-200 hover:shadow-lg hover:shadow-primary-100/50 transition-all duration-300 h-full"
               >
                 <div className={`w-14 h-14 ${feature.color} rounded-xl flex items-center justify-center mb-5 group-hover:scale-110 transition-transform`}>
                   <feature.icon className="w-7 h-7 text-white" />
@@ -750,7 +777,7 @@ export function LandingPage() {
       {/* How It Works */}
       <section id="how-it-works" className="py-14 lg:py-20 bg-gradient-to-br from-stone-50 to-primary-50/30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-3xl mx-auto mb-10 lg:mb-12">
+          <div className="fade-up text-center max-w-3xl mx-auto mb-10 lg:mb-12">
             <h2 className="text-3xl lg:text-4xl font-bold text-stone-900 mb-4">
               How It Works
             </h2>
@@ -762,7 +789,7 @@ export function LandingPage() {
           <div className="grid md:grid-cols-3 gap-6 lg:gap-8">
             {howItWorks.map((step) => (
               <div key={step.step} className="relative">
-                <div className="p-8 bg-white rounded-2xl border border-stone-100 h-full hover:shadow-lg hover:border-primary-200 transition-all duration-300">
+                <div className="motion-lift p-8 bg-white rounded-2xl border border-stone-100 h-full hover:shadow-lg hover:border-primary-200 transition-all duration-300">
                   <div className={`w-16 h-16 bg-gradient-to-br ${step.color} rounded-2xl flex items-center justify-center mb-6 shadow-lg`}>
                     <step.icon className="w-8 h-8 text-white" />
                   </div>
@@ -787,7 +814,7 @@ export function LandingPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-8 lg:gap-10 items-center">
             <div className="order-2 lg:order-1">
-              <div className="bg-gradient-to-br from-primary-50 to-primary-50 rounded-3xl p-8">
+              <div className="motion-lift bg-gradient-to-br from-primary-50 to-primary-50 rounded-3xl p-8">
                 <div className="space-y-4">
                   {[
                     'Direct access to thousands of buyers',
@@ -824,7 +851,7 @@ export function LandingPage() {
 
               {!user && (
                 <Link to="/signup">
-                  <Button size="lg" className="group">
+                  <Button size="lg" className="group motion-lift motion-press">
                     Start Selling Today
                     <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
                   </Button>
@@ -838,7 +865,7 @@ export function LandingPage() {
       {/* Testimonials Section */}
       <section id="testimonials" className="py-14 lg:py-20 bg-stone-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-3xl mx-auto mb-10 lg:mb-12">
+          <div className="fade-up text-center max-w-3xl mx-auto mb-10 lg:mb-12">
             <span className="inline-flex items-center gap-2 px-4 py-2 bg-primary-50 rounded-full text-sm font-medium text-primary-700 mb-4">
               <Star className="w-4 h-4" />
               Customer Reviews
@@ -855,7 +882,7 @@ export function LandingPage() {
             {testimonials.map((testimonial, index) => (
               <div
                 key={index}
-                className="bg-white rounded-2xl p-8 shadow-sm border border-stone-100 hover:shadow-lg transition-shadow duration-300"
+                className="motion-lift bg-white rounded-2xl p-8 shadow-sm border border-stone-100 hover:shadow-lg transition-shadow duration-300"
               >
                 <div className="flex items-center gap-1 mb-4">
                   {[...Array(testimonial.rating)].map((_, i) => (
@@ -895,7 +922,7 @@ export function LandingPage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link to="/marketplace">
-              <Button size="lg" variant="secondary" className="w-full sm:w-auto">
+              <Button size="lg" variant="secondary" className="motion-lift motion-press w-full sm:w-auto">
                 Browse Marketplace
               </Button>
             </Link>
@@ -903,7 +930,7 @@ export function LandingPage() {
               <Link to="/signup">
                 <Button
                   size="lg"
-                  className="w-full sm:w-auto bg-white text-primary-600 hover:bg-primary-50"
+                  className="motion-lift motion-press w-full sm:w-auto bg-white text-primary-600 hover:bg-primary-50"
                 >
                   Create Account
                 </Button>
@@ -969,12 +996,18 @@ export function LandingPage() {
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 lg:gap-10">
             {/* Brand Column */}
             <div className="col-span-2">
-              <Link to="/" className="flex items-center gap-2 mb-4">
+              <Link
+                to="/"
+                className="inline-flex items-center gap-3 rounded-full border border-stone-700/80 bg-white px-2 py-1.5 pr-4 shadow-[0_10px_28px_rgba(15,23,42,0.12)]"
+              >
                 <img
                   src="/logo-farmers-market.png"
                   alt="Farmers Market logo"
-                  className="h-12 w-auto rounded-lg bg-white/5 p-1"
+                  className="h-12 w-12 rounded-full bg-white object-contain p-1 brightness-110 contrast-110 saturate-125"
                 />
+                <span className="text-sm font-semibold tracking-[-0.01em] text-white">
+                  Farmers Market
+                </span>
               </Link>
               <p className="text-sm leading-relaxed mb-6 max-w-xs">
                 Nigeria's leading digital marketplace for agricultural produce. 

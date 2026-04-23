@@ -16,6 +16,7 @@ import { CreateListing } from './pages/CreateListing'
 import { EditListing } from './pages/EditListing'
 import { Profile } from './pages/Profile'
 import { Checkout } from './pages/Checkout'
+import { NotFound } from './pages/NotFound'
 import { useCart } from './hooks/useCart'
 import { Cart } from './pages/Cart'
 import { Contact } from './pages/Contact'
@@ -26,6 +27,7 @@ import { Careers } from './pages/Careers'
 import { Press } from './pages/Press'
 import { Partners } from './pages/Partners'
 import { SocialChannel } from './pages/SocialChannel'
+import { Operations } from './pages/Operations'
 import type { User } from './types'
 
 function ProtectedRoute({
@@ -96,6 +98,14 @@ function AppRoutes() {
         <Route path="/press" element={<Press />} />
         <Route path="/partners" element={<Partners />} />
         <Route path="/social/:channel" element={<SocialChannel />} />
+        <Route
+          path="/operations"
+          element={
+            <ProtectedRoute allowedRoles={['farmer', 'warehouse_manager', 'logistics']}>
+              <Operations />
+            </ProtectedRoute>
+          }
+        />
         <Route
           path="/listing/:id"
           element={<ListingDetail onAddToCart={addToCart} cartItemCount={cartItemCount} />}
@@ -180,17 +190,21 @@ function AppRoutes() {
         />
 
         {/* Catch-all */}
-        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="*" element={<NotFound />} />
     </Routes>
   )
 }
+
+import { ErrorBoundary } from './components/ErrorBoundary'
 
 function App() {
   return (
     <BrowserRouter>
       <I18nProvider>
         <AuthProvider>
-          <AppRoutes />
+          <ErrorBoundary>
+            <AppRoutes />
+          </ErrorBoundary>
         </AuthProvider>
       </I18nProvider>
     </BrowserRouter>

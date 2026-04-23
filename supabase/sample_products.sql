@@ -157,7 +157,7 @@ select
   'Ilorin, Kwara State',
   'Sweet honey beans (Oloyin) known for their naturally sweet taste that requires less seasoning. Carefully selected, stone-free, and properly cleaned. Perfect for moi-moi, akara, and gbegiri soup. Fast cooking time.',
   'Sweet Oloyin beans, stone-free, fast-cooking',
-  array['https://images.unsplash.com/photo-1515543904379-3d757afe72e3?w=800', 'https://images.unsplash.com/photo-1564834724105-918b73d1b9e0?w=800'],
+  array['/images/listings/beans.jpg'],
   array['honey-beans', 'oloyin', 'sweet', 'stone-free', 'moi-moi'],
   false,
   'active'
@@ -178,7 +178,7 @@ select
   'Zaria, Kaduna State',
   'Iron-rich beans (Olofi) with high protein content and firm texture. Holds shape well when cooked, perfect for salads and side dishes. Popular in Northern Nigeria. Cleaned and ready to cook.',
   'Iron-rich beans, high protein, firm texture',
-  array['https://images.unsplash.com/photo-1564834724105-918b73d1b9e0?w=800'],
+  array['/images/listings/beans.jpg'],
   array['iron-beans', 'olofi', 'protein', 'firm', 'salad'],
   false,
   'active'
@@ -199,7 +199,7 @@ select
   'Makurdi, Benue State',
   'Clean white beans, properly sorted and stone-free. Mild flavor that absorbs seasonings well. Great for porridge, stews, and baking. Affordable option for caterers and restaurants.',
   'Clean white beans, affordable, versatile',
-  array['https://images.unsplash.com/photo-1515543904379-3d757afe72e3?w=800'],
+  array['/images/listings/beans.jpg'],
   array['white-beans', 'clean', 'affordable', 'porridge'],
   false,
   'active'
@@ -220,7 +220,7 @@ select
   'Oshogbo, Osun State',
   'Brown beans with rich, nutty flavor. Higher fiber content than white beans. Excellent for traditional Nigerian dishes. Hand-picked and cleaned to ensure quality.',
   'Nutty brown beans, high fiber, hand-picked',
-  array['https://images.unsplash.com/photo-1564834724105-918b73d1b9e0?w=800'],
+  array['/images/listings/beans.jpg'],
   array['brown-beans', 'nutty', 'fiber', 'traditional'],
   false,
   'active'
@@ -312,7 +312,7 @@ select
   'Ondo Town, Ondo State',
   'Fresh green unripe plantains perfect for boiling, frying, and making plantain porridge. Firm texture and starchy taste. Excellent source of resistant starch. Harvested at optimal maturity for cooking.',
   'Fresh green plantains, firm, starchy, perfect for cooking',
-  array['https://images.unsplash.com/photo-1527963662183-79e9f5c6f33c?w=800', 'https://images.unsplash.com/photo-1596097635121-14b63b7a0c19?w=800'],
+  array['/images/listings/ripe-sweet-plantains.jpg'],
   array['green', 'unripe', 'plantain', 'cooking', 'starch'],
   false,
   'active'
@@ -333,7 +333,7 @@ select
   'Sapele, Delta State',
   'Semi-ripe plantains with perfect balance of sweetness and firmness. Great for roasting and frying (dodo). Naturally sweet without being mushy. Hand-selected for consistent quality.',
   'Semi-ripe plantains, sweet & firm, perfect for dodo',
-  array['https://images.unsplash.com/photo-1527963662183-79e9f5c6f33c?w=800'],
+  array['/images/listings/ripe-sweet-plantains.jpg'],
   array['semi-ripe', 'plantain', 'sweet', 'dodo', 'roasting'],
   false,
   'active'
@@ -354,7 +354,7 @@ select
   'Calabar, Cross River State',
   'Fully ripe yellow plantains with sweet, soft flesh. Perfect for caramelized plantain dishes and desserts. High in natural sugars and potassium. Ready to eat or cook.',
   'Ripe sweet plantains, perfect for desserts',
-  array['https://images.unsplash.com/photo-1527963662183-79e9f5c6f33c?w=800', 'https://images.unsplash.com/photo-1596097635121-14b63b7a0c19?w=800'],
+  array['/images/listings/ripe-sweet-plantains.jpg'],
   array['ripe', 'yellow', 'plantain', 'sweet', 'dessert'],
   false,
   'active'
@@ -375,7 +375,7 @@ select
   'Ibadan, Oyo State',
   'High-yielding hybrid plantain suckers for farming. Disease-resistant variety with faster maturity. Each sucker produces a full bunch in 10-12 months. Free planting guide included with bulk orders.',
   'Hybrid plantain suckers, high-yield, disease-resistant',
-  array['https://images.unsplash.com/photo-1596097635121-14b63b7a0c19?w=800'],
+  array['/images/listings/ripe-sweet-plantains.jpg'],
   array['suckers', 'hybrid', 'planting', 'farming', 'seedlings'],
   false,
   'active'
@@ -685,7 +685,7 @@ select
   'Lagos, Lagos State',
   'Fresh red bell peppers (tatashe), perfect for garnishing and cooking. Sweet flavor, thick flesh. Adds vibrant color and taste to any dish. Pesticide-free cultivation.',
   'Fresh red bell peppers, sweet, thick flesh',
-  array['https://images.unsplash.com/photo-1563565375-f3fdf5f516ae?w=800'],
+  array['https://images.unsplash.com/photo-1598170845058-32b9d6a5da37?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxMjA3fDB8MXxzZWFyY2h8Mnx8YmVsbCUyMHBlcHBlcnN8ZW58MHx8fHwxNzYxMjU5ODk3fDA&ixlib=rb-4.1.0&q=80&w=1080'],
   array['peppers', 'tatashe', 'red', 'bell-peppers', 'sweet'],
   false,
   'active'
@@ -706,7 +706,7 @@ select
   'Ibadan, Oyo State',
   'Fiery scotch bonnet peppers (ata rodo), essential for authentic Nigerian cooking. Intense heat and unique flavor. Perfect for ofada stew, pepper soup, and all spicy dishes.',
   'Fiery scotch bonnet peppers, intense heat, authentic flavor',
-  array['https://images.unsplash.com/photo-1588252303782-cb80119abd6c?w=800'],
+  array['https://images.unsplash.com/photo-1598170845058-32b9d6a5da37?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxMjA3fDB8MXxzZWFyY2h8Mnx8YmVsbCUyMHBlcHBlcnN8ZW58MHx8fHwxNzYxMjU5ODk3fDA&ixlib=rb-4.1.0&q=80&w=1080'],
   array['peppers', 'scotch-bonnet', 'ata-rodo', 'hot', 'spicy'],
   false,
   'active'

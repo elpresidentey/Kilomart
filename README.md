@@ -8,6 +8,7 @@ A digital platform that connects farmers, wholesalers, retailers, and consumers 
 - **Farmer Dashboard**: Manage inventory, create listings, track earnings
 - **Buyer Marketplace**: Browse, filter, and purchase produce
 - **Order Management**: Track orders from purchase to delivery
+- **Operations View**: Basic warehouse and inventory visibility for storage/logistics teams
 - **Quality Grading**: A-D quality grading system for produce
 - **Mobile-First Design**: Optimized for low-end Android devices
 
@@ -77,12 +78,19 @@ VITE_SUPABASE_URL=https://your-project.supabase.co
 VITE_SUPABASE_ANON_KEY=your-anon-key
 ```
 
-5. Set up Supabase database (see Database Schema section below)
+5. Set up Supabase database:
+   - For a fresh project, run `supabase/schema.sql`
+   - If you already have the earlier schema, run `supabase/migration.sql` after the base schema so newer tables, columns, and policies are added safely
 
 6. Start the development server:
 ```bash
 npm run dev
 ```
+
+## MVP Scope
+
+The current MVP covers authentication, produce listings, marketplace browsing, cart and checkout, order tracking, and a basic storage/logistics operations view.
+Deeper warehouse automation, route planning, and cold-chain workflows should stay in phase 2 unless you want to expand the first release.
 
 ## Database Schema
 
@@ -223,6 +231,12 @@ Preview production build:
 ```bash
 npm run preview
 ```
+
+### Paystack setup
+
+- `VITE_API_BASE_URL` should point to the deployed app origin when using the Paystack initialize and verify routes.
+- `PAYSTACK_SECRET_KEY` must be set in the server environment, not in the browser bundle.
+- In local development, run through a server that exposes `/api/paystack/*` routes, or keep checkout on cash-on-delivery/bank transfer until those routes are available.
 
 ## License
 

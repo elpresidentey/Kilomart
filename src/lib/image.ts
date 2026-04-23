@@ -1,4 +1,5 @@
 import type { SyntheticEvent } from 'react'
+import { LISTING_IMAGES_BUCKET } from './listingImages'
 
 const FALLBACK_SVG = encodeURIComponent(
   '<svg xmlns="http://www.w3.org/2000/svg" width="640" height="480" viewBox="0 0 640 480"><rect width="640" height="480" fill="#f5f5f4"/><rect x="220" y="150" width="200" height="140" rx="14" fill="#e7e5e4"/><circle cx="290" cy="205" r="20" fill="#d6d3d1"/><path d="M240 270l60-55 40 35 30-25 30 45H240z" fill="#d6d3d1"/></svg>'
@@ -11,6 +12,29 @@ const BEEF_FALLBACK_PAGE_URL =
   'https://unsplash.com/photos/two-steaks-on-a-plate-with-parsley-U5lLwx17rWs'
 const BUSH_MEAT_FALLBACK_PAGE_URL =
   'https://unsplash.com/photos/meat-and-sausages-grilling-on-a-barbecue-nzd6gTdAxUY'
+const BEANS_FALLBACK_IMAGE_SRC = '/images/listings/beans.jpg'
+const PLANTAIN_FALLBACK_IMAGE_SRC = '/images/listings/ripe-sweet-plantains.jpg'
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || ''
+
+function buildSupabasePublicImageUrl(path: string): string | null {
+  if (!SUPABASE_URL) return null
+
+  const normalized = path
+    .trim()
+    .replace(/^\/+/, '')
+    .replace(/^storage\/v1\/object\/public\//, '')
+    .replace(new RegExp(`^${LISTING_IMAGES_BUCKET}/`), '')
+
+  if (!normalized) return null
+
+  const encodedPath = normalized
+    .split('/')
+    .filter(Boolean)
+    .map((segment) => encodeURIComponent(segment))
+    .join('/')
+
+  return `${SUPABASE_URL}/storage/v1/object/public/${LISTING_IMAGES_BUCKET}/${encodedPath}`
+}
 
 function normalizeUnsplashUrl(src: string): string {
   try {
@@ -30,9 +54,36 @@ function normalizeUnsplashUrl(src: string): string {
 
 export function sanitizeImageUrl(value?: string | null): string | null {
   if (!value) return null
-  const src = normalizeUnsplashUrl(value.trim())
+  const raw = value.trim()
+  if (!raw) return null
+
+  if (
+    !raw.startsWith('http://') &&
+    !raw.startsWith('https://') &&
+    !raw.startsWith('data:') &&
+    !raw.startsWith('blob:') &&
+    !raw.startsWith('//') &&
+    !raw.startsWith('/')
+  ) {
+    return buildSupabasePublicImageUrl(raw)
+  }
+
+  const src = normalizeUnsplashUrl(raw)
   if (!src) return null
   if (src.startsWith('http://') || src.startsWith('https://') || src.startsWith('data:') || src.startsWith('blob:')) {
+    if (SUPABASE_URL && src.startsWith(`${SUPABASE_URL}/storage/v1/object/public/`)) {
+      try {
+        const url = new URL(src)
+        const marker = `/storage/v1/object/public/${LISTING_IMAGES_BUCKET}/`
+        const bucketPathIndex = url.pathname.indexOf(marker)
+        if (bucketPathIndex >= 0) {
+          const objectPath = decodeURIComponent(url.pathname.slice(bucketPathIndex + marker.length))
+          return buildSupabasePublicImageUrl(objectPath) ?? src
+        }
+      } catch {
+        return src
+      }
+    }
     return src
   }
   if (src.startsWith('//')) return `https:${src}`
@@ -57,6 +108,16 @@ export function getProductImageSrc(image?: string | null, productName?: string |
     return sanitizeImageUrl(BEEF_FALLBACK_PAGE_URL) ?? FALLBACK_IMAGE_SRC
   }
   if (
+    name.includes('bean') ||
+    name.includes('cowpea') ||
+    name.includes('oloyin') ||
+    name.includes('olofi') ||
+    name.includes('black-eyed') ||
+    name.includes('black eyed')
+  ) {
+    return sanitizeImageUrl(BEANS_FALLBACK_IMAGE_SRC) ?? FALLBACK_IMAGE_SRC
+  }
+  if (
     name.includes('bush meat') ||
     name.includes('bushmeat') ||
     name.includes('grasscutter') ||
@@ -65,6 +126,9 @@ export function getProductImageSrc(image?: string | null, productName?: string |
     name.includes('game meat')
   ) {
     return sanitizeImageUrl(BUSH_MEAT_FALLBACK_PAGE_URL) ?? FALLBACK_IMAGE_SRC
+  }
+  if (name.includes('plantain') || name.includes('plantains')) {
+    return sanitizeImageUrl(PLANTAIN_FALLBACK_IMAGE_SRC) ?? FALLBACK_IMAGE_SRC
   }
 
   return FALLBACK_IMAGE_SRC

@@ -165,6 +165,12 @@ export function ProduceCard({ listing, onAddToCart, listIndex }: ProduceCardProp
           <span className="truncate">{listing.location}</span>
         </div>
 
+        <div className="mb-3">
+          <span className="inline-flex items-center rounded-full bg-stone-100 px-2.5 py-1 text-xs font-medium text-stone-700">
+            Minimum order: {listing.min_order_kg || 1} kg
+          </span>
+        </div>
+
         {/* Price Row */}
         <div className="flex items-baseline justify-between mb-4">
           <div>

@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+
+# Block dashboard and checkout from crawlers
+Disallow: /farmer/
+Disallow: /buyer/
+Disallow: /operations
+Disallow: /checkout
+Disallow: /cart
+
+Sitemap: https://kilomarket.com/sitemap.xml
