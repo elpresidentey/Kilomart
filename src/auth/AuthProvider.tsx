@@ -102,7 +102,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
 
       if (!data) {
-        await new Promise((resolve) => setTimeout(resolve, 1500))
         if (!(await sessionStillValidFor(userId))) return
 
         const { data: retryData } = await supabase
@@ -169,9 +168,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         console.error('Signin error:', error)
         return { error }
       }
-      if (data?.user) {
-        await new Promise((resolve) => setTimeout(resolve, 500))
-      }
       return { error: null }
     } catch (err) {
       console.error('Signin exception:', err)
@@ -199,7 +195,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       if (data?.user) {
         await ensureProfileRow(data.user)
-        await new Promise((resolve) => setTimeout(resolve, 1000))
       }
 
       return { data, error: null }

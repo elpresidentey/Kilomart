@@ -14,6 +14,8 @@ const BUSH_MEAT_FALLBACK_PAGE_URL =
   'https://unsplash.com/photos/meat-and-sausages-grilling-on-a-barbecue-nzd6gTdAxUY'
 const BEANS_FALLBACK_IMAGE_SRC = '/images/listings/beans.jpg'
 const PLANTAIN_FALLBACK_IMAGE_SRC = '/images/listings/ripe-sweet-plantains.jpg'
+const POINT_OF_LAY_HENS_FALLBACK_IMAGE_SRC = '/images/listings/point-of-lay-hens.jpg'
+const YAM_TUBERS_FALLBACK_IMAGE_SRC = '/images/listings/yam-tubers.jpg'
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || ''
 
 function buildSupabasePublicImageUrl(path: string): string | null {
@@ -129,6 +131,17 @@ export function getProductImageSrc(image?: string | null, productName?: string |
   }
   if (name.includes('plantain') || name.includes('plantains')) {
     return sanitizeImageUrl(PLANTAIN_FALLBACK_IMAGE_SRC) ?? FALLBACK_IMAGE_SRC
+  }
+  if (
+    name.includes('point of lay') ||
+    name.includes('point-of-lay') ||
+    name.includes('laying hens') ||
+    name.includes('point of lay hens')
+  ) {
+    return sanitizeImageUrl(POINT_OF_LAY_HENS_FALLBACK_IMAGE_SRC) ?? FALLBACK_IMAGE_SRC
+  }
+  if (name.includes('yam') && !name.includes('flour')) {
+    return sanitizeImageUrl(YAM_TUBERS_FALLBACK_IMAGE_SRC) ?? FALLBACK_IMAGE_SRC
   }
 
   return FALLBACK_IMAGE_SRC

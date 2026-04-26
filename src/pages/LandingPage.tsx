@@ -53,6 +53,7 @@ export function LandingPage() {
   const [headerSearch, setHeaderSearch] = useState('')
   const [newsletterEmail, setNewsletterEmail] = useState('')
   const [newsletterStatus, setNewsletterStatus] = useState<'idle' | 'ok' | 'invalid'>('idle')
+  const [heroVideoReady, setHeroVideoReady] = useState(false)
   const [heroVideoError, setHeroVideoError] = useState(false)
 
   useEffect(() => {
@@ -64,6 +65,32 @@ export function LandingPage() {
     }, 100)
     return () => window.clearTimeout(t)
   }, [location.pathname, location.hash])
+
+  useEffect(() => {
+    let cancelled = false
+    const start = () => {
+      if (!cancelled) setHeroVideoReady(true)
+    }
+
+    const idleWindow = window as Window & {
+      requestIdleCallback?: (callback: IdleRequestCallback, options?: IdleRequestOptions) => number
+      cancelIdleCallback?: (handle: number) => void
+    }
+
+    if (typeof idleWindow.requestIdleCallback === 'function') {
+      const idleId = idleWindow.requestIdleCallback(start, { timeout: 1400 })
+      return () => {
+        cancelled = true
+        idleWindow.cancelIdleCallback?.(idleId)
+      }
+    }
+
+    const timeoutId = window.setTimeout(start, 900)
+    return () => {
+      cancelled = true
+      window.clearTimeout(timeoutId)
+    }
+  }, [])
 
   const handleLogout = async () => {
     await signOut()
@@ -656,10 +683,12 @@ export function LandingPage() {
             <div className="fade-up fade-up-delay-2 relative w-full">
               <div className="float-soft relative overflow-hidden rounded-[2rem] border border-stone-200/80 bg-white p-3 shadow-[0_28px_80px_rgba(15,23,42,0.14)] lg:p-4">
                 <div className="aspect-[4/3] overflow-hidden rounded-[1.5rem] border border-white/40 bg-stone-900 shadow-inner shadow-stone-950/40 sm:aspect-[16/11] lg:aspect-[5/4]">
-                  {!heroVideoError ? (
+                  {!heroVideoError && heroVideoReady ? (
                     <video
                       className="w-full h-full object-cover"
                       src={heroVideo}
+                      poster="/logo-farmers-market.png"
+                      preload="none"
                       autoPlay
                       muted
                       loop
@@ -667,13 +696,26 @@ export function LandingPage() {
                       onError={() => setHeroVideoError(true)}
                     />
                   ) : (
-                    <iframe
-                      className="w-full h-full"
-                      src="https://www.youtube.com/embed/nNjYd1Qh1Ws?autoplay=1&mute=1&loop=1&playlist=nNjYd1Qh1Ws"
-                      title="Farmers Market intro video"
-                      allow="autoplay; encrypted-media; picture-in-picture"
-                      allowFullScreen
-                    />
+                    <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-primary-950 via-stone-900 to-amber-950">
+                      <div className="flex flex-col items-center gap-4 text-center px-6">
+                        <div className="flex h-20 w-20 items-center justify-center rounded-full bg-white/10 ring-1 ring-white/15 backdrop-blur">
+                          <img
+                            src="/logo-farmers-market.png"
+                            alt=""
+                            aria-hidden="true"
+                            className="h-14 w-14 rounded-full object-contain"
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <p className="text-sm font-semibold uppercase tracking-[0.18em] text-primary-100/90">
+                            Platform preview
+                          </p>
+                          <p className="text-lg font-medium text-white">
+                            Fresh produce, faster flows.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
                   )}
                 </div>
               </div>
