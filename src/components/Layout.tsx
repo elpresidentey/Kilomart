@@ -17,7 +17,6 @@ import {
   Search,
   Phone,
   MapPin,
-  LayoutDashboard,
   ClipboardList,
   ChevronDown,
   Globe,
@@ -123,7 +122,6 @@ export function Layout({ children, cartItemCount }: LayoutProps) {
       ? [
           { name: t('nav.home'), href: '/', icon: Home },
           { name: t('nav.marketplace'), href: '/marketplace', icon: Store },
-          { name: t('nav.dashboard'), href: '/dashboard', icon: Store },
         ]
       : canAccessOperations(user.role)
         ? [
@@ -133,9 +131,6 @@ export function Layout({ children, cartItemCount }: LayoutProps) {
       : [
           { name: t('nav.home'), href: '/', icon: Home },
           { name: t('nav.marketplace'), href: '/marketplace', icon: Store },
-          ...(user.role === 'buyer'
-            ? [{ name: t('nav.dashboard'), href: '/buyer', icon: LayoutDashboard }]
-            : []),
           ...(canAccessBuyerOrders(user.role)
             ? [{ name: t('nav.orders'), href: '/orders', icon: Package }]
             : []),
@@ -160,17 +155,11 @@ export function Layout({ children, cartItemCount }: LayoutProps) {
   const accountNavigation = user
     ? user.role === 'farmer'
       ? [
-          { name: t('nav.dashboard'), href: '/dashboard', icon: Store },
           { name: t('nav.orders'), href: '/farmer/orders', icon: ClipboardList },
         ]
-      : user.role === 'buyer'
-        ? [
-            { name: t('nav.dashboard'), href: '/buyer', icon: LayoutDashboard },
-            { name: t('nav.orders'), href: '/orders', icon: Package },
-          ]
-        : canAccessBuyerOrders(user.role)
-          ? [{ name: t('nav.orders'), href: '/orders', icon: Package }]
-          : []
+      : canAccessBuyerOrders(user.role)
+        ? [{ name: t('nav.orders'), href: '/orders', icon: Package }]
+        : []
     : []
 
   const submitHeaderSearch = (e: FormEvent) => {
@@ -754,7 +743,7 @@ export function Layout({ children, cartItemCount }: LayoutProps) {
                     <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-stone-500">
                       Account
                     </p>
-                    <p className="mt-1 text-xs text-stone-500">Profile, dashboard, and sign out.</p>
+                    <p className="mt-1 text-xs text-stone-500">Profile, orders, and sign out.</p>
                   </div>
                   <div className="space-y-1">
                     <Link
