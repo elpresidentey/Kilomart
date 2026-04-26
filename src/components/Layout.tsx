@@ -17,6 +17,7 @@ import {
   Search,
   Phone,
   MapPin,
+  LayoutDashboard,
   ClipboardList,
   ChevronDown,
   Globe,
@@ -143,6 +144,7 @@ export function Layout({ children, cartItemCount }: LayoutProps) {
   const operationsNavigation = user
     ? user.role === 'farmer'
       ? [
+          { name: t('nav.dashboard'), href: '/dashboard', icon: LayoutDashboard },
           { name: t('nav.myListings'), href: '/listings', icon: Package },
           { name: t('nav.operations'), href: '/operations', icon: Warehouse },
           { name: t('nav.orders'), href: '/farmer/orders', icon: ClipboardList },
