@@ -3,6 +3,13 @@ type OrderItem = {
   quantity_kg: number
 }
 
+type ProduceListingRow = {
+  id: string
+  seller_id: string
+  price_per_kg: number
+  available_quantity: number
+}
+
 type Body = {
   items: OrderItem[]
   deliveryInfo: {
@@ -78,7 +85,7 @@ export default async function handler(req: any, res: any) {
     // Fetch listings with their current prices and seller IDs from DB
     const listingIds = items.map((i) => i.listing_id)
     const listingsRes = await fetch(
-      `${supabaseUrl}/rest/v1/produce_listings?id=in.(${listingIds.join(',')})&select=id,price_per_kg,seller_id,quantity_kg`,
+      `${supabaseUrl}/rest/v1/produce_listings?id=in.(${listingIds.join(',')})&select=id,price_per_kg,seller_id,available_quantity`,
       {
         headers: {
           Authorization: `Bearer ${supabaseKey}`,
@@ -87,14 +94,14 @@ export default async function handler(req: any, res: any) {
       }
     )
 
-    const listings = await listingsRes.json()
+    const listings = (await listingsRes.json()) as ProduceListingRow[]
     if (!listings?.length) {
       res.status(400).json({ error: 'Listings not found' })
       return
     }
 
     // Create a map for quick lookup
-    const listingMap = new Map(listings.map((l: any) => [l.id, l]))
+    const listingMap = new Map(listings.map((l) => [l.id, l] as const))
 
     const deliveryFee = 1500
     const deliveryFeePerItem = deliveryFee / items.length
@@ -109,7 +116,7 @@ export default async function handler(req: any, res: any) {
       }
 
       // Check stock
-      if (listing.quantity_kg < item.quantity_kg) {
+      if (listing.available_quantity < item.quantity_kg) {
         res.status(400).json({ error: `Insufficient stock for listing ${item.listing_id}` })
         return
       }
@@ -197,7 +204,7 @@ export default async function handler(req: any, res: any) {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            quantity_kg: listing.quantity_kg - item.quantity_kg,
+            available_quantity: listing.available_quantity - item.quantity_kg,
           }),
         }
       )
