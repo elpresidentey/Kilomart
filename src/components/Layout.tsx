@@ -68,6 +68,11 @@ export function Layout({ children, cartItemCount }: LayoutProps) {
   }, [location.pathname, location.search])
 
   useEffect(() => {
+    if (location.pathname !== '/marketplace') return
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' })
+  }, [location.pathname, location.search])
+
+  useEffect(() => {
     setOrdersMenuOpen(false)
     setMobileOrdersOpen(false)
   }, [location.pathname, location.search])
