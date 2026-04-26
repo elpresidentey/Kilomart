@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Layout } from '../components/Layout'
 import { ProduceCard } from '../components/ProduceCard'
 import { Input, Button } from '../components/ui'
@@ -22,6 +22,7 @@ export function Marketplace() {
   const addToCart = useCartStore((s) => s.addToCart)
   const { t } = useI18n()
   const [searchParams] = useSearchParams()
+  const searchInputRef = useRef<HTMLInputElement | null>(null)
   const qFromUrl = searchParams.get('q') || ''
   const [loading, setLoading] = useState(true)
   const [listings, setListings] = useState<ProduceListing[]>([])
@@ -79,6 +80,13 @@ export function Marketplace() {
   useEffect(() => {
     setSelectedProduct(categoryFromUrl ?? ALL_PRODUCTS)
   }, [categoryFromUrl])
+
+  useEffect(() => {
+    const id = window.setTimeout(() => {
+      searchInputRef.current?.focus()
+    }, 0)
+    return () => window.clearTimeout(id)
+  }, [])
 
   async function fetchListings() {
     try {
@@ -182,6 +190,7 @@ export function Marketplace() {
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-stone-400" />
             <Input
+              ref={searchInputRef}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder={t('marketplace.searchPlaceholder')}
