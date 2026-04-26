@@ -88,22 +88,18 @@ export function Layout({ children, cartItemCount }: LayoutProps) {
     return () => window.removeEventListener('mousedown', onPointerDown)
   }, [ordersMenuOpen])
 
-  const navigation = user
+  const mainNavigation = user
     ? user.role === 'farmer'
       ? [
           { name: t('nav.home'), href: '/', icon: Home },
           { name: t('nav.marketplace'), href: '/marketplace', icon: Store },
           { name: t('nav.dashboard'), href: '/dashboard', icon: Store },
-          { name: t('nav.myListings'), href: '/listings', icon: Package },
-          { name: t('nav.operations'), href: '/operations', icon: Warehouse },
-          { name: t('nav.orders'), href: '/farmer/orders', icon: ClipboardList },
           { name: t('nav.profile'), href: '/profile', icon: User },
         ]
       : canAccessOperations(user.role)
         ? [
             { name: t('nav.home'), href: '/', icon: Home },
             { name: t('nav.marketplace'), href: '/marketplace', icon: Store },
-            { name: t('nav.operations'), href: '/operations', icon: Warehouse },
             { name: t('nav.profile'), href: '/profile', icon: User },
           ]
       : [
@@ -121,6 +117,18 @@ export function Layout({ children, cartItemCount }: LayoutProps) {
         { name: t('nav.home'), href: '/', icon: Home },
         { name: t('nav.marketplace'), href: '/marketplace', icon: Store },
       ]
+
+  const operationsNavigation = user
+    ? user.role === 'farmer'
+      ? [
+          { name: t('nav.myListings'), href: '/listings', icon: Package },
+          { name: t('nav.operations'), href: '/operations', icon: Warehouse },
+          { name: t('nav.orders'), href: '/farmer/orders', icon: ClipboardList },
+        ]
+      : canAccessOperations(user.role)
+        ? [{ name: t('nav.operations'), href: '/operations', icon: Warehouse }]
+        : []
+    : []
 
   const submitHeaderSearch = (e: FormEvent) => {
     e.preventDefault()
@@ -206,100 +214,134 @@ export function Layout({ children, cartItemCount }: LayoutProps) {
               </form>
 
               {/* Desktop Navigation */}
-              <nav className="hidden md:flex items-center gap-0.5">
-                {navigation.map((item) => {
-                  const isOrdersDropdown =
-                    item.href === '/orders' && user != null && canAccessBuyerOrders(user.role)
+              <div className="hidden md:flex items-center gap-3">
+                <nav className="flex items-center gap-0.5">
+                  {mainNavigation.map((item) => {
+                    const isOrdersDropdown =
+                      item.href === '/orders' && user != null && canAccessBuyerOrders(user.role)
 
-                  if (!isOrdersDropdown) {
-                    return (
-                      <Link
-                        key={item.name}
-                        to={item.href}
-                        className={cn(
-                          'relative flex items-center gap-1 px-2.5 lg:px-3 py-1.5 rounded-lg text-sm font-medium tap-highlight-none',
-                          'motion-safe:transition-all motion-safe:duration-200 motion-safe:active:scale-[0.98]',
-                          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2',
-                          isActive(item.href)
-                            ? 'bg-primary-50 text-primary-700 shadow-sm'
-                            : 'text-stone-600 hover:bg-stone-50 hover:text-stone-900'
-                        )}
-                      >
-                        <item.icon
+                    if (!isOrdersDropdown) {
+                      return (
+                        <Link
+                          key={item.name}
+                          to={item.href}
                           className={cn(
-                            'w-4 h-4 motion-safe:transition-transform motion-safe:duration-200',
-                            isActive(item.href) && 'motion-safe:scale-110'
+                            'relative flex items-center gap-1 px-2.5 lg:px-3 py-1.5 rounded-lg text-sm font-medium tap-highlight-none',
+                            'motion-safe:transition-all motion-safe:duration-200 motion-safe:active:scale-[0.98]',
+                            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2',
+                            isActive(item.href)
+                              ? 'bg-primary-50 text-primary-700 shadow-sm'
+                              : 'text-stone-600 hover:bg-stone-50 hover:text-stone-900'
                           )}
-                        />
-                        {item.name}
-                      </Link>
-                    )
-                  }
-
-                  const activeOrders =
-                    location.pathname === '/orders' || location.pathname.startsWith('/orders/')
-
-                  return (
-                    <div key={item.name} className="relative" ref={ordersMenuRef}>
-                      <button
-                        type="button"
-                        aria-label="Orders: open menu for My orders and Pending orders"
-                        aria-haspopup="menu"
-                        aria-expanded={ordersMenuOpen}
-                        onClick={() => setOrdersMenuOpen((v) => !v)}
-                        className={cn(
-                          'relative flex items-center gap-1 px-2.5 lg:px-3 py-1.5 rounded-lg text-sm font-medium tap-highlight-none',
-                          'motion-safe:transition-all motion-safe:duration-200 motion-safe:active:scale-[0.98]',
-                          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2',
-                          activeOrders
-                            ? 'bg-primary-50 text-primary-700 shadow-sm'
-                            : 'text-stone-600 hover:bg-stone-50 hover:text-stone-900'
-                        )}
-                      >
-                        <item.icon
-                          className={cn(
-                            'w-4 h-4 motion-safe:transition-transform motion-safe:duration-200',
-                            activeOrders && 'motion-safe:scale-110'
-                          )}
-                        />
-                        {t('nav.ordersDropdown')}
-                        <ChevronDown
-                          className={cn(
-                            'w-4 h-4 ml-0.5 motion-safe:transition-transform motion-safe:duration-200',
-                            ordersMenuOpen && 'motion-safe:rotate-180'
-                          )}
-                        />
-                      </button>
-
-                      {ordersMenuOpen && (
-                        <div
-                          role="menu"
-                          className="absolute left-0 mt-2 w-48 rounded-xl border border-stone-200 bg-white shadow-lg shadow-stone-900/10 p-1"
                         >
-                          <Link
-                            to="/orders"
-                            role="menuitem"
-                            className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-stone-700 hover:bg-stone-50"
-                            onClick={() => setOrdersMenuOpen(false)}
+                          <item.icon
+                            className={cn(
+                              'w-4 h-4 motion-safe:transition-transform motion-safe:duration-200',
+                              isActive(item.href) && 'motion-safe:scale-110'
+                            )}
+                          />
+                          {item.name}
+                        </Link>
+                      )
+                    }
+
+                    const activeOrders =
+                      location.pathname === '/orders' || location.pathname.startsWith('/orders/')
+
+                    return (
+                      <div key={item.name} className="relative" ref={ordersMenuRef}>
+                        <button
+                          type="button"
+                          aria-label="Orders: open menu for My orders and Pending orders"
+                          aria-haspopup="menu"
+                          aria-expanded={ordersMenuOpen}
+                          onClick={() => setOrdersMenuOpen((v) => !v)}
+                          className={cn(
+                            'relative flex items-center gap-1 px-2.5 lg:px-3 py-1.5 rounded-lg text-sm font-medium tap-highlight-none',
+                            'motion-safe:transition-all motion-safe:duration-200 motion-safe:active:scale-[0.98]',
+                            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2',
+                            activeOrders
+                              ? 'bg-primary-50 text-primary-700 shadow-sm'
+                              : 'text-stone-600 hover:bg-stone-50 hover:text-stone-900'
+                          )}
+                        >
+                          <item.icon
+                            className={cn(
+                              'w-4 h-4 motion-safe:transition-transform motion-safe:duration-200',
+                              activeOrders && 'motion-safe:scale-110'
+                            )}
+                          />
+                          {t('nav.ordersDropdown')}
+                          <ChevronDown
+                            className={cn(
+                              'w-4 h-4 ml-0.5 motion-safe:transition-transform motion-safe:duration-200',
+                              ordersMenuOpen && 'motion-safe:rotate-180'
+                            )}
+                          />
+                        </button>
+
+                        {ordersMenuOpen && (
+                          <div
+                            role="menu"
+                            className="absolute left-0 mt-2 w-48 rounded-xl border border-stone-200 bg-white shadow-lg shadow-stone-900/10 p-1"
                           >
-                            <Package className="w-4 h-4" />
-                            {t('nav.myOrders')}
-                          </Link>
-                          <Link
-                            to="/orders?status=pending"
-                            role="menuitem"
-                            className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-stone-700 hover:bg-stone-50"
-                            onClick={() => setOrdersMenuOpen(false)}
-                          >
-                            <ClipboardList className="w-4 h-4" />
-                            {t('nav.pendingOrders')}
-                          </Link>
-                        </div>
-                      )}
+                            <Link
+                              to="/orders"
+                              role="menuitem"
+                              className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-stone-700 hover:bg-stone-50"
+                              onClick={() => setOrdersMenuOpen(false)}
+                            >
+                              <Package className="w-4 h-4" />
+                              {t('nav.myOrders')}
+                            </Link>
+                            <Link
+                              to="/orders?status=pending"
+                              role="menuitem"
+                              className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-stone-700 hover:bg-stone-50"
+                              onClick={() => setOrdersMenuOpen(false)}
+                            >
+                              <ClipboardList className="w-4 h-4" />
+                              {t('nav.pendingOrders')}
+                            </Link>
+                          </div>
+                        )}
+                      </div>
+                    )
+                  })}
+                </nav>
+
+                {operationsNavigation.length > 0 && (
+                  <div className="hidden xl:flex items-center gap-2 rounded-2xl border border-amber-100 bg-amber-50/80 px-2 py-1 shadow-sm shadow-amber-950/5">
+                    <span className="px-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-amber-700">
+                      Operations
+                    </span>
+                    <div className="flex items-center gap-0.5">
+                      {operationsNavigation.map((item) => (
+                        <Link
+                          key={item.name}
+                          to={item.href}
+                          className={cn(
+                            'relative flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-sm font-medium tap-highlight-none',
+                            'motion-safe:transition-all motion-safe:duration-200 motion-safe:active:scale-[0.98]',
+                            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2',
+                            isActive(item.href)
+                              ? 'bg-white text-amber-800 shadow-sm'
+                              : 'text-stone-600 hover:bg-white/80 hover:text-stone-900'
+                          )}
+                        >
+                          <item.icon
+                            className={cn(
+                              'w-4 h-4 motion-safe:transition-transform motion-safe:duration-200',
+                              isActive(item.href) && 'motion-safe:scale-110'
+                            )}
+                          />
+                          {item.name}
+                        </Link>
+                      ))}
                     </div>
-                  )
-                })}
-              </nav>
+                  </div>
+                )}
+              </div>
 
               {/* User Actions */}
               <div className="flex items-center gap-2 lg:gap-4">
@@ -444,77 +486,108 @@ export function Layout({ children, cartItemCount }: LayoutProps) {
               </label>
             </div>
 
-            <nav className="px-4 py-3 space-y-1">
-              {navigation.map((item) => {
-                const isOrdersDropdown =
-                  item.href === '/orders' && user != null && canAccessBuyerOrders(user.role)
+            <nav className="px-4 py-3 space-y-4">
+              <div className="space-y-1">
+                {mainNavigation.map((item) => {
+                  const isOrdersDropdown =
+                    item.href === '/orders' && user != null && canAccessBuyerOrders(user.role)
 
-                if (!isOrdersDropdown) {
-                  return (
-                    <Link
-                      key={item.name}
-                      to={item.href}
-                      className={cn(
-                        'flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium tap-highlight-none',
-                        'motion-safe:transition-all motion-safe:duration-200 motion-safe:active:scale-[0.99]',
-                        isActive(item.href)
-                          ? 'bg-primary-50 text-primary-700'
-                          : 'text-stone-600 hover:bg-stone-50'
-                      )}
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      <item.icon className="w-5 h-5" />
-                      {item.name}
-                    </Link>
-                  )
-                }
-
-                const activeOrders = location.pathname === '/orders'
-
-                return (
-                  <div key={item.name} className="rounded-xl">
-                    <button
-                      type="button"
-                      onClick={() => setMobileOrdersOpen((v) => !v)}
-                      className={cn(
-                        'flex w-full items-center justify-between gap-3 px-4 py-3 rounded-xl text-sm font-medium tap-highlight-none',
-                        'motion-safe:transition-all motion-safe:duration-200 motion-safe:active:scale-[0.99]',
-                        activeOrders ? 'bg-primary-50 text-primary-700' : 'text-stone-600 hover:bg-stone-50'
-                      )}
-                    >
-                      <span className="flex items-center gap-3">
-                        <Package className="w-5 h-5" />
-                        {t('nav.ordersDropdown')}
-                      </span>
-                      <ChevronDown
+                  if (!isOrdersDropdown) {
+                    return (
+                      <Link
+                        key={item.name}
+                        to={item.href}
                         className={cn(
-                          'w-5 h-5 motion-safe:transition-transform motion-safe:duration-200',
-                          mobileOrdersOpen && 'motion-safe:rotate-180'
+                          'flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium tap-highlight-none',
+                          'motion-safe:transition-all motion-safe:duration-200 motion-safe:active:scale-[0.99]',
+                          isActive(item.href)
+                            ? 'bg-primary-50 text-primary-700'
+                            : 'text-stone-600 hover:bg-stone-50'
                         )}
-                      />
-                    </button>
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        <item.icon className="w-5 h-5" />
+                        {item.name}
+                      </Link>
+                    )
+                  }
 
-                    {mobileOrdersOpen && (
-                      <div className="mt-1 ml-4 pl-3 border-l border-stone-200 space-y-1">
-                        <Link
-                          to="/orders"
-                          className="block px-4 py-2 rounded-lg text-sm text-stone-600 hover:bg-stone-50"
-                          onClick={() => setMobileMenuOpen(false)}
-                        >
-                          {t('nav.myOrders')}
-                        </Link>
-                        <Link
-                          to="/orders?status=pending"
-                          className="block px-4 py-2 rounded-lg text-sm text-stone-600 hover:bg-stone-50"
-                          onClick={() => setMobileMenuOpen(false)}
-                        >
-                          {t('nav.pendingOrders')}
-                        </Link>
-                      </div>
-                    )}
+                  const activeOrders = location.pathname === '/orders'
+
+                  return (
+                    <div key={item.name} className="rounded-xl">
+                      <button
+                        type="button"
+                        onClick={() => setMobileOrdersOpen((v) => !v)}
+                        className={cn(
+                          'flex w-full items-center justify-between gap-3 px-4 py-3 rounded-xl text-sm font-medium tap-highlight-none',
+                          'motion-safe:transition-all motion-safe:duration-200 motion-safe:active:scale-[0.99]',
+                          activeOrders ? 'bg-primary-50 text-primary-700' : 'text-stone-600 hover:bg-stone-50'
+                        )}
+                      >
+                        <span className="flex items-center gap-3">
+                          <Package className="w-5 h-5" />
+                          {t('nav.ordersDropdown')}
+                        </span>
+                        <ChevronDown
+                          className={cn(
+                            'w-5 h-5 motion-safe:transition-transform motion-safe:duration-200',
+                            mobileOrdersOpen && 'motion-safe:rotate-180'
+                          )}
+                        />
+                      </button>
+
+                      {mobileOrdersOpen && (
+                        <div className="mt-1 ml-4 pl-3 border-l border-stone-200 space-y-1">
+                          <Link
+                            to="/orders"
+                            className="block px-4 py-2 rounded-lg text-sm text-stone-600 hover:bg-stone-50"
+                            onClick={() => setMobileMenuOpen(false)}
+                          >
+                            {t('nav.myOrders')}
+                          </Link>
+                          <Link
+                            to="/orders?status=pending"
+                            className="block px-4 py-2 rounded-lg text-sm text-stone-600 hover:bg-stone-50"
+                            onClick={() => setMobileMenuOpen(false)}
+                          >
+                            {t('nav.pendingOrders')}
+                          </Link>
+                        </div>
+                      )}
+                    </div>
+                  )
+                })}
+              </div>
+
+              {operationsNavigation.length > 0 && (
+                <div className="rounded-2xl border border-amber-100 bg-amber-50/70 p-2">
+                  <div className="mb-2 flex items-center gap-2 px-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-amber-700">
+                    <span className="h-px flex-1 bg-amber-200/80" />
+                    <span>Operations</span>
+                    <span className="h-px flex-1 bg-amber-200/80" />
                   </div>
-                )
-              })}
+                  <div className="space-y-1">
+                    {operationsNavigation.map((item) => (
+                      <Link
+                        key={item.name}
+                        to={item.href}
+                        className={cn(
+                          'flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium tap-highlight-none',
+                          'motion-safe:transition-all motion-safe:duration-200 motion-safe:active:scale-[0.99]',
+                          isActive(item.href)
+                            ? 'bg-white text-amber-800 shadow-sm'
+                            : 'text-stone-600 hover:bg-white/80'
+                        )}
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        <item.icon className="w-5 h-5" />
+                        {item.name}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
               {!user && (
                 <div className="pt-3 border-t border-stone-100 space-y-2">
                   <Link to="/login" onClick={() => setMobileMenuOpen(false)}>
