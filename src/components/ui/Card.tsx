@@ -22,16 +22,19 @@ const Card = forwardRef<HTMLDivElement, CardProps>(
       <div
         ref={ref}
         className={cn(
-          'group bg-white rounded-xl shadow-sm border border-stone-100',
+          'group relative overflow-hidden bg-white rounded-xl shadow-sm border border-stone-100',
           'transform-gpu will-change-transform',
-          'motion-safe:transition-[transform,box-shadow,border-color] motion-safe:duration-200 motion-safe:ease-out',
+          'motion-safe:transition-[transform,box-shadow,border-color,background-color] motion-safe:duration-300 motion-safe:ease-out',
+          'motion-safe:hover:-translate-y-1 motion-safe:hover:shadow-[0_18px_50px_rgba(15,23,42,0.10)] motion-safe:hover:border-stone-200/90',
+          'motion-safe:active:scale-[0.995] motion-safe:focus-within:-translate-y-1 motion-safe:focus-within:shadow-[0_18px_50px_rgba(15,23,42,0.10)]',
           interactive &&
-            'hover:-translate-y-0.5 hover:shadow-md hover:border-stone-200/90 focus-within:-translate-y-0.5 focus-within:shadow-md focus-within:border-stone-200/90 cursor-default',
+            'cursor-default',
           paddings[padding],
           className
         )}
         {...props}
       >
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary-200/70 to-transparent opacity-0 transition-opacity duration-300 motion-safe:group-hover:opacity-100" />
         {children}
       </div>
     )
