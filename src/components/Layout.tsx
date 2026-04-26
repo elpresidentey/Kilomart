@@ -48,9 +48,12 @@ export function Layout({ children, cartItemCount }: LayoutProps) {
   const [headerSearch, setHeaderSearch] = useState('')
   const [headerElevated, setHeaderElevated] = useState(false)
   const [ordersMenuOpen, setOrdersMenuOpen] = useState(false)
+  const [operationsMenuOpen, setOperationsMenuOpen] = useState(false)
   const [mobileOrdersOpen, setMobileOrdersOpen] = useState(false)
+  const [mobileOperationsOpen, setMobileOperationsOpen] = useState(false)
   const isLandingPage = location.pathname === '/'
   const ordersMenuRef = useRef<HTMLDivElement | null>(null)
+  const operationsMenuRef = useRef<HTMLDivElement | null>(null)
   const mobileSearchRef = useRef<HTMLInputElement | null>(null)
 
   useEffect(() => {
@@ -74,7 +77,9 @@ export function Layout({ children, cartItemCount }: LayoutProps) {
 
   useEffect(() => {
     setOrdersMenuOpen(false)
+    setOperationsMenuOpen(false)
     setMobileOrdersOpen(false)
+    setMobileOperationsOpen(false)
   }, [location.pathname, location.search])
 
   useEffect(() => {
@@ -87,6 +92,17 @@ export function Layout({ children, cartItemCount }: LayoutProps) {
     window.addEventListener('mousedown', onPointerDown)
     return () => window.removeEventListener('mousedown', onPointerDown)
   }, [ordersMenuOpen])
+
+  useEffect(() => {
+    if (!operationsMenuOpen) return
+    const onPointerDown = (e: MouseEvent) => {
+      const el = operationsMenuRef.current
+      if (!el) return
+      if (e.target instanceof Node && !el.contains(e.target)) setOperationsMenuOpen(false)
+    }
+    window.addEventListener('mousedown', onPointerDown)
+    return () => window.removeEventListener('mousedown', onPointerDown)
+  }, [operationsMenuOpen])
 
   const mainNavigation = user
     ? user.role === 'farmer'
@@ -311,34 +327,65 @@ export function Layout({ children, cartItemCount }: LayoutProps) {
                 </nav>
 
                 {operationsNavigation.length > 0 && (
-                  <div className="hidden xl:flex items-center gap-2 rounded-2xl border border-amber-100 bg-amber-50/80 px-2 py-1 shadow-sm shadow-amber-950/5">
-                    <span className="px-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-amber-700">
-                      Operations
-                    </span>
-                    <div className="flex items-center gap-0.5">
-                      {operationsNavigation.map((item) => (
-                        <Link
-                          key={item.name}
-                          to={item.href}
-                          className={cn(
-                            'relative flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-sm font-medium tap-highlight-none',
-                            'motion-safe:transition-all motion-safe:duration-200 motion-safe:active:scale-[0.98]',
-                            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2',
-                            isActive(item.href)
-                              ? 'bg-white text-amber-800 shadow-sm'
-                              : 'text-stone-600 hover:bg-white/80 hover:text-stone-900'
-                          )}
-                        >
-                          <item.icon
-                            className={cn(
-                              'w-4 h-4 motion-safe:transition-transform motion-safe:duration-200',
-                              isActive(item.href) && 'motion-safe:scale-110'
-                            )}
-                          />
-                          {item.name}
-                        </Link>
-                      ))}
-                    </div>
+                  <div className="relative" ref={operationsMenuRef}>
+                    <button
+                      type="button"
+                      aria-label="Operations menu"
+                      aria-haspopup="menu"
+                      aria-expanded={operationsMenuOpen}
+                      onClick={() => setOperationsMenuOpen((v) => !v)}
+                      className={cn(
+                        'flex items-center gap-2 rounded-2xl border border-amber-100 bg-amber-50/80 px-3 py-2 text-sm font-semibold text-amber-800 shadow-sm shadow-amber-950/5',
+                        'motion-safe:transition-all motion-safe:duration-200 motion-safe:active:scale-[0.98]',
+                        'hover:border-amber-200 hover:bg-amber-50 hover:shadow-md',
+                        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2'
+                      )}
+                    >
+                      <Warehouse className="h-4 w-4" />
+                      <span>Operations</span>
+                      <ChevronDown
+                        className={cn(
+                          'h-4 w-4 motion-safe:transition-transform motion-safe:duration-200',
+                          operationsMenuOpen && 'motion-safe:rotate-180'
+                        )}
+                      />
+                    </button>
+
+                    {operationsMenuOpen && (
+                      <div
+                        role="menu"
+                        className="absolute right-0 mt-2 w-64 rounded-2xl border border-amber-100 bg-white p-2 shadow-xl shadow-stone-900/10"
+                      >
+                        <div className="px-3 py-2">
+                          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-amber-700">
+                            Operations
+                          </p>
+                          <p className="mt-1 text-xs text-stone-500">
+                            Warehousing, logistics, and inventory tools.
+                          </p>
+                        </div>
+                        <div className="space-y-1">
+                          {operationsNavigation.map((item) => (
+                            <Link
+                              key={item.name}
+                              to={item.href}
+                              role="menuitem"
+                              className={cn(
+                                'flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium tap-highlight-none',
+                                'motion-safe:transition-all motion-safe:duration-200 motion-safe:active:scale-[0.99]',
+                                isActive(item.href)
+                                  ? 'bg-amber-50 text-amber-800'
+                                  : 'text-stone-600 hover:bg-stone-50 hover:text-stone-900'
+                              )}
+                              onClick={() => setOperationsMenuOpen(false)}
+                            >
+                              <item.icon className="h-4 w-4" />
+                              <span>{item.name}</span>
+                            </Link>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
@@ -562,30 +609,48 @@ export function Layout({ children, cartItemCount }: LayoutProps) {
 
               {operationsNavigation.length > 0 && (
                 <div className="rounded-2xl border border-amber-100 bg-amber-50/70 p-2">
-                  <div className="mb-2 flex items-center gap-2 px-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-amber-700">
-                    <span className="h-px flex-1 bg-amber-200/80" />
-                    <span>Operations</span>
-                    <span className="h-px flex-1 bg-amber-200/80" />
-                  </div>
-                  <div className="space-y-1">
-                    {operationsNavigation.map((item) => (
-                      <Link
-                        key={item.name}
-                        to={item.href}
-                        className={cn(
-                          'flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium tap-highlight-none',
-                          'motion-safe:transition-all motion-safe:duration-200 motion-safe:active:scale-[0.99]',
-                          isActive(item.href)
-                            ? 'bg-white text-amber-800 shadow-sm'
-                            : 'text-stone-600 hover:bg-white/80'
-                        )}
-                        onClick={() => setMobileMenuOpen(false)}
-                      >
-                        <item.icon className="w-5 h-5" />
-                        {item.name}
-                      </Link>
-                    ))}
-                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setMobileOperationsOpen((v) => !v)}
+                    className={cn(
+                      'flex w-full items-center justify-between gap-3 rounded-xl px-4 py-3 text-sm font-semibold text-amber-800',
+                      'motion-safe:transition-all motion-safe:duration-200 motion-safe:active:scale-[0.99]',
+                      'hover:bg-amber-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2'
+                    )}
+                  >
+                    <span className="flex items-center gap-3">
+                      <Warehouse className="h-5 w-5" />
+                      Operations
+                    </span>
+                    <ChevronDown
+                      className={cn(
+                        'h-5 w-5 motion-safe:transition-transform motion-safe:duration-200',
+                        mobileOperationsOpen && 'motion-safe:rotate-180'
+                      )}
+                    />
+                  </button>
+
+                  {mobileOperationsOpen && (
+                    <div className="mt-2 space-y-1">
+                      {operationsNavigation.map((item) => (
+                        <Link
+                          key={item.name}
+                          to={item.href}
+                          className={cn(
+                            'flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium tap-highlight-none',
+                            'motion-safe:transition-all motion-safe:duration-200 motion-safe:active:scale-[0.99]',
+                            isActive(item.href)
+                              ? 'bg-white text-amber-800 shadow-sm'
+                              : 'text-stone-600 hover:bg-white/80'
+                          )}
+                          onClick={() => setMobileMenuOpen(false)}
+                        >
+                          <item.icon className="w-5 h-5" />
+                          {item.name}
+                        </Link>
+                      ))}
+                    </div>
+                  )}
                 </div>
               )}
               {!user && (
