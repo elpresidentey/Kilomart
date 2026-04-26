@@ -3,6 +3,13 @@ type ListingRow = {
   updated_at?: string
 }
 
+type SitemapEntry = {
+  loc: string
+  priority: string
+  changefreq: string
+  lastmod?: string | null
+}
+
 function getEnv(name: string): string | undefined {
   return (globalThis as any)?.process?.env?.[name]
 }
@@ -79,7 +86,7 @@ export default async function handler(req: any, res: any) {
     }
   }
 
-  const urls = [
+  const urls: SitemapEntry[] = [
     ...staticPages,
     ...listings.map((listing) => ({
       loc: `/listing/${listing.id}`,
