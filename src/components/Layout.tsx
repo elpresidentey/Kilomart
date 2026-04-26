@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { cn } from '../lib/utils'
 import { useI18n } from '../i18n/useI18n'
+import { Seo } from './Seo'
 import { PageTransition } from './PageTransition'
 import { Button } from './ui/Button'
 import {
@@ -23,9 +24,10 @@ import {
   Globe,
   Warehouse,
 } from 'lucide-react'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useCartStore, cartUnitsCount } from '../stores/cartStore'
 import { canAccessBuyerOrders, canAccessOperations } from '../lib/roles'
+import { getSiteUrl, toAbsoluteUrl } from '../lib/site'
 import type { Language } from '../i18n/strings'
 
 interface LayoutProps {
@@ -173,8 +175,200 @@ export function Layout({ children, cartItemCount }: LayoutProps) {
 
   const isActive = (path: string) => location.pathname === path
 
+  const routeSeo = useMemo(() => {
+    const path = location.pathname
+
+    if (path === '/') {
+      return {
+        title: 'Farmers Market - Fresh Produce from Local Farmers',
+        description:
+          'Buy fresh produce directly from local farmers. Browse verified listings, pay securely, and manage delivery in one place.',
+        canonicalPath: '/',
+        jsonLd: [
+          {
+            '@context': 'https://schema.org',
+            '@type': 'Organization',
+            name: 'Farmers Market',
+            url: getSiteUrl(),
+            logo: toAbsoluteUrl('/logo-farmers-market.png'),
+          },
+          {
+            '@context': 'https://schema.org',
+            '@type': 'WebSite',
+            name: 'Farmers Market',
+            url: getSiteUrl(),
+            potentialAction: {
+              '@type': 'SearchAction',
+              target: `${getSiteUrl()}/marketplace?q={search_term_string}`,
+              'query-input': 'required name=search_term_string',
+            },
+          },
+        ],
+      }
+    }
+
+    if (path === '/marketplace') {
+      return {
+        title: 'Marketplace - Buy Fresh Produce by the Kg',
+        description:
+          'Search fresh produce by category, grade, and location, then connect with local farmers in minutes.',
+        canonicalPath: '/marketplace',
+        noindex: location.search.length > 0,
+      }
+    }
+
+    if (path.startsWith('/listing/')) {
+      return {
+        title: 'Listing details - Farmers Market',
+        description:
+          'View product details, pricing, availability, and seller information for this listing.',
+        canonicalPath: path,
+      }
+    }
+
+    if (path === '/about') {
+      return {
+        title: 'About Farmers Market',
+        description:
+          'Learn how Farmers Market connects buyers with trusted farmers and improves access to fresh produce.',
+        canonicalPath: '/about',
+      }
+    }
+
+    if (path === '/help') {
+      return {
+        title: 'Help Center',
+        description:
+          'Get answers about buying, selling, delivery, and how to use Farmers Market effectively.',
+        canonicalPath: '/help',
+      }
+    }
+
+    if (path === '/contact') {
+      return {
+        title: 'Contact Farmers Market',
+        description:
+          'Reach the Farmers Market team for support, partnerships, press, and general enquiries.',
+        canonicalPath: '/contact',
+      }
+    }
+
+    if (path === '/careers') {
+      return {
+        title: 'Careers at Farmers Market',
+        description:
+          'Explore opportunities to join the team building logistics, marketplace, and farmer tools.',
+        canonicalPath: '/careers',
+      }
+    }
+
+    if (path === '/press') {
+      return {
+        title: 'Press and Media',
+        description:
+          'Read announcements, updates, and media information about Farmers Market.',
+        canonicalPath: '/press',
+      }
+    }
+
+    if (path === '/partners') {
+      return {
+        title: 'Partners',
+        description:
+          'See how Farmers Market works with logistics partners, farmers, and community collaborators.',
+        canonicalPath: '/partners',
+      }
+    }
+
+    if (path.startsWith('/legal/')) {
+      const kind = path.split('/').pop() || 'document'
+      const title =
+        kind === 'privacy'
+          ? 'Privacy Policy'
+          : kind === 'terms'
+            ? 'Terms of Service'
+            : kind === 'shipping'
+              ? 'Shipping Policy'
+              : kind === 'refund'
+                ? 'Refund Policy'
+                : 'Legal Document'
+
+      return {
+        title,
+        description: `Read the ${title.toLowerCase()} for Farmers Market.`,
+        canonicalPath: path,
+      }
+    }
+
+    if (path.startsWith('/social/')) {
+      const channel = path.split('/').pop() || 'social'
+      const prettyChannel = channel.charAt(0).toUpperCase() + channel.slice(1)
+      return {
+        title: `${prettyChannel} - Farmers Market`,
+        description: `Follow Farmers Market on ${prettyChannel} for updates, offers, and community stories.`,
+        canonicalPath: path,
+      }
+    }
+
+    const noindexRoutes = [
+      '/login',
+      '/signup',
+      '/auth/callback',
+      '/cart',
+      '/checkout',
+      '/profile',
+      '/buyer',
+      '/orders',
+      '/dashboard',
+      '/listings',
+      '/operations',
+      '/farmer/orders',
+    ]
+
+    if (noindexRoutes.some((route) => path === route || path.startsWith(`${route}/`))) {
+      const title =
+        path === '/login'
+          ? 'Sign in'
+          : path === '/signup'
+            ? 'Create account'
+            : path === '/cart'
+              ? 'Your cart'
+              : path === '/checkout'
+                ? 'Checkout'
+                : path === '/profile'
+                  ? 'Profile'
+                  : path === '/operations'
+                    ? 'Operations'
+                    : path === '/dashboard'
+                      ? 'Dashboard'
+                      : path === '/buyer'
+                        ? 'Buyer dashboard'
+                        : path === '/orders'
+                          ? 'Orders'
+                          : path === '/farmer/orders'
+                            ? 'Farmer orders'
+                            : 'Workspace'
+
+      return {
+        title,
+        description: 'This page is part of the authenticated workspace.',
+        canonicalPath: path,
+        noindex: true,
+      }
+    }
+
+    return {
+      title: 'Farmers Market',
+      description: 'Connect with local farmers and buy fresh produce directly.',
+      canonicalPath: path,
+      noindex: true,
+    }
+  }, [location.pathname, location.search])
+  const renderLayoutSeo = !location.pathname.startsWith('/listing/')
+
   return (
     <div className="min-h-screen bg-stone-50">
+      {renderLayoutSeo && <Seo {...routeSeo} />}
       {/* Header */}
       <header
         className={cn(

@@ -1,11 +1,18 @@
 import { Link } from 'react-router-dom'
 import { Layout } from '../components/Layout'
+import { Seo } from '../components/Seo'
 import { Button } from '../components/ui'
 import { Home, ArrowLeft } from 'lucide-react'
 
 export function NotFound() {
   return (
     <Layout>
+      <Seo
+        title="Page not found"
+        description="The page you are looking for could not be found."
+        canonicalPath="/"
+        noindex
+      />
       <div className="min-h-[60vh] flex items-center justify-center py-16 px-4">
         <div className="max-w-md w-full text-center">
           <div className="mb-8">

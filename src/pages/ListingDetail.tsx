@@ -1,11 +1,13 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { Layout } from '../components/Layout'
+import { Seo } from '../components/Seo'
 import { Button, Card, Badge } from '../components/ui'
 import { supabase } from '../lib/supabase'
 import type { CartItem, ProduceListing } from '../types'
 import { ArrowLeft, MapPin, Package, Minus, Plus, ShoppingCart, Check } from 'lucide-react'
 import { fallbackOnImageError, getProductImageSrc } from '../lib/image'
+import { toAbsoluteUrl } from '../lib/site'
 import { useI18n } from '../i18n/useI18n'
 
 interface ListingDetailProps {
@@ -183,9 +185,61 @@ export function ListingDetail({ onAddToCart, cartItemCount }: ListingDetailProps
   const q = qualityColors[listing.quality_grade]
   const minQ = listing.min_order_kg || 1
   const totalPrice = listing.price_per_kg * quantity
+  const seo = useMemo(() => {
+    const seoPath = id ? `/listing/${id}` : '/listing'
+    const seoImage = listing
+      ? toAbsoluteUrl(getProductImageSrc(listing.images?.[0], listing.product_name))
+      : '/logo-farmers-market.png'
+    const seoDescription = listing
+      ? `${listing.product_name} in ${listing.location}. ` +
+        `${listing.available_quantity.toLocaleString()} kg available at ${formatPrice(listing.price_per_kg)} per kg.`
+      : notFound
+        ? 'This listing may have been removed or is no longer available.'
+        : 'View product details, pricing, availability, and seller information.'
+    const seoJsonLd = listing
+      ? {
+          '@context': 'https://schema.org',
+          '@type': 'Product',
+          name: listing.product_name,
+          description: listing.description || seoDescription,
+          image: [seoImage],
+          brand: {
+            '@type': 'Brand',
+            name: 'Farmers Market',
+          },
+          offers: {
+            '@type': 'Offer',
+            priceCurrency: 'NGN',
+            price: listing.price_per_kg,
+            availability:
+              listing.available_quantity > 0
+                ? 'https://schema.org/InStock'
+                : 'https://schema.org/OutOfStock',
+            url: toAbsoluteUrl(`/listing/${listing.id}`),
+          },
+        }
+      : undefined
+    const seoNoindex = notFound || !listing
+    const seoTitle = listing
+      ? `${listing.product_name} in ${listing.location}`
+      : notFound
+        ? 'Listing not found'
+        : 'Listing details'
+
+    return { seoPath, seoImage, seoDescription, seoJsonLd, seoNoindex, seoTitle }
+  }, [id, listing, notFound])
 
   return (
     <Layout cartItemCount={cartItemCount}>
+      <Seo
+        title={seo.seoTitle}
+        description={seo.seoDescription}
+        canonicalPath={seo.seoPath}
+        type={listing ? 'product' : 'website'}
+        noindex={seo.seoNoindex}
+        image={seo.seoImage}
+        jsonLd={seo.seoJsonLd}
+      />
       <div className="max-w-4xl mx-auto py-8 motion-safe:animate-fade-in motion-reduce:animate-none">
         <button
           type="button"

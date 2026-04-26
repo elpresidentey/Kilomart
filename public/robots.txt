@@ -1,11 +1,18 @@
 User-agent: *
 Allow: /
 
-# Block dashboard and checkout from crawlers
+# Block authenticated and checkout surfaces from crawlers
+Disallow: /auth/
+Disallow: /login
+Disallow: /signup
+Disallow: /profile
 Disallow: /farmer/
 Disallow: /buyer/
 Disallow: /operations
+Disallow: /dashboard
+Disallow: /listings
+Disallow: /orders
 Disallow: /checkout
 Disallow: /cart
 
-Sitemap: https://kilomarket.com/sitemap.xml
+Sitemap: https://kilomart.vercel.app/sitemap.xml
