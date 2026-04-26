@@ -49,11 +49,13 @@ export function Layout({ children, cartItemCount }: LayoutProps) {
   const [headerElevated, setHeaderElevated] = useState(false)
   const [ordersMenuOpen, setOrdersMenuOpen] = useState(false)
   const [operationsMenuOpen, setOperationsMenuOpen] = useState(false)
+  const [accountMenuOpen, setAccountMenuOpen] = useState(false)
   const [mobileOrdersOpen, setMobileOrdersOpen] = useState(false)
   const [mobileOperationsOpen, setMobileOperationsOpen] = useState(false)
   const isLandingPage = location.pathname === '/'
   const ordersMenuRef = useRef<HTMLDivElement | null>(null)
   const operationsMenuRef = useRef<HTMLDivElement | null>(null)
+  const accountMenuRef = useRef<HTMLDivElement | null>(null)
   const mobileSearchRef = useRef<HTMLInputElement | null>(null)
 
   useEffect(() => {
@@ -78,6 +80,7 @@ export function Layout({ children, cartItemCount }: LayoutProps) {
   useEffect(() => {
     setOrdersMenuOpen(false)
     setOperationsMenuOpen(false)
+    setAccountMenuOpen(false)
     setMobileOrdersOpen(false)
     setMobileOperationsOpen(false)
   }, [location.pathname, location.search])
@@ -103,6 +106,17 @@ export function Layout({ children, cartItemCount }: LayoutProps) {
     window.addEventListener('mousedown', onPointerDown)
     return () => window.removeEventListener('mousedown', onPointerDown)
   }, [operationsMenuOpen])
+
+  useEffect(() => {
+    if (!accountMenuOpen) return
+    const onPointerDown = (e: MouseEvent) => {
+      const el = accountMenuRef.current
+      if (!el) return
+      if (e.target instanceof Node && !el.contains(e.target)) setAccountMenuOpen(false)
+    }
+    window.addEventListener('mousedown', onPointerDown)
+    return () => window.removeEventListener('mousedown', onPointerDown)
+  }, [accountMenuOpen])
 
   const mainNavigation = user
     ? user.role === 'farmer'
@@ -141,6 +155,22 @@ export function Layout({ children, cartItemCount }: LayoutProps) {
       : canAccessOperations(user.role)
         ? [{ name: t('nav.operations'), href: '/operations', icon: Warehouse }]
         : []
+    : []
+
+  const accountNavigation = user
+    ? user.role === 'farmer'
+      ? [
+          { name: t('nav.dashboard'), href: '/dashboard', icon: Store },
+          { name: t('nav.orders'), href: '/farmer/orders', icon: ClipboardList },
+        ]
+      : user.role === 'buyer'
+        ? [
+            { name: t('nav.dashboard'), href: '/buyer', icon: LayoutDashboard },
+            { name: t('nav.orders'), href: '/orders', icon: Package },
+          ]
+        : canAccessBuyerOrders(user.role)
+          ? [{ name: t('nav.orders'), href: '/orders', icon: Package }]
+          : []
     : []
 
   const submitHeaderSearch = (e: FormEvent) => {
@@ -424,26 +454,94 @@ export function Layout({ children, cartItemCount }: LayoutProps) {
                 </Link>
 
                 {user ? (
-                  <>
-                    <div className="hidden sm:flex items-center gap-3 pl-2 lg:pl-4 border-l border-stone-200">
-                      <Link to="/profile" className="flex items-center gap-2 text-stone-600 hover:text-primary-600 transition-colors">
-                        <div className="w-9 h-9 rounded-full bg-gradient-to-br from-primary-100 to-primary-50 flex items-center justify-center border border-primary-200">
-                          <User className="w-4 h-4 text-primary-700" />
-                        </div>
-                        <span className="font-medium text-sm hidden lg:block">{user.full_name?.split(' ')[0]}</span>
-                      </Link>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => {
-                          void signOut()
-                        }}
-                        className="text-stone-500 hover:text-stone-900"
-                      >
-                        <LogOut className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  </>
+                  <div
+                    ref={accountMenuRef}
+                    className="hidden sm:flex items-center gap-2 pl-2 lg:pl-4 border-l border-stone-200"
+                  >
+                    <Link
+                      to="/profile"
+                      className="flex items-center gap-2 rounded-full px-2 py-1.5 text-stone-600 hover:text-primary-600 hover:bg-stone-50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
+                    >
+                      <div className="w-9 h-9 rounded-full bg-gradient-to-br from-primary-100 to-primary-50 flex items-center justify-center border border-primary-200">
+                        <User className="w-4 h-4 text-primary-700" />
+                      </div>
+                      <span className="font-medium text-sm hidden lg:block">
+                        {user.full_name?.split(' ')[0]}
+                      </span>
+                    </Link>
+
+                    {accountNavigation.length > 0 && (
+                      <div className="relative">
+                        <button
+                          type="button"
+                          aria-label="Open account menu"
+                          aria-haspopup="menu"
+                          aria-expanded={accountMenuOpen}
+                          onClick={() => setAccountMenuOpen((v) => !v)}
+                          className={cn(
+                            'inline-flex items-center justify-center rounded-full border border-stone-200 bg-white p-2 text-stone-500 shadow-sm',
+                            'motion-safe:transition-all motion-safe:duration-200 motion-safe:active:scale-[0.98]',
+                            'hover:border-stone-300 hover:text-stone-800 hover:shadow-md',
+                            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2'
+                          )}
+                        >
+                          <ChevronDown
+                            className={cn(
+                              'h-4 w-4 motion-safe:transition-transform motion-safe:duration-200',
+                              accountMenuOpen && 'motion-safe:rotate-180'
+                            )}
+                          />
+                        </button>
+
+                        {accountMenuOpen && (
+                          <div
+                            role="menu"
+                            className="absolute right-0 mt-2 w-56 rounded-2xl border border-stone-200 bg-white p-2 shadow-xl shadow-stone-900/10"
+                          >
+                            <div className="px-3 py-2">
+                              <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-stone-500">
+                                Account
+                              </p>
+                              <p className="mt-1 text-xs text-stone-500">
+                                Quick access to your workspace.
+                              </p>
+                            </div>
+                            <div className="space-y-1">
+                              {accountNavigation.map((item) => (
+                                <Link
+                                  key={item.name}
+                                  to={item.href}
+                                  role="menuitem"
+                                  className={cn(
+                                    'flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium tap-highlight-none',
+                                    'motion-safe:transition-all motion-safe:duration-200 motion-safe:active:scale-[0.99]',
+                                    isActive(item.href)
+                                      ? 'bg-stone-50 text-stone-900'
+                                      : 'text-stone-600 hover:bg-stone-50 hover:text-stone-900'
+                                  )}
+                                  onClick={() => setAccountMenuOpen(false)}
+                                >
+                                  <item.icon className="h-4 w-4" />
+                                  <span>{item.name}</span>
+                                </Link>
+                              ))}
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setAccountMenuOpen(false)
+                                  void signOut()
+                                }}
+                                className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-stone-600 hover:bg-stone-50 hover:text-stone-900"
+                              >
+                                <LogOut className="h-4 w-4" />
+                                <span>{t('nav.signOut')}</span>
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
                 ) : (
                   <div className="hidden md:flex items-center gap-2">
                     <Link to="/login">
@@ -650,6 +748,54 @@ export function Layout({ children, cartItemCount }: LayoutProps) {
                   )}
                 </div>
               )}
+              {user && (
+                <div className="rounded-2xl border border-stone-200 bg-white p-2 shadow-sm">
+                  <div className="px-2 pb-2">
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-stone-500">
+                      Account
+                    </p>
+                    <p className="mt-1 text-xs text-stone-500">Profile, dashboard, and sign out.</p>
+                  </div>
+                  <div className="space-y-1">
+                    <Link
+                      to="/profile"
+                      className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-stone-600 hover:bg-stone-50"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      <User className="w-5 h-5" />
+                      Profile
+                    </Link>
+                    {accountNavigation.map((item) => (
+                      <Link
+                        key={item.name}
+                        to={item.href}
+                        className={cn(
+                          'flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium tap-highlight-none',
+                          'motion-safe:transition-all motion-safe:duration-200 motion-safe:active:scale-[0.99]',
+                          isActive(item.href)
+                            ? 'bg-stone-50 text-stone-900'
+                            : 'text-stone-600 hover:bg-stone-50'
+                        )}
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        <item.icon className="w-5 h-5" />
+                        {item.name}
+                      </Link>
+                    ))}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setMobileMenuOpen(false)
+                        void signOut()
+                      }}
+                      className="flex w-full items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-stone-600 hover:bg-stone-50 motion-safe:transition-colors"
+                    >
+                      <LogOut className="w-5 h-5" />
+                      {t('nav.signOut')}
+                    </button>
+                  </div>
+                </div>
+              )}
               {!user && (
                 <div className="pt-3 border-t border-stone-100 space-y-2">
                   <Link to="/login" onClick={() => setMobileMenuOpen(false)}>
@@ -663,19 +809,6 @@ export function Layout({ children, cartItemCount }: LayoutProps) {
                     </Button>
                   </Link>
                 </div>
-              )}
-              {user && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setMobileMenuOpen(false)
-                    void signOut()
-                  }}
-                  className="flex w-full items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-stone-600 hover:bg-stone-50 motion-safe:transition-colors"
-                >
-                  <LogOut className="w-5 h-5" />
-                  {t('nav.signOut')}
-                </button>
               )}
             </nav>
           </div>
