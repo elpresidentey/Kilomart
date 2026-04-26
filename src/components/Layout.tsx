@@ -310,9 +310,18 @@ export function Layout({ children, cartItemCount }: LayoutProps) {
                     setMobileMenuOpen(true)
                     window.setTimeout(() => mobileSearchRef.current?.focus(), 0)
                   }}
-                  className="md:hidden p-2 text-stone-600 hover:bg-stone-100 rounded-lg transition-colors"
+                  aria-label="Open search"
+                  className={cn(
+                    'md:hidden inline-flex items-center gap-2 rounded-full border border-stone-200 bg-stone-50 px-3 py-2',
+                    'text-sm font-medium text-stone-700 shadow-sm tap-highlight-none',
+                    'motion-safe:transition-all motion-safe:duration-200 motion-safe:ease-out',
+                    'hover:border-stone-300 hover:bg-white hover:text-primary-700 hover:shadow-md',
+                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2',
+                    'motion-safe:active:scale-[0.98]'
+                  )}
                 >
-                  <Search className="w-5 h-5" />
+                  <Search className="w-4 h-4" />
+                  <span className="hidden sm:inline">Search</span>
                 </button>
 
                 {/* Cart - visible to all users */}
