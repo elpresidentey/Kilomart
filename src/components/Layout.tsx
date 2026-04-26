@@ -110,13 +110,11 @@ export function Layout({ children, cartItemCount }: LayoutProps) {
           { name: t('nav.home'), href: '/', icon: Home },
           { name: t('nav.marketplace'), href: '/marketplace', icon: Store },
           { name: t('nav.dashboard'), href: '/dashboard', icon: Store },
-          { name: t('nav.profile'), href: '/profile', icon: User },
         ]
       : canAccessOperations(user.role)
         ? [
             { name: t('nav.home'), href: '/', icon: Home },
             { name: t('nav.marketplace'), href: '/marketplace', icon: Store },
-            { name: t('nav.profile'), href: '/profile', icon: User },
           ]
       : [
           { name: t('nav.home'), href: '/', icon: Home },
@@ -127,7 +125,6 @@ export function Layout({ children, cartItemCount }: LayoutProps) {
           ...(canAccessBuyerOrders(user.role)
             ? [{ name: t('nav.orders'), href: '/orders', icon: Package }]
             : []),
-          { name: t('nav.profile'), href: '/profile', icon: User },
         ]
     : [
         { name: t('nav.home'), href: '/', icon: Home },
