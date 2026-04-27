@@ -361,7 +361,6 @@ export default async function handler(req: any, res: any) {
     const listingMap = new Map(listings.map((listing) => [listing.id, listing] as const))
     const orderNumbers: string[] = []
     const orderIds: string[] = []
-    const mutationKey = serviceRoleKey || supabaseKey
 
     for (const item of items) {
       const listing = listingMap.get(item.listing_id)
@@ -376,92 +375,22 @@ export default async function handler(req: any, res: any) {
         return
       }
 
-      const rpcResponse = await fetch(`${supabaseUrl}/rest/v1/rpc/create_order_with_stock`, {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`,
-          Apikey: mutationKey,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          p_listing_id: item.listing_id,
-          p_quantity_kg: item.quantity_kg,
-          p_buyer_id: buyerId,
-          p_seller_id: listing.seller_id,
-          p_price_per_kg: listing.price_per_kg,
-          p_delivery_fee: deliveryFeePerItem,
-          p_delivery_address: {
-            address: deliveryInfo.address,
-            city: deliveryInfo.city,
-            state: deliveryInfo.state,
-            phone: deliveryInfo.phone,
-            contact_name: deliveryInfo.fullName,
-          },
-          p_payment_method: paymentMethod,
-          p_status: paymentMethod === 'paystack' ? 'paid' : 'pending',
-          p_provider_reference: providerReference || null,
-        }),
-      })
-
-      const rpcData = await safeJson(rpcResponse)
-      if (!rpcResponse.ok) {
-        const rpcMessage = rpcData?.message || rpcData?.error || ''
-        const missingRpc =
-          rpcResponse.status === 404 ||
-          /could not find the function/i.test(rpcMessage) ||
-          /schema cache/i.test(rpcMessage)
-
-        if (!missingRpc) {
-          throw new Error(rpcMessage || `Failed to create order for ${item.listing_id}`)
-        }
-
-        const fallback = await createOrderViaRest(
-          supabaseUrl,
-          token,
-          supabaseKey,
-          buyerId,
-          listing,
-          item,
-          deliveryInfo,
-          paymentMethod,
-          providerReference,
-          deliveryFeePerItem,
-          serviceRoleKey || undefined
-        )
-        orderIds.push(fallback.orderId)
-        orderNumbers.push(fallback.orderNumber)
-        continue
-      }
-
-      const orderId = String(rpcData ?? '')
-      if (!orderId) {
-        throw new Error('Failed to create order')
-      }
-
-      const orderRes = await fetch(
-        `${supabaseUrl}/rest/v1/orders?id=eq.${orderId}&select=id,order_number`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            Apikey: supabaseKey,
-          },
-        }
+      const created = await createOrderViaRest(
+        supabaseUrl,
+        token,
+        supabaseKey,
+        buyerId,
+        listing,
+        item,
+        deliveryInfo,
+        paymentMethod,
+        providerReference,
+        deliveryFeePerItem,
+        serviceRoleKey || undefined
       )
 
-      if (!orderRes.ok) {
-        const err = await orderRes.text()
-        throw new Error(`Could not load created order: ${err}`)
-      }
-
-      const createdOrders = await orderRes.json()
-      const orderNumber = createdOrders?.[0]?.order_number
-
-      if (!orderNumber) {
-        throw new Error('Failed to get order number')
-      }
-
-      orderIds.push(orderId)
-      orderNumbers.push(orderNumber)
+      orderIds.push(created.orderId)
+      orderNumbers.push(created.orderNumber)
     }
 
     res.status(200).json({
