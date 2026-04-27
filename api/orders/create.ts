@@ -415,12 +415,6 @@ export default async function handler(req: any, res: any) {
           throw new Error(rpcMessage || `Failed to create order for ${item.listing_id}`)
         }
 
-        if (!serviceRoleKey) {
-          throw new Error(
-            'The checkout RPC is missing from Supabase and SUPABASE_SERVICE_ROLE_KEY is not configured for fallback.'
-          )
-        }
-
         const fallback = await createOrderViaRest(
           supabaseUrl,
           token,
