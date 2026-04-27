@@ -131,21 +131,23 @@ async function patchJson(url: string, headers: Record<string, string>, body: unk
 
 async function createOrderViaRest(
   supabaseUrl: string,
-  mutationKey: string,
+  authToken: string,
+  apiKey: string,
   buyerId: string,
   listing: ListingRow,
   item: OrderItem,
   deliveryInfo: DeliveryInfo,
   paymentMethod: Body['paymentMethod'],
   providerReference: string | undefined,
-  deliveryFeePerItem: number
+  deliveryFeePerItem: number,
+  mutationKey?: string
 ) {
   const orderNumber = generateFallbackOrderNumber()
   const subtotal = Number((listing.price_per_kg * item.quantity_kg).toFixed(2))
   const totalAmount = Number((subtotal + deliveryFeePerItem).toFixed(2))
   const authHeaders = {
-    Authorization: `Bearer ${mutationKey}`,
-    Apikey: mutationKey,
+    Authorization: `Bearer ${authToken}`,
+    Apikey: apiKey,
   }
 
   const orderRes = await postJson(
@@ -184,19 +186,24 @@ async function createOrderViaRest(
     throw new Error('Failed to create order')
   }
 
-  const nextAvailableQuantity = Number((listing.available_quantity - item.quantity_kg).toFixed(2))
-  const listingRes = await patchJson(
-    `${supabaseUrl}/rest/v1/produce_listings?id=eq.${item.listing_id}`,
-    authHeaders,
-    {
-      available_quantity: nextAvailableQuantity,
-      status: nextAvailableQuantity <= 0 ? 'sold_out' : 'active',
-    }
-  )
+  if (mutationKey) {
+    const nextAvailableQuantity = Number((listing.available_quantity - item.quantity_kg).toFixed(2))
+    const listingRes = await patchJson(
+      `${supabaseUrl}/rest/v1/produce_listings?id=eq.${item.listing_id}`,
+      {
+        Authorization: `Bearer ${mutationKey}`,
+        Apikey: mutationKey,
+      },
+      {
+        available_quantity: nextAvailableQuantity,
+        status: nextAvailableQuantity <= 0 ? 'sold_out' : 'active',
+      }
+    )
 
-  if (!listingRes.ok) {
-    const err = await safeJson(listingRes)
-    throw new Error(err?.message || err?.error || `Failed to update stock for ${item.listing_id}`)
+    if (!listingRes.ok) {
+      const err = await safeJson(listingRes)
+      throw new Error(err?.message || err?.error || `Failed to update stock for ${item.listing_id}`)
+    }
   }
 
   const paymentRes = await postJson(
@@ -416,14 +423,16 @@ export default async function handler(req: any, res: any) {
 
         const fallback = await createOrderViaRest(
           supabaseUrl,
-          serviceRoleKey,
+          token,
+          supabaseKey,
           buyerId,
           listing,
           item,
           deliveryInfo,
           paymentMethod,
           providerReference,
-          deliveryFeePerItem
+          deliveryFeePerItem,
+          serviceRoleKey || undefined
         )
         orderIds.push(fallback.orderId)
         orderNumbers.push(fallback.orderNumber)
