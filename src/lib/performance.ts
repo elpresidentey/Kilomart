@@ -13,6 +13,11 @@ type BenchmarkSummary = {
   }
 }
 
+type LayoutShiftEntry = PerformanceEntry & {
+  hadRecentInput: boolean
+  value: number
+}
+
 function formatMs(value?: number): string {
   if (typeof value !== 'number' || !Number.isFinite(value)) return 'n/a'
   return `${Math.round(value)} ms`
@@ -77,7 +82,7 @@ export function startAppBenchmarking() {
     lcpObserver.observe({ type: 'largest-contentful-paint', buffered: true })
 
     const clsObserver = new PerformanceObserver((list) => {
-      for (const entry of list.getEntries() as LayoutShift[]) {
+      for (const entry of list.getEntries() as LayoutShiftEntry[]) {
         if (!entry.hadRecentInput) {
           summary.metrics.cls += entry.value
         }

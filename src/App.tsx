@@ -1,6 +1,7 @@
 import { Suspense, lazy, type ReactNode } from 'react'
 import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import { ErrorBoundary } from './components/ErrorBoundary'
+import { ToastViewport } from './components/ToastViewport'
 import { I18nProvider } from './i18n/I18nProvider'
 import { AuthProvider, useAuth } from './hooks/useAuth'
 import { useCart } from './hooks/useCart'
@@ -196,6 +197,7 @@ function App() {
       <I18nProvider>
         <AuthProvider>
           <ErrorBoundary>
+            <ToastViewport />
             <Suspense fallback={loadingFallback}>
               <AppRoutes />
             </Suspense>

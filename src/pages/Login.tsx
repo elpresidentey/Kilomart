@@ -5,12 +5,15 @@ import { useAuth } from '../hooks/useAuth'
 import { Leaf } from 'lucide-react'
 import { safeRedirectPath } from '../lib/redirect'
 import { useI18n } from '../i18n/useI18n'
+import { useToastStore } from '../stores/toastStore'
 
 export function Login() {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const { signIn } = useAuth()
   const { t } = useI18n()
+  const toastSuccess = useToastStore((state) => state.success)
+  const toastError = useToastStore((state) => state.error)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -35,8 +38,10 @@ export function Login() {
     
     if (error) {
       setError(error.message)
+      toastError(error.message, 'Sign in failed')
       setIsLoading(false)
     } else {
+      toastSuccess('Signed in successfully.')
       navigate(safeRedirectPath(searchParams.get('redirect')))
     }
   }

@@ -6,11 +6,13 @@ import { cartUnitsCount } from '../stores/cartStore'
 import { fallbackOnImageError, getProductImageSrc } from '../lib/image'
 import { useI18n } from '../i18n/useI18n'
 import { ShoppingCart, Trash2, Plus, Minus, ArrowRight, Truck } from 'lucide-react'
+import { useToastStore } from '../stores/toastStore'
 
 export function Cart() {
   const navigate = useNavigate()
   const { cart, removeFromCart, updateQuantity, getCartTotal, clearCart } = useCart()
   const { t } = useI18n()
+  const successToast = useToastStore((state) => state.success)
 
   const deliveryFee = 1500
   const subtotal = getCartTotal()
@@ -71,7 +73,15 @@ export function Cart() {
                   <div className="flex items-center gap-3 mt-3">
                     <button
                       type="button"
-                      onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                      onClick={() => {
+                        const nextQuantity = item.quantity - 1
+                        updateQuantity(item.id, nextQuantity)
+                        successToast(
+                          nextQuantity <= 0
+                            ? `${item.name} removed from cart.`
+                            : `${item.name} quantity updated.`
+                        )
+                      }}
                       className="w-8 h-8 rounded-lg border border-stone-200 flex items-center justify-center hover:bg-stone-50 transition-colors"
                     >
                       <Minus className="w-4 h-4" />
@@ -79,7 +89,11 @@ export function Cart() {
                     <span className="w-12 text-center font-medium">{item.quantity}</span>
                     <button
                       type="button"
-                      onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                      onClick={() => {
+                        const nextQuantity = item.quantity + 1
+                        updateQuantity(item.id, nextQuantity)
+                        successToast(`${item.name} quantity updated.`)
+                      }}
                       className="w-8 h-8 rounded-lg border border-stone-200 flex items-center justify-center hover:bg-stone-50 transition-colors"
                     >
                       <Plus className="w-4 h-4" />
@@ -93,7 +107,10 @@ export function Cart() {
                   </p>
                   <button
                     type="button"
-                    onClick={() => removeFromCart(item.id)}
+                    onClick={() => {
+                      removeFromCart(item.id)
+                      successToast(`${item.name} removed from cart.`)
+                    }}
                     className="p-2 text-stone-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
                   >
                     <Trash2 className="w-5 h-5" />
@@ -104,7 +121,10 @@ export function Cart() {
 
             <button
               type="button"
-              onClick={clearCart}
+              onClick={() => {
+                clearCart()
+                successToast('Cart cleared.')
+              }}
               className="text-sm text-stone-500 hover:text-red-500 transition-colors"
             >
               {t('cart.clearAll')}

@@ -1,4 +1,4 @@
-import { useEffect, useState, type ChangeEvent } from 'react'
+import { useCallback, useEffect, useState, type ChangeEvent } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { Layout } from '../components/Layout'
 import { Button } from '../components/ui'
@@ -9,6 +9,7 @@ import type { CartItem } from '../types'
 import { ArrowLeft, MapPin, Phone, User, CreditCard, Truck, CheckCircle } from 'lucide-react'
 import { repairText } from '../i18n/repairText'
 import { useI18n } from '../i18n/useI18n'
+import { useToastStore } from '../stores/toastStore'
 
 const CHECKOUT_SNAPSHOT_KEY = 'farmersmarket_checkout_snapshot'
 
@@ -51,6 +52,16 @@ function clearCheckoutSnapshot() {
   sessionStorage.removeItem(CHECKOUT_SNAPSHOT_KEY)
 }
 
+async function safeJson(response: Response): Promise<any> {
+  const text = await response.text()
+  if (!text) return null
+  try {
+    return JSON.parse(text)
+  } catch {
+    return null
+  }
+}
+
 export function Checkout() {
   const navigate = useNavigate()
   const [searchParams, setSearchParams] = useSearchParams()
@@ -58,6 +69,8 @@ export function Checkout() {
   const clearCart = useCartStore((s) => s.clearCart)
   const { user, loading: authLoading } = useAuth()
   const { t, language } = useI18n()
+  const toastSuccess = useToastStore((state) => state.success)
+  const toastError = useToastStore((state) => state.error)
   const [loading, setLoading] = useState(false)
   const [orderComplete, setOrderComplete] = useState(false)
   const [orderNumber, setOrderNumber] = useState('')
@@ -86,15 +99,6 @@ export function Checkout() {
   const initializeUrl = apiBase ? `${apiBase}/api/paystack/initialize` : '/api/paystack/initialize'
   const verifyUrl = apiBase ? `${apiBase}/api/paystack/verify` : '/api/paystack/verify'
   const [debugHint, setDebugHint] = useState<string | null>(null)
-  async function safeJson(r: Response): Promise<any> {
-    const text = await r.text()
-    if (!text) return null
-    try {
-      return JSON.parse(text)
-    } catch {
-      return null
-    }
-  }
   const copy = repairText(
     language === 'ha'
       ? {
@@ -179,132 +183,65 @@ export function Checkout() {
   const checkoutFinalTotal =
     snapshot?.paymentMethod === 'paystack' && cart.length === 0 ? snapshot.finalTotal : finalTotal
 
-  const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setDeliveryInfo({ ...deliveryInfo, [e.target.name]: e.target.value })
-  }
+  const submitOrderBatch = useCallback(
+    async (
+      items: CartItem[],
+      currentDeliveryInfo: DeliveryInfo,
+      currentPaymentMethod: 'cash_on_delivery' | 'bank_transfer' | 'paystack',
+      providerReference?: string
+    ) => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession()
 
-  const createOrdersAndPayments = async (
-    items: CartItem[],
-    currentDeliveryInfo: DeliveryInfo,
-    currentPaymentMethod: 'cash_on_delivery' | 'bank_transfer' | 'paystack',
-    providerReference?: string
-  ) => {
-    if (!user) throw new Error(copy.loginToOrder)
-    const {
-      data: { user: authUser },
-    } = await supabase.auth.getUser()
-
-    const profilePayload = {
-      id: user.id,
-      email: user.email || authUser?.email || '',
-      full_name:
-        user.full_name?.trim() ||
-        authUser?.user_metadata?.full_name ||
-        authUser?.user_metadata?.name ||
-        authUser?.email?.split('@')[0] ||
-        'User',
-      phone: user.phone || authUser?.user_metadata?.phone || '',
-      role: user.role || 'buyer',
-      location: user.location || authUser?.user_metadata?.location || '',
-      avatar_url: user.avatar_url || authUser?.user_metadata?.avatar_url || '',
-    }
-
-    const { error: profileError } = await supabase.from('users').upsert(profilePayload, {
-      onConflict: 'id',
-    })
-    if (profileError) {
-      console.warn('Could not ensure buyer profile exists before order creation:', profileError)
-    }
-
-    if (providerReference) {
-      const { data: existingPayments, error: existingPaymentsError } = await supabase
-        .from('payments')
-        .select('order_id')
-        .eq('payer_id', user.id)
-        .eq('provider_reference', providerReference)
-        .limit(1)
-
-      if (existingPaymentsError) {
-        console.warn('Could not query existing payment records:', existingPaymentsError)
+      if (!session?.access_token) {
+        throw new Error(copy.loginToOrder)
       }
 
-      const existingOrderId = existingPaymentsError ? null : existingPayments?.[0]?.order_id
-      if (existingOrderId) {
-        const { data: existingOrder, error: existingOrderError } = await supabase
-          .from('orders')
-          .select('order_number')
-          .eq('id', existingOrderId)
-          .maybeSingle()
-
-        if (existingOrderError) throw existingOrderError
-
-        setOrderNumber(existingOrder?.order_number || '')
-        setOrderComplete(true)
-        clearCart()
-        clearCheckoutSnapshot()
-        setSnapshot(null)
-        return
-      }
-    }
-
-    const currentDeliveryPayload = {
-      address: currentDeliveryInfo.address,
-      city: currentDeliveryInfo.city,
-      state: currentDeliveryInfo.state,
-      phone: currentDeliveryInfo.phone,
-      contact_name: currentDeliveryInfo.fullName,
-    }
-    const orderNumbers: string[] = []
-
-    for (const item of items) {
-      const orderNumber = 'ORD-' + Date.now() + '-' + Math.random().toString(36).substring(2, 8).toUpperCase()
-      const itemTotal = item.price * item.quantity
-      const lineTotal = itemTotal + checkoutDeliveryFee / items.length
-
-      const { data: orderRow, error: orderError } = await supabase
-        .from('orders')
-        .insert({
-          order_number: orderNumber,
-          buyer_id: user.id,
-          seller_id: item.seller_id,
-          listing_id: item.id,
-          quantity_kg: item.quantity,
-          price_per_kg: item.price,
-          subtotal: itemTotal,
-          delivery_fee: checkoutDeliveryFee / items.length,
-          total_amount: lineTotal,
-          delivery_address: currentDeliveryPayload,
-          status: currentPaymentMethod === 'paystack' ? 'paid' : 'pending',
-        })
-        .select('id')
-        .single()
-
-      if (orderError) throw orderError
-
-      const { error: paymentError } = await supabase.from('payments').insert({
-        order_id: orderRow.id,
-        payer_id: user.id,
-        payee_id: item.seller_id,
-        amount: lineTotal,
-        currency: 'NGN',
-        payment_method: currentPaymentMethod,
-        provider: currentPaymentMethod === 'paystack' ? 'paystack' : null,
-        provider_reference: providerReference || null,
-        status: currentPaymentMethod === 'paystack' ? 'completed' : 'pending',
+      const response = await fetch('/api/orders/create', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          items: items.map((item) => ({
+            listing_id: item.id,
+            quantity_kg: item.quantity,
+          })),
+          deliveryInfo: currentDeliveryInfo,
+          paymentMethod: currentPaymentMethod,
+          providerReference,
+        }),
       })
 
-      if (paymentError) {
-        console.warn('Could not save payment record:', paymentError)
+      const data = await safeJson(response)
+      if (!response.ok) {
+        throw new Error(data?.error || copy.orderFailed)
       }
 
-      orderNumbers.push(orderNumber)
-    }
+      const orderNumbers = Array.isArray(data?.orderNumbers) ? data.orderNumbers : []
+      if (orderNumbers.length === 0) {
+        throw new Error('Order completed but no order number was returned.')
+      }
+      const firstOrderNumber = orderNumbers[0] || ''
 
-    setOrderNumber(orderNumbers[0])
-    setOrderComplete(true)
-    clearCart()
-    clearCheckoutSnapshot()
-    setSnapshot(null)
+      setOrderNumber(firstOrderNumber)
+      setOrderComplete(true)
+      clearCart()
+      clearCheckoutSnapshot()
+      setSnapshot(null)
+      toastSuccess(
+        currentPaymentMethod === 'paystack'
+          ? 'Payment verified and your order is on the way.'
+          : `Order ${firstOrderNumber} placed successfully.`
+      )
+    },
+    [clearCart, copy.loginToOrder, copy.orderFailed, setSnapshot, toastSuccess]
+  )
+
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setDeliveryInfo({ ...deliveryInfo, [e.target.name]: e.target.value })
   }
 
   useEffect(() => {
@@ -326,19 +263,20 @@ export function Checkout() {
         if (!r.ok) throw new Error(data?.error || copy.verifyPayment)
         if (!data || data.status !== 'success') throw new Error(copy.payNotSuccessful)
 
-        const itemsToCreate = cart.length > 0 ? cart : snapshotData?.cart || []
+        const itemsToCreate = snapshotData?.cart?.length ? snapshotData.cart : cart
         const deliveryInfoToUse = snapshotData?.deliveryInfo || deliveryInfo
         const paymentMethodToUse = snapshotData?.paymentMethod || paymentMethod
-        await createOrdersAndPayments(itemsToCreate, deliveryInfoToUse, paymentMethodToUse, reference)
+        await submitOrderBatch(itemsToCreate, deliveryInfoToUse, paymentMethodToUse, reference)
         sessionStorage.setItem(marker, '1')
         setSearchParams({}, { replace: true })
       } catch (e: any) {
         setError(e?.message || copy.verifyPayment)
+        toastError(e?.message || copy.verifyPayment, 'Payment verification failed')
       } finally {
         setLoading(false)
       }
     })()
-  }, [searchParams, authLoading, user, cart.length, setSearchParams])
+  }, [searchParams, authLoading, user, cart.length, setSearchParams, submitOrderBatch])
 
   const placeOrder = async () => {
     // `user` comes from fetching your `public.users` profile row, which is async.
@@ -349,12 +287,20 @@ export function Checkout() {
 
     if (!user) {
       setError(copy.loginToOrder)
+      toastError(copy.loginToOrder, 'Checkout blocked')
       return
     }
     
-    if (!deliveryInfo.fullName || !deliveryInfo.phone || !deliveryInfo.address) {
+    if (
+      !deliveryInfo.fullName ||
+      !deliveryInfo.phone ||
+      !deliveryInfo.address ||
+      !deliveryInfo.city ||
+      !deliveryInfo.state
+    ) {
       setError(copy.fillDelivery)
       setDebugHint(null)
+      toastError(copy.fillDelivery, 'Missing delivery details')
       return
     }
     
@@ -409,10 +355,11 @@ export function Checkout() {
         return
       }
 
-      await createOrdersAndPayments(cart, deliveryInfo, paymentMethod)
+      await submitOrderBatch(cart, deliveryInfo, paymentMethod)
     } catch (error: any) {
       console.error('Order failed:', error)
       setError(error?.message || error?.error_description || copy.orderFailed)
+      toastError(error?.message || error?.error_description || copy.orderFailed, 'Order failed')
     } finally {
       setLoading(false)
     }

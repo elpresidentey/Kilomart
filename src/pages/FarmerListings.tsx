@@ -5,15 +5,19 @@ import { Card, Button, Badge } from '../components/ui'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../hooks/useAuth'
 import type { ProduceListing } from '../types'
-import { Plus, Package, MapPin, ExternalLink, PencilLine } from 'lucide-react'
+import { Plus, Package, MapPin, ExternalLink, PencilLine, Trash2 } from 'lucide-react'
 import { fallbackOnImageError, getProductImageSrc } from '../lib/image'
 import { useI18n } from '../i18n/useI18n'
+import { useToastStore } from '../stores/toastStore'
 
 export function FarmerListings() {
   const { language } = useI18n()
   const { user } = useAuth()
+  const toastSuccess = useToastStore((state) => state.success)
+  const toastError = useToastStore((state) => state.error)
   const [listings, setListings] = useState<ProduceListing[]>([])
   const [loading, setLoading] = useState(true)
+  const [deletingId, setDeletingId] = useState<string | null>(null)
 
   const copy =
     language === 'ha'
@@ -135,6 +139,38 @@ export function FarmerListings() {
     return map[status] || status
   }
 
+  async function handleDelete(listing: ProduceListing) {
+    if (!user?.id || deletingId) return
+
+    const confirmed = window.confirm(
+      `Delete "${listing.product_name}"? This will remove it from the marketplace.`
+    )
+    if (!confirmed) return
+
+    setDeletingId(listing.id)
+    try {
+      const { data, error } = await supabase
+        .from('produce_listings')
+        .delete()
+        .eq('id', listing.id)
+        .eq('seller_id', user.id)
+        .select('id')
+
+      if (error) throw error
+      if (!data || data.length === 0) {
+        throw new Error('Listing not found or you do not have permission to delete it.')
+      }
+
+      setListings((current) => current.filter((item) => item.id !== listing.id))
+      toastSuccess('Listing deleted successfully.')
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Failed to delete listing.'
+      toastError(message, 'Could not delete listing')
+    } finally {
+      setDeletingId(null)
+    }
+  }
+
   return (
     <Layout>
       <div className="space-y-6">
@@ -222,6 +258,15 @@ export function FarmerListings() {
                     {copy.editListing}
                     <PencilLine className="w-3.5 h-3.5" />
                   </Link>
+                  <button
+                    type="button"
+                    onClick={() => handleDelete(listing)}
+                    disabled={deletingId === listing.id}
+                    className="inline-flex items-center justify-center gap-1 text-sm text-red-700 font-medium hover:underline disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    {deletingId === listing.id ? 'Deleting...' : 'Delete'}
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
                   <Link
                     to={`/listing/${listing.id}`}
                     className="inline-flex items-center justify-center gap-1 text-sm text-primary-700 font-medium hover:underline"

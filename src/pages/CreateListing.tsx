@@ -1,10 +1,10 @@
-import { useState, type ChangeEvent, type FormEvent, useEffect, useMemo } from 'react'
+import { useRef, useState, type ChangeEvent, type FormEvent, useEffect, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Layout } from '../components/Layout'
 import { Card, Input, Button } from '../components/ui'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../hooks/useAuth'
-import { ArrowLeft, Package, MapPin, DollarSign, FileText, Image as ImageIcon, Upload } from 'lucide-react'
+import { ArrowLeft, Package, MapPin, DollarSign, FileText, Image as ImageIcon, Upload, Sparkles, RotateCcw } from 'lucide-react'
 import type { ProduceListing } from '../types'
 import { fallbackOnImageError, sanitizeImageUrl } from '../lib/image'
 import {
@@ -12,6 +12,7 @@ import {
   uploadListingImage,
 } from '../lib/listingImages'
 import { useI18n } from '../i18n/useI18n'
+import { useToastStore } from '../stores/toastStore'
 
 const QUALITY_GRADES: { value: ProduceListing['quality_grade']; label: string }[] = [
   { value: 'A', label: 'Grade A - Premium Quality' },
@@ -20,14 +21,108 @@ const QUALITY_GRADES: { value: ProduceListing['quality_grade']; label: string }[
   { value: 'D', label: 'Grade D - Basic Quality' },
 ]
 
+type ListingDraft = {
+  product_name: string
+  category_id: string
+  price_per_kg: string
+  available_quantity: string
+  min_order_kg: string
+  quality_grade: ProduceListing['quality_grade']
+  location: string
+  description: string
+  image_urls: string
+}
+
+type QuickPreset = {
+  title: string
+  categoryName: string
+  productName: string
+  minOrderKg: string
+  qualityGrade: ProduceListing['quality_grade']
+  description: string
+  locationHint?: string
+}
+
+const LISTING_DRAFT_KEY = 'kilomarket_create_listing_draft_v1'
+
+const QUICK_PRESETS: QuickPreset[] = [
+  {
+    title: 'Fast vegetables',
+    categoryName: 'Vegetables',
+    productName: 'Fresh Vegetables',
+    minOrderKg: '5',
+    qualityGrade: 'B',
+    description: 'Fresh farm vegetables picked daily and ready for local buyers.',
+  },
+  {
+    title: 'Bulk grains',
+    categoryName: 'Grains',
+    productName: 'Bulk Grain Supply',
+    minOrderKg: '50',
+    qualityGrade: 'A',
+    description: 'Clean, sorted grain supply available in bulk for retailers and processors.',
+  },
+  {
+    title: 'Fruit harvest',
+    categoryName: 'Fruits',
+    productName: 'Fresh Fruits',
+    minOrderKg: '5',
+    qualityGrade: 'B',
+    description: 'Fresh seasonal fruits harvested for quick sale and delivery.',
+  },
+]
+
+const EMPTY_DRAFT: ListingDraft = {
+  product_name: '',
+  category_id: '',
+  price_per_kg: '',
+  available_quantity: '',
+  min_order_kg: '5',
+  quality_grade: 'B',
+  location: '',
+  description: '',
+  image_urls: '',
+}
+
+function readListingDraft(): ListingDraft | null {
+  if (typeof window === 'undefined') return null
+  try {
+    const raw = window.localStorage.getItem(LISTING_DRAFT_KEY)
+    if (!raw) return null
+    const parsed = JSON.parse(raw) as Partial<ListingDraft>
+    return {
+      ...EMPTY_DRAFT,
+      ...parsed,
+      quality_grade: parsed.quality_grade || 'B',
+    }
+  } catch {
+    return null
+  }
+}
+
+function saveListingDraft(draft: ListingDraft) {
+  if (typeof window === 'undefined') return
+  window.localStorage.setItem(LISTING_DRAFT_KEY, JSON.stringify(draft))
+}
+
+function clearListingDraft() {
+  if (typeof window === 'undefined') return
+  window.localStorage.removeItem(LISTING_DRAFT_KEY)
+}
+
 export function CreateListing() {
   const navigate = useNavigate()
   const { user } = useAuth()
   const { t } = useI18n()
+  const toastSuccess = useToastStore((state) => state.success)
+  const toastError = useToastStore((state) => state.error)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState('')
   const [selectedFiles, setSelectedFiles] = useState<File[]>([])
   const [uploadError, setUploadError] = useState('')
+  const [hasDraft, setHasDraft] = useState(false)
+  const [draftHydrated, setDraftHydrated] = useState(false)
+  const draftPersistenceEnabled = useRef(true)
 
   const [categories, setCategories] = useState<{id: string, name: string}[]>([])
 
@@ -57,6 +152,27 @@ export function CreateListing() {
     image_urls: '',
   })
 
+  useEffect(() => {
+    const draft = readListingDraft()
+    if (draft) {
+      setFormData(draft)
+      setHasDraft(true)
+    }
+    setDraftHydrated(true)
+  }, [])
+
+  useEffect(() => {
+    if (!draftHydrated || !draftPersistenceEnabled.current) return
+    saveListingDraft(formData)
+    setHasDraft(true)
+  }, [formData, draftHydrated])
+
+  useEffect(() => {
+    if (user?.location && !formData.location) {
+      setFormData((current) => ({ ...current, location: user.location || current.location }))
+    }
+  }, [user?.location, formData.location])
+
   const imageUrls = formData.image_urls
     .split(/[\n,]/)
     .map((value) => sanitizeImageUrl(value))
@@ -75,6 +191,35 @@ export function CreateListing() {
       filePreviews.forEach((preview) => URL.revokeObjectURL(preview.url))
     }
   }, [filePreviews])
+
+  const categoryIdByName = useMemo(() => {
+    return new Map(categories.map((category) => [category.name.toLowerCase(), category.id] as const))
+  }, [categories])
+
+  function applyPreset(preset: QuickPreset) {
+    const categoryId = categoryIdByName.get(preset.categoryName.toLowerCase()) || ''
+    setFormData((current) => ({
+      ...current,
+      product_name: preset.productName,
+      category_id: categoryId,
+      min_order_kg: preset.minOrderKg,
+      quality_grade: preset.qualityGrade,
+      description: preset.description,
+      location: current.location || preset.locationHint || '',
+    }))
+  }
+
+  function restoreDraft() {
+    const draft = readListingDraft()
+    if (!draft) return
+    setFormData(draft)
+    setHasDraft(true)
+  }
+
+  function clearDraft() {
+    clearListingDraft()
+    setHasDraft(false)
+  }
 
   function handleFileSelection(e: ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files || [])
@@ -133,6 +278,9 @@ export function CreateListing() {
 
       if (submitError) throw submitError
 
+      draftPersistenceEnabled.current = false
+      clearDraft()
+      toastSuccess('Listing created successfully.')
       navigate('/listings')
     } catch (err) {
       const message = err instanceof Error ? err.message : t('listing.create.errorDefault')
@@ -146,6 +294,7 @@ export function CreateListing() {
       } else {
         setError(message)
       }
+      toastError(message, 'Could not create listing')
       setIsSubmitting(false)
     }
   }
@@ -166,6 +315,48 @@ export function CreateListing() {
             <p className="text-stone-500">{t('listing.create.subtitle')}</p>
           </div>
         </div>
+
+        {(hasDraft || QUICK_PRESETS.length > 0) && (
+          <Card padding="md" className="mb-6 border-primary-100 bg-primary-50/40">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="font-semibold text-stone-900 flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-primary-700" />
+                  Faster listing setup
+                </p>
+                <p className="text-sm text-stone-600">
+                  Restore your last draft or start from a preset for common produce.
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {hasDraft && (
+                  <Button variant="outline" size="sm" type="button" onClick={restoreDraft}>
+                    <RotateCcw className="w-4 h-4 mr-2" />
+                    Restore draft
+                  </Button>
+                )}
+                {hasDraft && (
+                  <Button variant="ghost" size="sm" type="button" onClick={clearDraft}>
+                    Clear draft
+                  </Button>
+                )}
+              </div>
+            </div>
+            <div className="mt-4 flex flex-wrap gap-2">
+              {QUICK_PRESETS.map((preset) => (
+                <Button
+                  key={preset.title}
+                  variant="secondary"
+                  size="sm"
+                  type="button"
+                  onClick={() => applyPreset(preset)}
+                >
+                  {preset.title}
+                </Button>
+              ))}
+            </div>
+          </Card>
+        )}
 
         <Card padding="lg">
           <form onSubmit={handleSubmit} className="space-y-6">

@@ -4,13 +4,14 @@ import { Layout } from '../components/Layout'
 import { Card, Input, Button } from '../components/ui'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../hooks/useAuth'
-import { ArrowLeft, Package, MapPin, DollarSign, FileText, Image as ImageIcon, Upload, X } from 'lucide-react'
+import { ArrowLeft, Package, MapPin, DollarSign, FileText, Image as ImageIcon, Upload, X, Trash2 } from 'lucide-react'
 import type { ProduceListing } from '../types'
 import { fallbackOnImageError, sanitizeImageUrl } from '../lib/image'
 import {
   MAX_LISTING_IMAGE_SIZE_BYTES,
   uploadListingImage,
 } from '../lib/listingImages'
+import { useToastStore } from '../stores/toastStore'
 
 const QUALITY_GRADES: { value: ProduceListing['quality_grade']; label: string }[] = [
   { value: 'A', label: 'Grade A - Premium Quality' },
@@ -30,7 +31,10 @@ export function EditListing() {
   const navigate = useNavigate()
   const { id } = useParams<{ id: string }>()
   const { user } = useAuth()
+  const toastSuccess = useToastStore((state) => state.success)
+  const toastError = useToastStore((state) => state.error)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState('')
   const [uploadError, setUploadError] = useState('')
@@ -197,6 +201,7 @@ export function EditListing() {
 
       if (updateError) throw updateError
 
+      toastSuccess('Listing updated successfully.')
       navigate('/listings')
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Unable to update listing.'
@@ -210,7 +215,40 @@ export function EditListing() {
       } else {
         setError(message)
       }
+      toastError(message, 'Could not update listing')
       setIsSubmitting(false)
+    }
+  }
+
+  async function handleDelete() {
+    if (!user || !id || isDeleting) return
+
+    const confirmed = window.confirm(
+      'Delete this listing? This will remove it from the marketplace for everyone.'
+    )
+    if (!confirmed) return
+
+    setIsDeleting(true)
+    try {
+      const { data, error: deleteError } = await supabase
+        .from('produce_listings')
+        .delete()
+        .eq('id', id)
+        .eq('seller_id', user.id)
+        .select('id')
+
+      if (deleteError) throw deleteError
+      if (!data || data.length === 0) {
+        throw new Error('Listing not found or you do not have permission to delete it.')
+      }
+
+      toastSuccess('Listing deleted successfully.')
+      navigate('/listings')
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Unable to delete listing.'
+      setError(message)
+      toastError(message, 'Could not delete listing')
+      setIsDeleting(false)
     }
   }
 
@@ -559,6 +597,16 @@ export function EditListing() {
                 className="flex-1"
               >
                 Cancel
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleDelete}
+                disabled={isSubmitting || isDeleting}
+                className="flex-1 border-red-200 text-red-700 hover:bg-red-50 hover:text-red-800"
+              >
+                <Trash2 className="w-4 h-4 mr-2" />
+                {isDeleting ? 'Deleting...' : 'Delete listing'}
               </Button>
               <Button type="submit" isLoading={isSubmitting} className="flex-1">
                 Save changes

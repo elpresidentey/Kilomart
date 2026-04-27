@@ -10,7 +10,8 @@ CREATE OR REPLACE FUNCTION create_order_with_stock(
   p_delivery_fee DECIMAL(10,2),
   p_delivery_address JSONB,
   p_payment_method TEXT,
-  p_status TEXT DEFAULT 'pending'
+  p_status TEXT DEFAULT 'pending',
+  p_provider_reference TEXT DEFAULT NULL
 )
 RETURNS UUID AS $$
 DECLARE
@@ -20,8 +21,12 @@ DECLARE
   v_subtotal DECIMAL(10,2);
   v_total_amount DECIMAL(10,2);
 BEGIN
+  IF auth.uid() IS DISTINCT FROM p_buyer_id THEN
+    RAISE EXCEPTION 'Unauthorized';
+  END IF;
+
   -- Lock the listing row for update to prevent concurrent modifications
-  SELECT quantity_kg INTO v_current_stock
+  SELECT available_quantity INTO v_current_stock
   FROM produce_listings
   WHERE id = p_listing_id
   FOR UPDATE;
@@ -74,7 +79,11 @@ BEGIN
 
   -- Decrement stock atomically
   UPDATE produce_listings
-  SET quantity_kg = quantity_kg - p_quantity_kg,
+  SET available_quantity = available_quantity - p_quantity_kg,
+      status = CASE
+        WHEN available_quantity - p_quantity_kg <= 0 THEN 'sold_out'
+        ELSE status
+      END,
       updated_at = NOW()
   WHERE id = p_listing_id;
 
@@ -87,6 +96,7 @@ BEGIN
     currency,
     payment_method,
     provider,
+    provider_reference,
     status
   )
   VALUES (
@@ -97,6 +107,7 @@ BEGIN
     'NGN',
     p_payment_method,
     CASE WHEN p_payment_method = 'paystack' THEN 'paystack' ELSE NULL END,
+    p_provider_reference,
     CASE WHEN p_payment_method = 'paystack' THEN 'completed' ELSE 'pending' END
   );
 

@@ -23,6 +23,7 @@ import {
   ChevronDown,
   Globe,
   Warehouse,
+  Truck,
 } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useCartStore, cartUnitsCount } from '../stores/cartStore'
@@ -149,11 +150,20 @@ export function Layout({ children, cartItemCount }: LayoutProps) {
           { name: t('nav.dashboard'), href: '/dashboard', icon: LayoutDashboard },
           { name: t('nav.myListings'), href: '/listings', icon: Package },
           { name: t('nav.operations'), href: '/operations', icon: Warehouse },
+          { name: t('nav.logistics'), href: '/operations?view=logistics', icon: Truck },
           { name: t('nav.orders'), href: '/farmer/orders', icon: ClipboardList },
         ]
-      : canAccessOperations(user.role)
-        ? [{ name: t('nav.operations'), href: '/operations', icon: Warehouse }]
-        : []
+      : user.role === 'logistics'
+        ? [
+            { name: t('nav.logistics'), href: '/operations?view=logistics', icon: Truck },
+            { name: t('nav.operations'), href: '/operations', icon: Warehouse },
+          ]
+        : canAccessOperations(user.role)
+          ? [
+              { name: t('nav.operations'), href: '/operations', icon: Warehouse },
+              { name: t('nav.logistics'), href: '/operations?view=logistics', icon: Truck },
+            ]
+          : []
     : []
 
   const accountNavigation = user
@@ -173,7 +183,8 @@ export function Layout({ children, cartItemCount }: LayoutProps) {
     setMobileMenuOpen(false)
   }
 
-  const isActive = (path: string) => location.pathname === path
+  const normalizeRoute = (path: string) => path.split(/[?#]/)[0]
+  const isActive = (path: string) => location.pathname === normalizeRoute(path)
 
   const routeSeo = useMemo(() => {
     const path = location.pathname

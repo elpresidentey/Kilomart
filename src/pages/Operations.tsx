@@ -1,5 +1,6 @@
 ﻿import { useEffect, useMemo, useState } from 'react'
 import { Layout } from '../components/Layout'
+import { useSearchParams } from 'react-router-dom'
 import { Badge, Button, Card, Modal } from '../components/ui'
 import { useAuth } from '../hooks/useAuth'
 import { useI18n } from '../i18n/useI18n'
@@ -13,6 +14,7 @@ type FieldErrors = Record<string, string>
 export function Operations() {
   const { user } = useAuth()
   const { t } = useI18n()
+  const [searchParams] = useSearchParams()
   const warehouseHook = useWarehouse()
   const inventoryHook = useInventory()
   const [toasts, setToasts] = useState<Toast[]>([])
@@ -39,7 +41,19 @@ export function Operations() {
     void inventoryHook.fetchInventory()
   }, [user, warehouseHook.fetchWarehouses, inventoryHook.fetchInventory])
 
-  const roleLabel = user?.role === 'warehouse_manager' ? 'Warehouse manager' : user?.role === 'logistics' ? 'Logistics partner' : 'Farmer operations'
+  useEffect(() => {
+    if (searchParams.get('view') !== 'logistics') return
+    window.setTimeout(() => {
+      document.getElementById('logistics')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }, 0)
+  }, [searchParams])
+
+  const roleLabel =
+    user?.role === 'warehouse_manager'
+      ? 'Warehouse manager'
+      : user?.role === 'logistics'
+        ? 'Logistics partner'
+        : 'Farmer operations'
   const totalCapacity = useMemo(() => warehouseHook.warehouses.reduce((sum, warehouse) => sum + (warehouse.capacity_kg || 0), 0), [warehouseHook.warehouses])
   const totalAvailableSpace = useMemo(() => warehouseHook.warehouses.reduce((sum, warehouse) => sum + (warehouse.available_space_kg || 0), 0), [warehouseHook.warehouses])
   const totalStored = Math.max(totalCapacity - totalAvailableSpace, 0)
@@ -172,7 +186,7 @@ export function Operations() {
           <div>
             <p className="text-sm font-medium text-primary-700">{roleLabel}</p>
             <h1 className="text-2xl font-bold text-stone-900">Storage & Logistics</h1>
-            <p className="text-stone-500">Manage warehouses and inventory.</p>
+            <p className="text-stone-500">Manage warehouses, inventory, and logistics handoff.</p>
           </div>
           <Button
             variant="outline"
@@ -232,6 +246,38 @@ export function Operations() {
           <Card padding="lg" interactive>
             <div className="mb-4 flex items-center justify-between gap-3"><div className="flex items-center gap-2"><Package className="h-5 w-5 text-primary-700" /><h2 className="text-lg font-semibold text-stone-900">Inventory</h2></div>{warehouseHook.warehouses.length > 0 && <Button size="sm" variant="outline" onClick={() => openInventoryModal()}><Plus className="mr-1 h-4 w-4" /> Add</Button>}</div>
             {loading ? <div className="space-y-3">{[1, 2].map((value) => <div key={value} className="h-24 animate-pulse rounded-lg bg-stone-100" />)}</div> : inventoryHook.inventory.length === 0 ? <p className="text-sm text-stone-500">{warehouseHook.warehouses.length === 0 ? 'Add a warehouse first.' : 'No inventory yet. Click "Add" to add inventory.'}</p> : <div className="space-y-3">{inventoryHook.inventory.map((item) => (<div key={item.id} className="group rounded-lg border border-stone-200 p-4 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-stone-300 hover:shadow-md"><div className="flex items-start justify-between gap-3"><div className="min-w-0 flex-1"><p className="truncate font-semibold text-stone-900">{item.product_name}</p><p className="truncate text-sm text-stone-500">{item.warehouse?.name || 'Warehouse'}{item.warehouse?.location ? ` - ${item.warehouse.location}` : ''}</p></div><div className="flex items-center gap-2"><button type="button" onClick={() => openInventoryModal(item)} className="rounded-lg p-1.5 text-stone-500 transition-transform duration-200 hover:bg-primary-50 hover:text-primary-600 group-hover:scale-105" title="Edit inventory"><Pencil className="h-4 w-4" /></button><button type="button" onClick={() => handleDeleteInventory(item.id)} className="rounded-lg p-1.5 text-stone-500 transition-transform duration-200 hover:bg-red-50 hover:text-red-600 group-hover:scale-105" title="Delete inventory"><Trash2 className="h-4 w-4" /></button><Badge variant="default">{item.quality_grade}</Badge></div></div><div className="mt-3 flex flex-wrap items-center gap-3 text-sm text-stone-600"><span className="font-medium text-stone-900">{item.quantity_kg.toLocaleString()} kg</span><Badge variant={statusBadge(item.status) as 'default' | 'success' | 'warning'}>{item.status}</Badge></div></div>))}</div>}
+          </Card>
+        </div>
+
+        <div id="logistics">
+          <Card padding="lg" interactive className="border-amber-100 bg-gradient-to-br from-amber-50/80 to-white">
+            <div className="mb-4 flex items-center justify-between gap-3">
+              <div className="flex items-center gap-2">
+                <Truck className="h-5 w-5 text-amber-700" />
+                <h2 className="text-lg font-semibold text-stone-900">Logistics handoff</h2>
+              </div>
+              <Badge variant="warning">Operational</Badge>
+            </div>
+            <div className="grid gap-4 md:grid-cols-3">
+              <div className="rounded-xl border border-amber-100 bg-white p-4">
+                <p className="text-sm font-medium text-stone-900">Pickup readiness</p>
+                <p className="mt-1 text-sm text-stone-500">
+                  Confirm stock, packaging, and warehouse availability before dispatch.
+                </p>
+              </div>
+              <div className="rounded-xl border border-amber-100 bg-white p-4">
+                <p className="text-sm font-medium text-stone-900">Delivery coordination</p>
+                <p className="mt-1 text-sm text-stone-500">
+                  Track where each batch is going and share details with the receiving party.
+                </p>
+              </div>
+              <div className="rounded-xl border border-amber-100 bg-white p-4">
+                <p className="text-sm font-medium text-stone-900">Status updates</p>
+                <p className="mt-1 text-sm text-stone-500">
+                  Use the order status and inventory tools above to keep operations aligned.
+                </p>
+              </div>
+            </div>
           </Card>
         </div>
       </div>

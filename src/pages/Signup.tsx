@@ -6,12 +6,15 @@ import { Leaf } from 'lucide-react'
 import type { User } from '../types'
 import { safeRedirectPath } from '../lib/redirect'
 import { useI18n } from '../i18n/useI18n'
+import { useToastStore } from '../stores/toastStore'
 
 export function Signup() {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const { signUp } = useAuth()
   const { t } = useI18n()
+  const toastSuccess = useToastStore((state) => state.success)
+  const toastError = useToastStore((state) => state.error)
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -39,13 +42,16 @@ export function Signup() {
     
     if (error) {
       setError(error.message)
+      toastError(error.message, 'Sign up failed')
       setIsLoading(false)
     } else if (data?.user?.identities?.length === 0) {
       // Email confirmation required
       setSuccessMessage(t('auth.signup.successEmailConfirm'))
+      toastSuccess('Confirmation email sent.')
       setIsLoading(false)
     } else {
       // Auto-confirmed (or user already exists)
+      toastSuccess('Account created successfully.')
       navigate(safeRedirectPath(searchParams.get('redirect')))
     }
   }

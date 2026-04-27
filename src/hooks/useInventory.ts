@@ -52,7 +52,11 @@ export function useInventory(): UseInventoryReturn {
         .order('created_at', { ascending: false })
 
       if (err) throw err
-      setInventory(data || [])
+      const nextInventory = (data || []).map((item: any) => ({
+        ...item,
+        warehouse: Array.isArray(item.warehouse) ? item.warehouse[0] ?? null : item.warehouse ?? null,
+      }))
+      setInventory(nextInventory)
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Failed to fetch inventory'
       setError(message)

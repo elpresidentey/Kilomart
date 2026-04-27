@@ -7,6 +7,7 @@ import { useAuth } from '../hooks/useAuth'
 import type { Order, OrderStatus } from '../types'
 import { Package, MapPin, RefreshCw } from 'lucide-react'
 import { useI18n } from '../i18n/useI18n'
+import { useToastStore } from '../stores/toastStore'
 
 const STATUS_OPTIONS: OrderStatus[] = [
   'pending',
@@ -28,6 +29,8 @@ export function FarmerOrders() {
   const [updatingId, setUpdatingId] = useState<string | null>(null)
   const [newOrderIds, setNewOrderIds] = useState<string[]>([])
   const [statusChangedOrderIds, setStatusChangedOrderIds] = useState<string[]>([])
+  const toastSuccess = useToastStore((state) => state.success)
+  const toastError = useToastStore((state) => state.error)
 
   const hasLoadedRef = useRef(false)
   const orderIdsRef = useRef<Set<string>>(new Set())
@@ -116,9 +119,10 @@ export function FarmerOrders() {
       const { error } = await supabase.from('orders').update({ status }).eq('id', orderId)
       if (error) throw error
       setOrders((prev) => prev.map((o) => (o.id === orderId ? { ...o, status } : o)))
+      toastSuccess(`Order status updated to ${status}.`)
     } catch (e) {
       console.error(e)
-      alert(t('farmerOrders.updateStatusError'))
+      toastError(t('farmerOrders.updateStatusError'), 'Update failed')
     } finally {
       setUpdatingId(null)
     }

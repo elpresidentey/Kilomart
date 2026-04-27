@@ -4,11 +4,13 @@ import { Layout } from '../components/Layout'
 import { Seo } from '../components/Seo'
 import { Button, Card, Badge } from '../components/ui'
 import { supabase } from '../lib/supabase'
+import { useAuth } from '../hooks/useAuth'
 import type { CartItem, ProduceListing } from '../types'
-import { ArrowLeft, MapPin, Package, Minus, Plus, ShoppingCart, Check } from 'lucide-react'
+import { ArrowLeft, MapPin, Package, Minus, Plus, ShoppingCart, Check, PencilLine, Trash2 } from 'lucide-react'
 import { fallbackOnImageError, getProductImageSrc } from '../lib/image'
 import { toAbsoluteUrl } from '../lib/site'
 import { useI18n } from '../i18n/useI18n'
+import { useToastStore } from '../stores/toastStore'
 
 interface ListingDetailProps {
   onAddToCart: (item: CartItem) => void
@@ -17,6 +19,9 @@ interface ListingDetailProps {
 
 export function ListingDetail({ onAddToCart, cartItemCount }: ListingDetailProps) {
   const { language } = useI18n()
+  const { user } = useAuth()
+  const pushSuccessToast = useToastStore((state) => state.success)
+  const pushErrorToast = useToastStore((state) => state.error)
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const [listing, setListing] = useState<ProduceListing | null>(null)
@@ -24,6 +29,7 @@ export function ListingDetail({ onAddToCart, cartItemCount }: ListingDetailProps
   const [notFound, setNotFound] = useState(false)
   const [quantity, setQuantity] = useState(1)
   const [added, setAdded] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
   const copy =
     language === 'ha'
       ? {
@@ -115,6 +121,7 @@ export function ListingDetail({ onAddToCart, cartItemCount }: ListingDetailProps
       } catch (e) {
         console.error(e)
         if (!cancelled) {
+          pushErrorToast('Could not load this listing right now.', 'Listing unavailable')
           setNotFound(true)
           setListing(null)
         }
@@ -126,7 +133,7 @@ export function ListingDetail({ onAddToCart, cartItemCount }: ListingDetailProps
     return () => {
       cancelled = true
     }
-  }, [id])
+  }, [id, pushErrorToast])
 
   const formatPrice = (price: number) =>
     new Intl.NumberFormat('en-NG', {
@@ -153,38 +160,45 @@ export function ListingDetail({ onAddToCart, cartItemCount }: ListingDetailProps
       seller_id: listing.seller_id,
       image: listing.images?.[0],
     })
+    pushSuccessToast(`${listing.product_name} was added to your cart.`)
     setAdded(true)
     setTimeout(() => setAdded(false), 2000)
   }
 
-  if (loading) {
-    return (
-      <Layout cartItemCount={cartItemCount}>
-        <div className="max-w-4xl mx-auto py-12 animate-pulse space-y-4">
-          <div className="h-8 bg-stone-200 rounded w-1/3" />
-          <div className="h-64 bg-stone-200 rounded-xl" />
-          <div className="h-24 bg-stone-200 rounded" />
-        </div>
-      </Layout>
+  const handleDelete = async () => {
+    if (!listing || !user?.id || user.id !== listing.seller_id || isDeleting) return
+
+    const confirmed = window.confirm(
+      `Delete "${listing.product_name}"? This will remove it from the marketplace.`
     )
+    if (!confirmed) return
+
+    setIsDeleting(true)
+    try {
+      const { data, error } = await supabase
+        .from('produce_listings')
+        .delete()
+        .eq('id', listing.id)
+        .eq('seller_id', user.id)
+        .select('id')
+
+      if (error) throw error
+      if (!data || data.length === 0) {
+        throw new Error('Listing not found or you do not have permission to delete it.')
+      }
+
+      pushSuccessToast('Listing deleted successfully.')
+      navigate('/listings')
+    } catch (e) {
+      const message = e instanceof Error ? e.message : 'Unable to delete listing.'
+      pushErrorToast(message, 'Could not delete listing')
+      setIsDeleting(false)
+    }
   }
 
-  if (notFound || !listing) {
-    return (
-      <Layout cartItemCount={cartItemCount}>
-        <div className="max-w-lg mx-auto py-16 text-center">
-          <Package className="w-16 h-16 text-stone-300 mx-auto mb-4" />
-          <h1 className="text-xl font-bold text-stone-900 mb-2">{copy.notFoundTitle}</h1>
-          <p className="text-stone-500 mb-6">{copy.notFoundBody}</p>
-          <Button onClick={() => navigate('/marketplace')}>{copy.backToMarketplace}</Button>
-        </div>
-      </Layout>
-    )
-  }
-
-  const q = qualityColors[listing.quality_grade]
-  const minQ = listing.min_order_kg || 1
-  const totalPrice = listing.price_per_kg * quantity
+  const q = listing ? qualityColors[listing.quality_grade] ?? qualityColors.C : qualityColors.C
+  const minQ = listing?.min_order_kg || 1
+  const totalPrice = listing ? listing.price_per_kg * quantity : 0
   const seo = useMemo(() => {
     const seoPath = id ? `/listing/${id}` : '/listing'
     const seoImage = listing
@@ -228,6 +242,31 @@ export function ListingDetail({ onAddToCart, cartItemCount }: ListingDetailProps
 
     return { seoPath, seoImage, seoDescription, seoJsonLd, seoNoindex, seoTitle }
   }, [id, listing, notFound])
+
+  if (loading) {
+    return (
+      <Layout cartItemCount={cartItemCount}>
+        <div className="max-w-4xl mx-auto py-12 animate-pulse space-y-4">
+          <div className="h-8 bg-stone-200 rounded w-1/3" />
+          <div className="h-64 bg-stone-200 rounded-xl" />
+          <div className="h-24 bg-stone-200 rounded" />
+        </div>
+      </Layout>
+    )
+  }
+
+  if (notFound || !listing) {
+    return (
+      <Layout cartItemCount={cartItemCount}>
+        <div className="max-w-lg mx-auto py-16 text-center">
+          <Package className="w-16 h-16 text-stone-300 mx-auto mb-4" />
+          <h1 className="text-xl font-bold text-stone-900 mb-2">{copy.notFoundTitle}</h1>
+          <p className="text-stone-500 mb-6">{copy.notFoundBody}</p>
+          <Button onClick={() => navigate('/marketplace')}>{copy.backToMarketplace}</Button>
+        </div>
+      </Layout>
+    )
+  }
 
   return (
     <Layout cartItemCount={cartItemCount}>
@@ -315,19 +354,39 @@ export function ListingDetail({ onAddToCart, cartItemCount }: ListingDetailProps
             <p className="text-lg font-semibold text-stone-900">{copy.total}: {formatPrice(totalPrice)}</p>
 
             <div className="flex flex-wrap gap-3">
-              <Button className="bg-primary-600 hover:bg-primary-700" onClick={handleAdd} disabled={added}>
-                {added ? (
-                  <>
-                    <Check className="w-4 h-4 mr-2" />
-                    {copy.added}
-                  </>
-                ) : (
-                  <>
-                    <ShoppingCart className="w-4 h-4 mr-2" />
-                    {copy.add}
-                  </>
-                )}
-              </Button>
+              {user?.id === listing.seller_id ? (
+                <>
+                  <Link to={`/listings/${listing.id}/edit`}>
+                    <Button variant="outline">
+                      <PencilLine className="w-4 h-4 mr-2" />
+                      Edit listing
+                    </Button>
+                  </Link>
+                  <Button
+                    variant="outline"
+                    onClick={handleDelete}
+                    disabled={isDeleting}
+                    className="border-red-200 text-red-700 hover:bg-red-50 hover:text-red-800"
+                  >
+                    <Trash2 className="w-4 h-4 mr-2" />
+                    {isDeleting ? 'Deleting...' : 'Delete listing'}
+                  </Button>
+                </>
+              ) : (
+                <Button className="bg-primary-600 hover:bg-primary-700" onClick={handleAdd} disabled={added}>
+                  {added ? (
+                    <>
+                      <Check className="w-4 h-4 mr-2" />
+                      {copy.added}
+                    </>
+                  ) : (
+                    <>
+                      <ShoppingCart className="w-4 h-4 mr-2" />
+                      {copy.add}
+                    </>
+                  )}
+                </Button>
+              )}
               <Link to="/cart">
                 <Button variant="outline">{copy.viewCart}</Button>
               </Link>

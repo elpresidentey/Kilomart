@@ -269,7 +269,18 @@ export function LandingPage() {
   ]
 
   /** Aligned with Supabase `categories` (no seafood). `marketplaceHref` = filter or browse-all for split DB categories. */
-  const categories = [
+  type LandingCategory = {
+    name: string
+    icon: typeof Leaf
+    iconGradient: string
+    surface: string
+    items: string
+    count: string
+    marketplaceHref: string
+    images?: string[]
+  }
+
+  const categories: LandingCategory[] = [
     {
       name: 'Grains & cereals',
       icon: Wheat,
@@ -324,6 +335,7 @@ export function LandingPage() {
       items: 'Broilers, Layers, Turkey, Duck, Fresh eggs',
       count: '900+',
       marketplaceHref: '/marketplace?category=Poultry',
+      images: ['/images/categories/poultry-1.jpg', '/images/categories/poultry-2.jpg'],
     },
     {
       name: 'Livestock',

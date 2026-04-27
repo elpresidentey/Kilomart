@@ -3,11 +3,13 @@ import { Layout } from '../components/Layout'
 import { ProduceCard } from '../components/ProduceCard'
 import { Input, Button } from '../components/ui'
 import { supabase } from '../lib/supabase'
+import { useAuth } from '../hooks/useAuth'
 import { useCartStore } from '../stores/cartStore'
 import type { ProduceListing } from '../types'
 import { Search, Filter, MapPin, SlidersHorizontal } from 'lucide-react'
 import { useSearchParams } from 'react-router-dom'
 import { useI18n } from '../i18n/useI18n'
+import { useToastStore } from '../stores/toastStore'
 import {
   MARKETPLACE_PRODUCT_FILTERS,
   parseCategorySearchParam,
@@ -20,7 +22,10 @@ const MARKETPLACE_CACHE_KEY = 'kilomarket.marketplace.listings'
 
 export function Marketplace() {
   const addToCart = useCartStore((s) => s.addToCart)
+  const { user } = useAuth()
   const { t } = useI18n()
+  const toastSuccess = useToastStore((state) => state.success)
+  const toastError = useToastStore((state) => state.error)
   const [searchParams] = useSearchParams()
   const searchInputRef = useRef<HTMLInputElement | null>(null)
   const qFromUrl = searchParams.get('q') || ''
@@ -31,6 +36,7 @@ export function Marketplace() {
   const [selectedLocation, setSelectedLocation] = useState(ALL_LOCATIONS)
   const [selectedGrade, setSelectedGrade] = useState('all')
   const [showFilters, setShowFilters] = useState(false)
+  const [deletingListingId, setDeletingListingId] = useState<string | null>(null)
 
   const locations = [
     { value: ALL_LOCATIONS, label: t('marketplace.allLocations') },
@@ -52,6 +58,38 @@ export function Marketplace() {
       seller_id: listing.seller_id,
       image: listing.images?.[0]
     })
+  }
+
+  async function handleDeleteListing(listing: ProduceListing) {
+    if (!user?.id || deletingListingId) return
+
+    const confirmed = window.confirm(
+      `Delete "${listing.product_name}"? This will remove it from the marketplace.`
+    )
+    if (!confirmed) return
+
+    setDeletingListingId(listing.id)
+    try {
+      const { data, error } = await supabase
+        .from('produce_listings')
+        .delete()
+        .eq('id', listing.id)
+        .eq('seller_id', user.id)
+        .select('id')
+
+      if (error) throw error
+      if (!data || data.length === 0) {
+        throw new Error('Listing not found or you do not have permission to delete it.')
+      }
+
+      setListings((current) => current.filter((item) => item.id !== listing.id))
+      toastSuccess('Listing deleted successfully.')
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Failed to delete listing.'
+      toastError(message, 'Could not delete listing')
+    } finally {
+      setDeletingListingId(null)
+    }
   }
 
   useEffect(() => {
@@ -115,6 +153,7 @@ export function Marketplace() {
 
       if (error) {
         console.error('Supabase error:', error)
+        toastError('Could not load marketplace listings.', 'Marketplace unavailable')
         setListings([])
       } else {
         const nextListings: ProduceListing[] = ((data || []) as Array<Record<string, unknown>>).map((row) => {
@@ -138,6 +177,7 @@ export function Marketplace() {
       }
     } catch (err) {
       console.error('Error fetching listings:', err)
+      toastError('Could not load marketplace listings.', 'Marketplace unavailable')
       setListings([])
     } finally {
       setLoading(false)
@@ -284,6 +324,9 @@ export function Marketplace() {
                 listing={listing}
                 listIndex={i}
                 onAddToCart={handleAddToCart}
+                currentUserId={user?.id}
+                onDeleteListing={handleDeleteListing}
+                deletingListingId={deletingListingId}
               />
             ))}
           </div>
