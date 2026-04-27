@@ -29,6 +29,11 @@ type PaymentRow = {
   order_id: string
 }
 
+type CreatedOrderRow = {
+  id: string
+  order_number: string
+}
+
 function parseBody(input: unknown): Body | null {
   if (!input) return null
   if (typeof input === 'string') {
@@ -80,6 +85,12 @@ function getEnv(env: Record<string, string | undefined>, ...keys: string[]): str
   return ''
 }
 
+function generateFallbackOrderNumber() {
+  return `KM-${new Date().toISOString().slice(0, 10).replace(/-/g, '')}-${Math.floor(Math.random() * 10000)
+    .toString()
+    .padStart(4, '0')}`
+}
+
 async function safeJson(response: Response): Promise<any> {
   const text = await response.text()
   if (!text) return null
@@ -87,6 +98,131 @@ async function safeJson(response: Response): Promise<any> {
     return JSON.parse(text)
   } catch {
     return null
+  }
+}
+
+async function postJson(
+  url: string,
+  headers: Record<string, string>,
+  body: unknown,
+  options?: { returnRepresentation?: boolean }
+) {
+  return fetch(url, {
+    method: 'POST',
+    headers: {
+      ...headers,
+      'Content-Type': 'application/json',
+      ...(options?.returnRepresentation ? { Prefer: 'return=representation' } : {}),
+    },
+    body: JSON.stringify(body),
+  })
+}
+
+async function patchJson(url: string, headers: Record<string, string>, body: unknown) {
+  return fetch(url, {
+    method: 'PATCH',
+    headers: {
+      ...headers,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(body),
+  })
+}
+
+async function createOrderViaRest(
+  supabaseUrl: string,
+  mutationKey: string,
+  buyerId: string,
+  listing: ListingRow,
+  item: OrderItem,
+  deliveryInfo: DeliveryInfo,
+  paymentMethod: Body['paymentMethod'],
+  providerReference: string | undefined,
+  deliveryFeePerItem: number
+) {
+  const orderNumber = generateFallbackOrderNumber()
+  const subtotal = Number((listing.price_per_kg * item.quantity_kg).toFixed(2))
+  const totalAmount = Number((subtotal + deliveryFeePerItem).toFixed(2))
+  const authHeaders = {
+    Authorization: `Bearer ${mutationKey}`,
+    Apikey: mutationKey,
+  }
+
+  const orderRes = await postJson(
+    `${supabaseUrl}/rest/v1/orders?select=id,order_number`,
+    authHeaders,
+    {
+      order_number: orderNumber,
+      buyer_id: buyerId,
+      seller_id: listing.seller_id,
+      listing_id: item.listing_id,
+      quantity_kg: item.quantity_kg,
+      price_per_kg: listing.price_per_kg,
+      subtotal,
+      delivery_fee: deliveryFeePerItem,
+      total_amount: totalAmount,
+      delivery_address: {
+        address: deliveryInfo.address,
+        city: deliveryInfo.city,
+        state: deliveryInfo.state,
+        phone: deliveryInfo.phone,
+        contact_name: deliveryInfo.fullName,
+      },
+      status: paymentMethod === 'paystack' ? 'paid' : 'pending',
+    },
+    { returnRepresentation: true }
+  )
+
+  if (!orderRes.ok) {
+    const err = await safeJson(orderRes)
+    throw new Error(err?.message || err?.error || `Failed to create order for ${item.listing_id}`)
+  }
+
+  const createdOrders = (await orderRes.json()) as CreatedOrderRow[]
+  const createdOrder = createdOrders?.[0]
+  if (!createdOrder?.id || !createdOrder.order_number) {
+    throw new Error('Failed to create order')
+  }
+
+  const nextAvailableQuantity = Number((listing.available_quantity - item.quantity_kg).toFixed(2))
+  const listingRes = await patchJson(
+    `${supabaseUrl}/rest/v1/produce_listings?id=eq.${item.listing_id}`,
+    authHeaders,
+    {
+      available_quantity: nextAvailableQuantity,
+      status: nextAvailableQuantity <= 0 ? 'sold_out' : 'active',
+    }
+  )
+
+  if (!listingRes.ok) {
+    const err = await safeJson(listingRes)
+    throw new Error(err?.message || err?.error || `Failed to update stock for ${item.listing_id}`)
+  }
+
+  const paymentRes = await postJson(
+    `${supabaseUrl}/rest/v1/payments?select=id`,
+    authHeaders,
+    {
+      order_id: createdOrder.id,
+      payer_id: buyerId,
+      payee_id: listing.seller_id,
+      amount: totalAmount,
+      currency: 'NGN',
+      payment_method: paymentMethod,
+      provider: paymentMethod === 'paystack' ? 'paystack' : null,
+      provider_reference: providerReference || null,
+      status: paymentMethod === 'paystack' ? 'completed' : 'pending',
+    }
+  )
+
+  if (!paymentRes.ok) {
+    const err = await safeJson(paymentRes)
+    throw new Error(err?.message || err?.error || `Failed to create payment for ${item.listing_id}`)
+  }
+
+  return {
+    orderId: createdOrder.id,
+    orderNumber: createdOrder.order_number,
   }
 }
 
@@ -99,6 +235,7 @@ export default async function handler(req: any, res: any) {
   const env = (globalThis as any)?.process?.env ?? {}
   const supabaseUrl = getEnv(env, 'SUPABASE_URL', 'VITE_SUPABASE_URL')
   const supabaseKey = getEnv(env, 'SUPABASE_ANON_KEY', 'VITE_SUPABASE_ANON_KEY')
+  const serviceRoleKey = getEnv(env, 'SUPABASE_SERVICE_ROLE_KEY')
 
   if (!supabaseUrl || !supabaseKey) {
     res.status(500).json({ error: 'Supabase not configured' })
@@ -217,6 +354,7 @@ export default async function handler(req: any, res: any) {
     const listingMap = new Map(listings.map((listing) => [listing.id, listing] as const))
     const orderNumbers: string[] = []
     const orderIds: string[] = []
+    const mutationKey = serviceRoleKey || supabaseKey
 
     for (const item of items) {
       const listing = listingMap.get(item.listing_id)
@@ -235,7 +373,7 @@ export default async function handler(req: any, res: any) {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,
-          Apikey: supabaseKey,
+          Apikey: mutationKey,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
@@ -260,7 +398,36 @@ export default async function handler(req: any, res: any) {
 
       const rpcData = await safeJson(rpcResponse)
       if (!rpcResponse.ok) {
-        throw new Error(rpcData?.message || rpcData?.error || `Failed to create order for ${item.listing_id}`)
+        const rpcMessage = rpcData?.message || rpcData?.error || ''
+        const missingRpc =
+          rpcResponse.status === 404 ||
+          /could not find the function/i.test(rpcMessage) ||
+          /schema cache/i.test(rpcMessage)
+
+        if (!missingRpc) {
+          throw new Error(rpcMessage || `Failed to create order for ${item.listing_id}`)
+        }
+
+        if (!serviceRoleKey) {
+          throw new Error(
+            'The checkout RPC is missing from Supabase and SUPABASE_SERVICE_ROLE_KEY is not configured for fallback.'
+          )
+        }
+
+        const fallback = await createOrderViaRest(
+          supabaseUrl,
+          serviceRoleKey,
+          buyerId,
+          listing,
+          item,
+          deliveryInfo,
+          paymentMethod,
+          providerReference,
+          deliveryFeePerItem
+        )
+        orderIds.push(fallback.orderId)
+        orderNumbers.push(fallback.orderNumber)
+        continue
       }
 
       const orderId = String(rpcData ?? '')
