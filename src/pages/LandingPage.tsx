@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { Button } from '../components/ui'
 import { useAuth } from '../hooks/useAuth'
 import { useCartStore, cartUnitsCount } from '../stores/cartStore'
+import { ThreeParticlesField } from '../components/ThreeParticlesField'
 import { fallbackOnImageError, sanitizeImageUrl, FALLBACK_IMAGE_SRC } from '../lib/image'
 import { useI18n } from '../i18n/useI18n'
 import heroVideo from '../../Hero image/4K Cinematic Drone view village Highway l Free  Drone Video l Free stock footage l Copyright free.mp4'
@@ -328,14 +329,13 @@ export function LandingPage() {
       marketplaceHref: '/marketplace?category=Beans',
     },
     {
-      name: 'Poultry & eggs',
+      name: 'Poultry',
       icon: Egg,
       iconGradient: 'from-orange-500 via-orange-500 to-orange-700',
       surface: 'bg-gradient-to-br from-orange-50 via-orange-50 to-orange-100/90',
       items: 'Broilers, Layers, Turkey, Duck, Fresh eggs',
       count: '900+',
       marketplaceHref: '/marketplace?category=Poultry',
-      images: ['/images/categories/poultry-1.jpg', '/images/categories/poultry-2.jpg'],
     },
     {
       name: 'Livestock',
@@ -694,10 +694,11 @@ export function LandingPage() {
             {/* Right Content - Hero Video */}
             <div className="fade-up fade-up-delay-2 relative w-full">
               <div className="float-soft relative overflow-hidden rounded-[2rem] border border-stone-200/80 bg-white p-3 shadow-[0_28px_80px_rgba(15,23,42,0.14)] lg:p-4">
+                <ThreeParticlesField className="pointer-events-none absolute inset-0 z-0 opacity-70" />
                 <div className="aspect-[4/3] overflow-hidden rounded-[1.5rem] border border-white/40 bg-stone-900 shadow-inner shadow-stone-950/40 sm:aspect-[16/11] lg:aspect-[5/4]">
                   {!heroVideoError && heroVideoReady ? (
                     <video
-                      className="w-full h-full object-cover"
+                      className="relative z-10 w-full h-full object-cover"
                       src={heroVideo}
                       poster="/logo-farmers-market.png"
                       preload="none"
@@ -708,7 +709,7 @@ export function LandingPage() {
                       onError={() => setHeroVideoError(true)}
                     />
                   ) : (
-                    <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-primary-950 via-stone-900 to-amber-950">
+                    <div className="relative z-10 flex h-full w-full items-center justify-center bg-gradient-to-br from-primary-950 via-stone-900 to-amber-950">
                       <div className="flex flex-col items-center gap-4 text-center px-6">
                         <div className="flex h-20 w-20 items-center justify-center rounded-full bg-white/10 ring-1 ring-white/15 backdrop-blur">
                           <img
@@ -763,22 +764,34 @@ export function LandingPage() {
                   className="flex h-full w-full flex-col p-5 sm:p-6"
                 >
                   {category.images ? (
-                    <div className="mb-4 grid h-24 grid-cols-[1.4fr_1fr] gap-2 overflow-hidden rounded-2xl">
-                      <img
-                        src={category.images[0]}
-                        alt={`${category.name} preview 1`}
-                        className="h-full w-full rounded-xl object-cover"
-                        loading="lazy"
-                        onError={fallbackOnImageError}
-                      />
-                      <img
-                        src={category.images[1]}
-                        alt={`${category.name} preview 2`}
-                        className="h-full w-full rounded-xl object-cover"
-                        loading="lazy"
-                        onError={fallbackOnImageError}
-                      />
-                    </div>
+                    category.images.length > 1 ? (
+                      <div className="mb-4 grid h-24 grid-cols-[1.4fr_1fr] gap-2 overflow-hidden rounded-2xl">
+                        <img
+                          src={category.images[0]}
+                          alt={`${category.name} preview 1`}
+                          className="h-full w-full rounded-xl object-cover"
+                          loading="lazy"
+                          onError={fallbackOnImageError}
+                        />
+                        <img
+                          src={category.images[1]}
+                          alt={`${category.name} preview 2`}
+                          className="h-full w-full rounded-xl object-cover"
+                          loading="lazy"
+                          onError={fallbackOnImageError}
+                        />
+                      </div>
+                    ) : (
+                      <div className="mb-4 h-24 overflow-hidden rounded-2xl">
+                        <img
+                          src={category.images[0]}
+                          alt={`${category.name} preview`}
+                          className="h-full w-full rounded-2xl object-cover"
+                          loading="lazy"
+                          onError={fallbackOnImageError}
+                        />
+                      </div>
+                    )
                   ) : null}
                   <div
                     className={`mb-4 flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br shadow-md ring-1 ring-white/40 transition-transform duration-200 group-hover:scale-105 group-hover:-translate-y-0.5 ${category.iconGradient}`}
