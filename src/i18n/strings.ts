@@ -51,6 +51,7 @@ const rawStrings = repairText({
     'auth.signup.accountTypeLabel': 'Account Type',
     'auth.signup.buyerOption': 'Buyer (I want to purchase produce)',
     'auth.signup.farmerOption': 'Farmer (I want to sell produce)',
+    'auth.signup.logisticsOption': 'Logistics Partner (I move goods and manage deliveries)',
     'auth.signup.passwordPlaceholder': 'Create a password (min 6 characters)',
     'auth.signup.successEmailConfirm':
       'Account created! Please check your email to confirm your account before signing in.',

@@ -113,6 +113,7 @@ export function Signup() {
             >
               <option value="buyer">{t('auth.signup.buyerOption')}</option>
               <option value="farmer">{t('auth.signup.farmerOption')}</option>
+              <option value="logistics">{t('auth.signup.logisticsOption')}</option>
             </select>
           </div>
           

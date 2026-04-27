@@ -3,6 +3,7 @@ import { Layout } from '../components/Layout'
 import { useSearchParams } from 'react-router-dom'
 import { Badge, Button, Card, Modal } from '../components/ui'
 import { useAuth } from '../hooks/useAuth'
+import { useLogistics, type LogisticsDriver } from '../hooks/useLogistics'
 import { useI18n } from '../i18n/useI18n'
 import { useWarehouse, type Warehouse, type WarehouseFormData } from '../hooks/useWarehouse'
 import { useInventory, type InventoryFormData, type InventoryItem } from '../hooks/useInventory'
@@ -11,13 +12,106 @@ import { AlertCircle, Building2, CheckCircle, Package, Pencil, Plus, RefreshCw, 
 type Toast = { id: string; type: 'success' | 'error'; message: string }
 type FieldErrors = Record<string, string>
 
+const sampleDrivers: LogisticsDriver[] = [
+  {
+    id: 'driver-1',
+    name: 'A. Mohammed',
+    truck: 'Toyota Hiace - FM 221 LG',
+    destination: 'Lagos',
+    route: 'Abuja to Lagos',
+    pickupArea: 'Kuje warehouse',
+    capacityKg: 500,
+    availability: 'available',
+    rate: 'From ₦18,000',
+  },
+  {
+    id: 'driver-2',
+    name: 'S. Ibrahim',
+    truck: 'Box truck - FM 078 TR',
+    destination: 'Abuja',
+    route: 'Kaduna to Abuja',
+    pickupArea: 'Kaduna staging point',
+    capacityKg: 1000,
+    availability: 'soon',
+    rate: 'From ₦22,000',
+  },
+  {
+    id: 'driver-3',
+    name: 'C. Okafor',
+    truck: 'Pickup - FM 154 DP',
+    destination: 'Ibadan',
+    route: 'Abeokuta to Ibadan',
+    pickupArea: 'Abeokuta pack house',
+    capacityKg: 350,
+    availability: 'busy',
+    rate: 'From ₦12,500',
+  },
+  {
+    id: 'driver-4',
+    name: 'M. Bello',
+    truck: 'Lorry - FM 406 AB',
+    destination: 'Port Harcourt',
+    route: 'Onitsha to Port Harcourt',
+    pickupArea: 'Onitsha depot',
+    capacityKg: 1200,
+    availability: 'available',
+    rate: 'From ₦28,000',
+  },
+  {
+    id: 'driver-5',
+    name: 'F. Yusuf',
+    truck: 'Van - FM 512 NG',
+    destination: 'Enugu',
+    route: 'Aba to Enugu',
+    pickupArea: 'Aba logistics yard',
+    capacityKg: 600,
+    availability: 'available',
+    rate: 'From ₦16,000',
+  },
+  {
+    id: 'driver-6',
+    name: 'K. Adisa',
+    truck: 'Pickup - FM 188 LG',
+    destination: 'Kano',
+    route: 'Kaduna to Kano',
+    pickupArea: 'Kaduna inland depot',
+    capacityKg: 400,
+    availability: 'soon',
+    rate: 'From ₦14,000',
+  },
+  {
+    id: 'driver-7',
+    name: 'T. Ibekwe',
+    truck: 'Box truck - FM 930 LS',
+    destination: 'Ibadan',
+    route: 'Lagos to Ibadan',
+    pickupArea: 'Ikeja dispatch point',
+    capacityKg: 900,
+    availability: 'available',
+    rate: 'From ₦20,000',
+  },
+  {
+    id: 'driver-8',
+    name: 'J. Danladi',
+    truck: 'Truck - FM 771 KD',
+    destination: 'Benin City',
+    route: 'Warri to Benin City',
+    pickupArea: 'Warri market hub',
+    capacityKg: 800,
+    availability: 'busy',
+    rate: 'From ₦19,500',
+  },
+]
+
 export function Operations() {
   const { user } = useAuth()
   const { t } = useI18n()
   const [searchParams] = useSearchParams()
+  const logisticsHook = useLogistics()
   const warehouseHook = useWarehouse()
   const inventoryHook = useInventory()
   const [toasts, setToasts] = useState<Toast[]>([])
+  const [selectedDriverId, setSelectedDriverId] = useState<string | null>(sampleDrivers[0]?.id ?? null)
   const [warehouseModalOpen, setWarehouseModalOpen] = useState(false)
   const [warehouseSaving, setWarehouseSaving] = useState(false)
   const [warehouseErrors, setWarehouseErrors] = useState<FieldErrors>({})
@@ -42,6 +136,10 @@ export function Operations() {
   }, [user, warehouseHook.fetchWarehouses, inventoryHook.fetchInventory])
 
   useEffect(() => {
+    void logisticsHook.fetchDrivers()
+  }, [logisticsHook.fetchDrivers])
+
+  useEffect(() => {
     if (searchParams.get('view') !== 'logistics') return
     window.setTimeout(() => {
       document.getElementById('logistics')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
@@ -60,7 +158,17 @@ export function Operations() {
   const storageUtilization = totalCapacity > 0 ? Math.round((totalStored / totalCapacity) * 100) : 0
   const activeWarehouses = warehouseHook.warehouses.filter((warehouse) => warehouse.status === 'active').length
   const storedBatches = inventoryHook.inventory.filter((item) => item.status === 'in_storage').length
-  const loading = warehouseHook.loading || inventoryHook.loading
+  const logisticsDrivers = logisticsHook.drivers.length > 0 ? logisticsHook.drivers : sampleDrivers
+  const availableDrivers = logisticsDrivers.filter((driver) => driver.availability === 'available').length
+  const nearbyDrivers = logisticsDrivers.filter((driver) => driver.availability !== 'busy').length
+  const loading = warehouseHook.loading || inventoryHook.loading || logisticsHook.loading
+
+  useEffect(() => {
+    if (logisticsDrivers.length === 0) return
+    if (!logisticsDrivers.some((driver) => driver.id === selectedDriverId)) {
+      setSelectedDriverId(logisticsDrivers[0].id)
+    }
+  }, [logisticsDrivers, selectedDriverId])
 
   const validateWarehouse = () => {
     const errors: FieldErrors = {}
@@ -192,8 +300,11 @@ export function Operations() {
             variant="outline"
             size="sm"
             onClick={async () => {
-              await warehouseHook.fetchWarehouses()
-              await inventoryHook.fetchInventory()
+              await Promise.all([
+                warehouseHook.fetchWarehouses(),
+                inventoryHook.fetchInventory(),
+                logisticsHook.fetchDrivers(),
+              ])
             }}
             disabled={loading}
           >
@@ -249,34 +360,130 @@ export function Operations() {
           </Card>
         </div>
 
-        <div id="logistics">
-          <Card padding="lg" interactive className="border-amber-100 bg-gradient-to-br from-amber-50/80 to-white">
-            <div className="mb-4 flex items-center justify-between gap-3">
-              <div className="flex items-center gap-2">
-                <Truck className="h-5 w-5 text-amber-700" />
-                <h2 className="text-lg font-semibold text-stone-900">Logistics handoff</h2>
+        <div id="logistics" className="scroll-mt-24">
+          <Card padding="lg" interactive className="border-amber-100 bg-gradient-to-br from-amber-50/80 via-white to-stone-50">
+            <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+              <div className="max-w-2xl">
+                <div className="flex items-center gap-2">
+                  <Truck className="h-5 w-5 text-amber-700" />
+                  <h2 className="text-lg font-semibold text-stone-900">Available drivers</h2>
+                </div>
+                <p className="mt-2 text-sm text-stone-600">
+                  Pick a driver based on the destination they are already heading toward.
+                </p>
               </div>
-              <Badge variant="warning">Operational</Badge>
+              <Badge variant="warning">{availableDrivers} ready now</Badge>
             </div>
-            <div className="grid gap-4 md:grid-cols-3">
-              <div className="rounded-xl border border-amber-100 bg-white p-4">
-                <p className="text-sm font-medium text-stone-900">Pickup readiness</p>
-                <p className="mt-1 text-sm text-stone-500">
-                  Confirm stock, packaging, and warehouse availability before dispatch.
+
+            {logisticsHook.error && (
+              <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">
+                {logisticsHook.error}
+              </div>
+            )}
+
+            <div className="mt-6 grid gap-4 md:grid-cols-3">
+              <div className="rounded-xl border border-amber-100 bg-white p-4 shadow-sm">
+                <p className="text-sm font-medium text-stone-500">Available drivers</p>
+                <p className="mt-2 text-2xl font-bold text-stone-900">{availableDrivers}</p>
+              </div>
+              <div className="rounded-xl border border-amber-100 bg-white p-4 shadow-sm">
+                <p className="text-sm font-medium text-stone-500">Near you</p>
+                <p className="mt-2 text-2xl font-bold text-stone-900">{nearbyDrivers}</p>
+              </div>
+              <div className="rounded-xl border border-amber-100 bg-white p-4 shadow-sm">
+                <p className="text-sm font-medium text-stone-500">Selected driver</p>
+                <p className="mt-2 text-base font-semibold text-stone-900">
+                  {logisticsDrivers.find((driver) => driver.id === selectedDriverId)?.name || 'None'}
                 </p>
               </div>
-              <div className="rounded-xl border border-amber-100 bg-white p-4">
-                <p className="text-sm font-medium text-stone-900">Delivery coordination</p>
-                <p className="mt-1 text-sm text-stone-500">
-                  Track where each batch is going and share details with the receiving party.
-                </p>
-              </div>
-              <div className="rounded-xl border border-amber-100 bg-white p-4">
-                <p className="text-sm font-medium text-stone-900">Status updates</p>
-                <p className="mt-1 text-sm text-stone-500">
-                  Use the order status and inventory tools above to keep operations aligned.
-                </p>
-              </div>
+            </div>
+
+            <div className="mt-6 space-y-4">
+              {logisticsDrivers.map((driver) => {
+                const isSelected = driver.id === selectedDriverId
+                return (
+                  <div
+                    key={driver.id}
+                    className={[
+                      'rounded-2xl border bg-white p-4 shadow-sm transition-all',
+                      isSelected ? 'border-primary-300 ring-1 ring-primary-100' : 'border-stone-200',
+                    ].join(' ')}
+                  >
+                    <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                      <div className="min-w-0 space-y-2">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <p className="font-semibold text-stone-900">{driver.name}</p>
+                          <Badge
+                            variant={
+                              driver.availability === 'available'
+                                ? 'success'
+                                : driver.availability === 'soon'
+                                  ? 'warning'
+                                  : 'default'
+                            }
+                          >
+                            {driver.availability === 'available'
+                              ? 'Available'
+                              : driver.availability === 'soon'
+                                ? 'Available soon'
+                                : 'Busy'}
+                          </Badge>
+                          {isSelected && <Badge variant="info">Selected</Badge>}
+                        </div>
+                        <p className="text-sm text-stone-600">
+                          Going to <span className="font-medium text-stone-900">{driver.destination}</span>{' '}
+                          from <span className="font-medium text-stone-900">{driver.pickupArea}</span>
+                        </p>
+                        <div className="grid gap-2 sm:grid-cols-3">
+                          <div className="rounded-xl bg-stone-50 px-3 py-2">
+                            <p className="text-xs uppercase tracking-wide text-stone-500">Route</p>
+                            <p className="text-sm font-medium text-stone-900">{driver.route}</p>
+                          </div>
+                          <div className="rounded-xl bg-stone-50 px-3 py-2">
+                            <p className="text-xs uppercase tracking-wide text-stone-500">Truck</p>
+                            <p className="text-sm font-medium text-stone-900">{driver.truck}</p>
+                          </div>
+                          <div className="rounded-xl bg-stone-50 px-3 py-2">
+                            <p className="text-xs uppercase tracking-wide text-stone-500">Capacity</p>
+                            <p className="text-sm font-medium text-stone-900">{driver.capacityKg.toLocaleString()} kg</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="flex shrink-0 flex-col gap-2 md:items-end">
+                        <p className="text-sm font-medium text-stone-900">{driver.rate}</p>
+                        <Button
+                          variant={isSelected ? 'secondary' : 'outline'}
+                          size="sm"
+                          isLoading={logisticsHook.bookingDriverId === driver.id}
+                          onClick={async () => {
+                            if (!user) {
+                              addToast('error', 'Please sign in to book a driver')
+                              return
+                            }
+                            try {
+                              await logisticsHook.bookDriver({ driver })
+                              setSelectedDriverId(driver.id)
+                              addToast('success', `${driver.name} booked for ${driver.destination}`)
+                            } catch (err) {
+                              addToast('error', err instanceof Error ? err.message : 'Could not book driver')
+                            }
+                          }}
+                          disabled={driver.availability !== 'available' || logisticsHook.loading || !user}
+                        >
+                          {driver.availability === 'available'
+                            ? isSelected
+                              ? 'Booked'
+                              : user
+                                ? 'Book driver'
+                                : 'Sign in to book'
+                            : 'Unavailable'}
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                )
+              })}
             </div>
           </Card>
         </div>

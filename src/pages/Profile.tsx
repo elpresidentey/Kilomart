@@ -376,6 +376,14 @@ export function Profile() {
                 {copy.goDashboard}
               </Button>
             )}
+            {(user.role === 'warehouse_manager' || user.role === 'logistics') && (
+              <Button
+                onClick={() => navigate(user.role === 'logistics' ? '/operations?view=logistics' : '/operations')}
+                variant="outline"
+              >
+                {t('nav.operations')}
+              </Button>
+            )}
             {user.role === 'buyer' && (
               <Button onClick={() => navigate('/orders')} variant="outline">
                 {copy.myOrders}
