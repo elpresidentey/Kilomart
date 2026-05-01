@@ -174,6 +174,19 @@ export function Layout({ children, cartItemCount }: LayoutProps) {
         : []
     : []
 
+  function getOperationsHint(href: string) {
+    if (href.includes('logistics')) return 'Book drivers and move goods.'
+    if (href.includes('operations')) return 'Manage storage, inventory, and flow.'
+    return 'Quick access to workspace tools.'
+  }
+
+  const mobileNavigation = [
+    ...mainNavigation,
+    ...(operationsNavigation.length > 0
+      ? [{ name: t('nav.operations'), href: '/operations', icon: Warehouse }]
+      : []),
+  ]
+
   const submitHeaderSearch = (e: FormEvent) => {
     e.preventDefault()
     const q = headerSearch.trim()
@@ -823,44 +836,13 @@ export function Layout({ children, cartItemCount }: LayoutProps) {
             </div>
 
             <nav className="px-4 py-3 space-y-4">
-              {operationsNavigation.length > 0 && (
-                <div className="rounded-2xl border border-amber-100 bg-amber-50/70 p-2">
-                  <div className="px-3 pt-2 pb-1">
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-amber-700">
-                      Operations
-                    </p>
-                    <p className="mt-1 text-xs text-amber-800/80">
-                      Logistics, storage, and warehouse tools.
-                    </p>
-                  </div>
-                  <div className="space-y-1">
-                    {operationsNavigation.map((item) => (
-                      <Link
-                        key={item.name}
-                        to={item.href}
-                        className={cn(
-                          'flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium tap-highlight-none',
-                          'motion-safe:transition-all motion-safe:duration-200 motion-safe:active:scale-[0.99]',
-                          isActive(item.href)
-                            ? 'bg-white text-amber-900 shadow-sm'
-                            : 'text-stone-700 hover:bg-white/80'
-                        )}
-                        onClick={() => setMobileMenuOpen(false)}
-                      >
-                        <item.icon className="w-5 h-5" />
-                        {item.name}
-                      </Link>
-                    ))}
-                  </div>
-                </div>
-              )}
-
               <div className="space-y-1">
-                {mainNavigation.map((item) => {
+                {mobileNavigation.map((item) => {
                   const isOrdersDropdown =
                     item.href === '/orders' && user != null && canAccessBuyerOrders(user.role)
+                  const isOperationsEntry = item.href === '/operations'
 
-                  if (!isOrdersDropdown) {
+                  if (!isOrdersDropdown && !isOperationsEntry) {
                     return (
                       <Link
                         key={item.name}
@@ -870,12 +852,37 @@ export function Layout({ children, cartItemCount }: LayoutProps) {
                           'motion-safe:transition-all motion-safe:duration-200 motion-safe:active:scale-[0.99]',
                           isActive(item.href)
                             ? 'bg-primary-50 text-primary-700'
-                            : 'text-stone-600 hover:bg-stone-50'
+                          : 'text-stone-600 hover:bg-stone-50'
                         )}
                         onClick={() => setMobileMenuOpen(false)}
                       >
                         <item.icon className="w-5 h-5" />
                         {item.name}
+                      </Link>
+                    )
+                  }
+
+                  if (isOperationsEntry) {
+                    return (
+                      <Link
+                        key={item.name}
+                        to={item.href}
+                        className={cn(
+                          'flex items-start gap-3 px-4 py-3 rounded-xl text-sm font-semibold tap-highlight-none border',
+                          'motion-safe:transition-all motion-safe:duration-200 motion-safe:active:scale-[0.99]',
+                          isActive(item.href)
+                            ? 'border-amber-200 bg-amber-50 text-amber-900 shadow-sm'
+                            : 'border-amber-100 bg-amber-50/80 text-amber-800 hover:bg-amber-50 hover:text-amber-900'
+                        )}
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        <Warehouse className="w-5 h-5 mt-0.5 shrink-0" />
+                        <span className="min-w-0">
+                          <span className="block">Operations</span>
+                          <span className="mt-1 block text-xs font-normal text-stone-600">
+                            Logistics, storage, and warehouse tools.
+                          </span>
+                        </span>
                       </Link>
                     )
                   }
@@ -927,6 +934,63 @@ export function Layout({ children, cartItemCount }: LayoutProps) {
                   )
                 })}
               </div>
+
+              {operationsNavigation.length > 0 && (
+                <div className="rounded-2xl border border-amber-100 bg-amber-50/60 p-3">
+                  <div className="mb-3 flex items-start justify-between gap-3">
+                    <div>
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-amber-700">
+                        Operations
+                      </p>
+                      <p className="mt-1 text-xs text-stone-600">
+                        Logistics, storage, and warehouse tools.
+                      </p>
+                    </div>
+                    <span className="rounded-full bg-white px-2.5 py-1 text-[11px] font-semibold text-amber-800 shadow-sm">
+                      {operationsNavigation.length} tools
+                    </span>
+                  </div>
+
+                  <div className="mb-3 rounded-2xl bg-white/80 px-3 py-2 text-xs text-stone-600 shadow-sm">
+                    <div className="flex flex-wrap gap-2">
+                      <span className="rounded-full bg-amber-50 px-2 py-1 font-medium text-amber-800">
+                        Buyers book drivers
+                      </span>
+                      <span className="rounded-full bg-amber-50 px-2 py-1 font-medium text-amber-800">
+                        Sellers move goods
+                      </span>
+                      <span className="rounded-full bg-amber-50 px-2 py-1 font-medium text-amber-800">
+                        Teams manage flow
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    {operationsNavigation.map((item) => (
+                      <Link
+                        key={item.name}
+                        to={item.href}
+                        className={cn(
+                          'flex items-start gap-3 rounded-2xl border px-4 py-3 text-left text-sm font-medium tap-highlight-none',
+                          'motion-safe:transition-all motion-safe:duration-200 motion-safe:active:scale-[0.99]',
+                          isActive(item.href)
+                            ? 'border-amber-200 bg-white text-amber-900 shadow-sm'
+                            : 'border-transparent bg-white/70 text-stone-700 hover:border-amber-100 hover:bg-white hover:text-stone-900'
+                        )}
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        <item.icon className="mt-0.5 h-5 w-5 shrink-0" />
+                        <span className="min-w-0">
+                          <span className="block">{item.name}</span>
+                          <span className="mt-1 block text-xs font-normal text-stone-500">
+                            {getOperationsHint(item.href)}
+                          </span>
+                        </span>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {user && (
                 <div className="rounded-2xl border border-stone-200 bg-white p-2 shadow-sm">

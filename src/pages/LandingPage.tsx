@@ -426,17 +426,17 @@ export function LandingPage() {
               {/* Logo */}
               <Link
                 to="/"
-                className="group motion-lift motion-press flex items-center gap-3 rounded-full border border-stone-200 bg-white px-2 py-1.5 pr-4 shadow-[0_10px_30px_rgba(15,23,42,0.08)] hover:border-primary-200 hover:shadow-[0_14px_36px_rgba(15,23,42,0.1)]"
+                className="inline-flex items-center gap-3 tap-highlight-none motion-safe:transition-opacity motion-safe:duration-200 hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
               >
-                <div className="pulse-soft flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-[inset_0_1px_0_rgba(255,255,255,0.8),0_10px_24px_rgba(15,23,42,0.12)] ring-1 ring-primary-200/70 sm:h-11 sm:w-11 lg:h-11 lg:w-11">
+                <div className="pulse-soft flex h-10 w-10 items-center justify-center overflow-hidden rounded-full sm:h-11 sm:w-11 lg:h-11 lg:w-11">
                   <img
                     src="/logo-farmers-market.png"
                     alt="Farmers Market logo"
-                    className="h-8 w-8 rounded-full object-contain brightness-[1.2] contrast-[1.08] saturate-[1.18] sm:h-9 sm:w-9 lg:h-9 lg:w-9"
+                    className="h-full w-full rounded-full object-cover"
                   />
                 </div>
                 <span className="hidden min-w-0 whitespace-nowrap text-[0.98rem] font-semibold leading-none tracking-[-0.01em] text-stone-950 sm:block lg:text-base">
-                  Farmers Market
+                  Fresh from the Farm
                 </span>
               </Link>
 
@@ -1050,15 +1050,15 @@ export function LandingPage() {
             <div className="col-span-2">
               <Link
                 to="/"
-                className="inline-flex items-center gap-3 rounded-full border border-stone-700/80 bg-white px-2 py-1.5 pr-4 shadow-[0_10px_28px_rgba(15,23,42,0.12)]"
+                className="inline-flex items-center gap-3 tap-highlight-none"
               >
                 <img
                   src="/logo-farmers-market.png"
                   alt="Farmers Market logo"
-                  className="h-12 w-12 rounded-full bg-white object-contain p-1 brightness-110 contrast-110 saturate-125"
+                  className="h-12 w-12 rounded-full object-cover"
                 />
                 <span className="text-sm font-semibold tracking-[-0.01em] text-white">
-                  Farmers Market
+                  Fresh from the Farm
                 </span>
               </Link>
               <p className="text-sm leading-relaxed mb-6 max-w-xs">
