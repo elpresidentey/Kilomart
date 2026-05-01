@@ -630,7 +630,7 @@ export function LandingPage() {
       </header>
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden pb-14 pt-10 lg:pb-20 lg:pt-12">
+      <section className="relative overflow-hidden pb-12 pt-8 lg:pb-20 lg:pt-12">
         {/* Background Decorations */}
         <div className="absolute inset-0 -z-10">
           <div className="absolute left-[-3rem] top-10 h-72 w-72 rounded-full bg-stone-100/80 blur-3xl" />
@@ -639,9 +639,9 @@ export function LandingPage() {
         </div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-[minmax(0,0.92fr)_minmax(0,1.18fr)] gap-10 lg:gap-14 items-center">
+          <div className="grid items-center gap-8 lg:grid-cols-[minmax(0,0.92fr)_minmax(0,1.18fr)] lg:gap-14">
             {/* Left Content */}
-            <div className="fade-up space-y-5 lg:space-y-4 max-w-lg">
+            <div className="fade-up max-w-lg space-y-4 lg:space-y-4">
               <h1 className="text-4xl sm:text-[3.2rem] lg:text-[3.7rem] font-bold text-stone-900 leading-[1.05]">
                 {copy.heroTitleTop}
                 <span className="block text-primary-700">
@@ -653,7 +653,7 @@ export function LandingPage() {
                 {copy.heroSub}
               </p>
 
-              <div className="fade-up fade-up-delay-2 flex flex-col sm:flex-row gap-4">
+              <div className="fade-up fade-up-delay-2 flex flex-col gap-3 sm:flex-row sm:gap-4">
                 <Link to="/marketplace">
                   <Button size="lg" className="group motion-lift motion-press w-full bg-primary-600 shadow-lg shadow-primary-500/20 sm:w-auto">
                     Explore Marketplace
@@ -670,7 +670,7 @@ export function LandingPage() {
               </div>
 
               {/* Trust Badges */}
-              <div className="fade-up fade-up-delay-3 flex items-center gap-4 pt-2">
+              <div className="fade-up fade-up-delay-3 flex items-center gap-4 pt-1">
                 <div className="flex -space-x-3">
                   {[1, 2, 3, 4].map((i) => (
                     <div

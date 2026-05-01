@@ -54,7 +54,6 @@ export function Layout({ children, cartItemCount }: LayoutProps) {
   const [operationsMenuOpen, setOperationsMenuOpen] = useState(false)
   const [accountMenuOpen, setAccountMenuOpen] = useState(false)
   const [mobileOrdersOpen, setMobileOrdersOpen] = useState(false)
-  const [mobileOperationsOpen, setMobileOperationsOpen] = useState(false)
   const isLandingPage = location.pathname === '/'
   const ordersMenuRef = useRef<HTMLDivElement | null>(null)
   const operationsMenuRef = useRef<HTMLDivElement | null>(null)
@@ -85,7 +84,6 @@ export function Layout({ children, cartItemCount }: LayoutProps) {
     setOperationsMenuOpen(false)
     setAccountMenuOpen(false)
     setMobileOrdersOpen(false)
-    setMobileOperationsOpen(false)
   }, [location.pathname, location.search])
 
   useEffect(() => {
@@ -426,12 +424,12 @@ export function Layout({ children, cartItemCount }: LayoutProps) {
               {/* Logo */}
               <Link
                 to="/"
-                className="flex items-center gap-2 lg:gap-3 rounded-xl tap-highlight-none motion-safe:transition-transform motion-safe:duration-200 motion-safe:active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
+                className="flex items-center gap-2 lg:gap-3 tap-highlight-none motion-safe:transition-opacity motion-safe:duration-200 hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
               >
                 <img
                   src="/logo-farmers-market.png"
                   alt="Farmers Market logo"
-                  className="h-11 w-auto sm:h-12 lg:h-14"
+                  className="h-11 w-auto sm:h-12 lg:h-14 drop-shadow-sm"
                 />
               </Link>
 
@@ -825,6 +823,38 @@ export function Layout({ children, cartItemCount }: LayoutProps) {
             </div>
 
             <nav className="px-4 py-3 space-y-4">
+              {operationsNavigation.length > 0 && (
+                <div className="rounded-2xl border border-amber-100 bg-amber-50/70 p-2">
+                  <div className="px-3 pt-2 pb-1">
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-amber-700">
+                      Operations
+                    </p>
+                    <p className="mt-1 text-xs text-amber-800/80">
+                      Logistics, storage, and warehouse tools.
+                    </p>
+                  </div>
+                  <div className="space-y-1">
+                    {operationsNavigation.map((item) => (
+                      <Link
+                        key={item.name}
+                        to={item.href}
+                        className={cn(
+                          'flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium tap-highlight-none',
+                          'motion-safe:transition-all motion-safe:duration-200 motion-safe:active:scale-[0.99]',
+                          isActive(item.href)
+                            ? 'bg-white text-amber-900 shadow-sm'
+                            : 'text-stone-700 hover:bg-white/80'
+                        )}
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        <item.icon className="w-5 h-5" />
+                        {item.name}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               <div className="space-y-1">
                 {mainNavigation.map((item) => {
                   const isOrdersDropdown =
@@ -898,52 +928,6 @@ export function Layout({ children, cartItemCount }: LayoutProps) {
                 })}
               </div>
 
-              {operationsNavigation.length > 0 && (
-                <div className="rounded-2xl border border-amber-100 bg-amber-50/70 p-2">
-                  <button
-                    type="button"
-                    onClick={() => setMobileOperationsOpen((v) => !v)}
-                    className={cn(
-                      'flex w-full items-center justify-between gap-3 rounded-xl px-4 py-3 text-sm font-semibold text-amber-800',
-                      'motion-safe:transition-all motion-safe:duration-200 motion-safe:active:scale-[0.99]',
-                      'hover:bg-amber-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2'
-                    )}
-                  >
-                    <span className="flex items-center gap-3">
-                      <Warehouse className="h-5 w-5" />
-                      Operations
-                    </span>
-                    <ChevronDown
-                      className={cn(
-                        'h-5 w-5 motion-safe:transition-transform motion-safe:duration-200',
-                        mobileOperationsOpen && 'motion-safe:rotate-180'
-                      )}
-                    />
-                  </button>
-
-                  {mobileOperationsOpen && (
-                    <div className="mt-2 space-y-1">
-                      {operationsNavigation.map((item) => (
-                        <Link
-                          key={item.name}
-                          to={item.href}
-                          className={cn(
-                            'flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium tap-highlight-none',
-                            'motion-safe:transition-all motion-safe:duration-200 motion-safe:active:scale-[0.99]',
-                            isActive(item.href)
-                              ? 'bg-white text-amber-800 shadow-sm'
-                              : 'text-stone-600 hover:bg-white/80'
-                          )}
-                          onClick={() => setMobileMenuOpen(false)}
-                        >
-                          <item.icon className="w-5 h-5" />
-                          {item.name}
-                        </Link>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              )}
               {user && (
                 <div className="rounded-2xl border border-stone-200 bg-white p-2 shadow-sm">
                   <div className="px-2 pb-2">
