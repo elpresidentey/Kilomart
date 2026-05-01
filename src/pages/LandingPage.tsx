@@ -360,22 +360,16 @@ export function LandingPage() {
   const testimonials = [
     {
       name: 'Adebayo Johnson',
-      role: 'Restaurant Owner, Lagos',
-      image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face',
       quote: 'Farmers Market has transformed how I source ingredients. Fresh produce delivered daily, and the per-kilo pricing helps me manage costs better.',
       rating: 5,
     },
     {
       name: 'Chioma Nwosu',
-      role: 'Home Cook, Abuja',
-      image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop&crop=face',
       quote: 'The quality of vegetables is unmatched. I can taste the difference - everything is genuinely farm fresh. Worth every naira!',
       rating: 5,
     },
     {
       name: 'Ibrahim Yusuf',
-      role: 'Catering Business, Kano',
-      image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=face',
       quote: 'As a caterer, I need consistent supply. Farmers Market connects me directly with reliable farmers. My orders have never been smoother.',
       rating: 5,
     },
@@ -962,17 +956,8 @@ export function LandingPage() {
                     "{testimonial.quote}"
                   </p>
                 </div>
-                <div className="flex items-center gap-4">
-                  <img
-                    src={sanitizeImageUrl(testimonial.image) ?? FALLBACK_IMAGE_SRC}
-                    alt={testimonial.name}
-                    onError={fallbackOnImageError}
-                    className="w-12 h-12 rounded-full object-cover"
-                  />
-                  <div>
-                    <p className="font-semibold text-stone-900">{testimonial.name}</p>
-                    <p className="text-sm text-stone-500">{testimonial.role}</p>
-                  </div>
+                <div className="pt-1">
+                  <p className="font-semibold text-stone-900">{testimonial.name}</p>
                 </div>
               </div>
             ))}
