@@ -97,7 +97,7 @@ function AppRoutes() {
       <Route
         path="/operations"
         element={
-          <ProtectedRoute allowedRoles={['farmer', 'warehouse_manager', 'logistics']}>
+          <ProtectedRoute>
             <Operations />
           </ProtectedRoute>
         }

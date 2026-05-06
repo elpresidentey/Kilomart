@@ -156,12 +156,14 @@ export function Layout({ children, cartItemCount }: LayoutProps) {
             { name: t('nav.logistics'), href: '/operations?view=logistics', icon: Truck },
             { name: t('nav.operations'), href: '/operations', icon: Warehouse },
           ]
-        : canAccessOperations(user.role)
+        : user.role === 'warehouse_manager'
           ? [
               { name: t('nav.operations'), href: '/operations', icon: Warehouse },
               { name: t('nav.logistics'), href: '/operations?view=logistics', icon: Truck },
             ]
-          : []
+          : [
+              { name: t('nav.operations'), href: '/operations', icon: Warehouse },
+            ]
     : []
 
   const accountNavigation = user
