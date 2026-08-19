@@ -79,7 +79,7 @@ export function Signup() {
             <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-primary-400 to-primary-500 shadow-lg ring-1 ring-inset ring-white/20">
               <Leaf className="h-6 w-6 text-white" />
             </span>
-            <span className="text-xl font-semibold text-white">Fresh from the Farm</span>
+            <span className="text-xl font-semibold text-white">Farmers Market</span>
           </Link>
 
           <div className="relative">

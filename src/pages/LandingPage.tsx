@@ -425,7 +425,7 @@ export function LandingPage() {
                   />
                 </div>
                 <span className="hidden min-w-0 whitespace-nowrap text-[0.98rem] font-semibold leading-none tracking-[-0.01em] text-stone-950 sm:block lg:text-base">
-                  Fresh from the Farm
+                  Farmers Market
                 </span>
               </Link>
 
@@ -1089,7 +1089,7 @@ export function LandingPage() {
                   className="h-12 w-12 rounded-full object-cover"
                 />
                 <span className="text-sm font-semibold tracking-[-0.01em] text-white">
-                  Fresh from the Farm
+                  Farmers Market
                 </span>
               </Link>
               <p className="text-sm leading-relaxed mb-6 max-w-xs">

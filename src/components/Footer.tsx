@@ -27,7 +27,7 @@ export function Footer() {
               <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-primary-500 to-primary-700 shadow-lg shadow-primary-900/40 ring-1 ring-inset ring-white/20">
                 <Leaf className="h-6 w-6 text-white" />
               </span>
-              <span className="text-xl font-semibold text-white">Fresh from the Farm</span>
+              <span className="text-xl font-semibold text-white">Farmers Market</span>
             </Link>
             <p className="mt-4 max-w-sm text-sm leading-relaxed text-primary-200/80">
               {t('footer.brandDescription')}
@@ -108,7 +108,7 @@ export function Footer() {
         </div>
 
         <div className="mt-14 flex flex-col items-center justify-between gap-4 border-t border-white/10 pt-6 text-xs text-primary-300/70 sm:flex-row">
-          <p>© {new Date().getFullYear()} Fresh from the Farm. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} Farmers Market. All rights reserved.</p>
           <p className="flex items-center gap-1.5">
             <Leaf className="h-3.5 w-3.5 text-primary-400" />
             Grown with care, delivered with trust
