@@ -83,14 +83,14 @@ export function Signup() {
           </Link>
 
           <div className="relative">
-            <p className="eyebrow mb-4 justify-start before:opacity-100 text-primary-200/90">
+            <p className="eyebrow mb-4 justify-start before:opacity-100 text-primary-100">
               Start selling
             </p>
-            <h1 className="font-display text-3xl font-semibold leading-tight tracking-tight sm:text-4xl">
+            <h1 className="font-display text-3xl font-semibold leading-tight tracking-tight sm:text-4xl text-white [text-shadow:0_1px_3px_rgba(5,41,31,0.35)]">
               Join the farm-to-table movement.{' '}
               <span className="block">Sell directly to buyers who value freshness.</span>
             </h1>
-            <p className="mt-5 max-w-md text-base text-primary-200/85">
+            <p className="mt-5 max-w-md text-base text-primary-100/90">
               List your produce by weight, set fair prices, and reach thousands of
               buyers across Nigeria — no middlemen.
             </p>
@@ -101,7 +101,7 @@ export function Signup() {
                 </span>
                 <div>
                   <p className="text-sm font-semibold text-white">Reach buyers directly</p>
-                  <p className="mt-0.5 text-sm text-primary-200/80">
+                  <p className="mt-0.5 text-sm text-primary-100/80">
                     No middlemen — sell at fair per-kilo prices.
                   </p>
                 </div>
@@ -112,7 +112,7 @@ export function Signup() {
                 </span>
                 <div>
                   <p className="text-sm font-semibold text-white">Grow your business</p>
-                  <p className="mt-0.5 text-sm text-primary-200/80">
+                  <p className="mt-0.5 text-sm text-primary-100/80">
                     Track orders, payments, and delivery in one dashboard.
                   </p>
                 </div>

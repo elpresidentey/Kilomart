@@ -69,11 +69,11 @@ export function Login() {
             <span className="text-xl font-semibold text-white">Fresh from the Farm</span>
           </Link>
           <div className="relative">
-            <p className="eyebrow mb-4 justify-start before:opacity-100 text-primary-200/90">Welcome back</p>
-            <h1 className="font-display text-3xl font-semibold leading-tight tracking-tight sm:text-4xl">
+            <p className="eyebrow mb-4 justify-start before:opacity-100 text-primary-100">Welcome back</p>
+            <h1 className="font-display text-3xl font-semibold leading-tight tracking-tight sm:text-4xl text-white [text-shadow:0_1px_3px_rgba(5,41,31,0.35)]">
               Good to see you again. <span className="block">Sign in to your fresh finds.</span>
             </h1>
-            <p className="mt-5 max-w-md text-base text-primary-200/85">
+            <p className="mt-5 max-w-md text-base text-primary-100/90">
               Pick up where you left off — your saved produce, orders, and preferences await.
             </p>
             <ul className="mt-10 grid gap-5 max-w-sm">
@@ -84,14 +84,14 @@ export function Login() {
                   </span>
                   <div>
                     <p className="text-sm font-semibold text-white">{item.label}</p>
-                    <p className="mt-0.5 text-sm text-primary-200/80">{item.desc}</p>
+                    <p className="mt-0.5 text-sm text-primary-100/80">{item.desc}</p>
                   </div>
                 </li>
               ))}
                         </ul>
           </div>
 
-          <p className="relative text-xs text-primary-200/60">
+          <p className="relative text-xs text-primary-200/80">
             © {new Date().getFullYear()} Fresh from the Farm.
           </p>
         </div>
