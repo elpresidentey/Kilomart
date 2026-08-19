@@ -51,7 +51,7 @@ export function SocialChannel() {
           Back to home
         </Link>
 
-        <h1 className="text-3xl font-bold text-stone-900 mb-2">Farmers Market on {info.title}</h1>
+        <h1 className="text-2xl font-bold text-stone-900 mb-2">Farmers Market on {info.title}</h1>
         <p className="text-stone-600 text-sm leading-relaxed mb-8">{info.description}</p>
 
         <a href={info.url} target="_blank" rel="noopener noreferrer" className="inline-flex">

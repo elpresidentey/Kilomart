@@ -29,7 +29,7 @@ export function Contact() {
           {t('static.backHome')}
         </Link>
 
-        <h1 className="text-3xl font-bold text-stone-900 mb-2">{t('contact.title')}</h1>
+        <h1 className="text-2xl font-bold text-stone-900 mb-2">{t('contact.title')}</h1>
         <p className="text-stone-600 mb-8">
           {t('contact.subtitle')}
           {topic !== 'general' && (

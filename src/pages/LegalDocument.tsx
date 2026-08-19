@@ -149,7 +149,7 @@ export function LegalDocument() {
         </Link>
 
         <article className="prose prose-stone max-w-none">
-          <h1 className="text-3xl font-bold text-stone-900 mb-6">{title}</h1>
+          <h1 className="text-2xl font-bold text-stone-900 mb-6">{title}</h1>
           <div className="space-y-4 text-stone-600 text-sm leading-relaxed">
             {body.map((p, i) => (
               <p key={`${kind}-${i}`}>{p}</p>

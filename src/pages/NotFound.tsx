@@ -31,7 +31,7 @@ export function NotFound() {
             </span>
           </div>
 
-          <h1 className="text-3xl font-display font-bold text-stone-900 mb-3">
+          <h1 className="text-2xl font-display font-bold text-stone-900 mb-3">
             Page Not Found
           </h1>
           <p className="text-stone-600 mb-8">

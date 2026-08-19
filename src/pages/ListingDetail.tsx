@@ -317,7 +317,7 @@ export function ListingDetail({ onAddToCart, cartItemCount }: ListingDetailProps
               <MapPin className="w-4 h-4" />
               <span>{listing.location}</span>
             </div>
-            <p className="text-3xl font-bold text-primary-700">
+            <p className="text-2xl font-bold text-primary-700">
               {formatPrice(listing.price_per_kg)}
               <span className="text-base font-normal text-stone-500">{copy.perKg}</span>
             </p>

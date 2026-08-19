@@ -218,7 +218,7 @@ export function Operations() {
                 </div>
                 <div>
                   <p className="text-sm text-stone-500">Warehouses</p>
-                  <p className="text-2xl font-bold text-stone-900">{totalWarehouses}</p>
+                  <p className="text-xl font-bold text-stone-900">{totalWarehouses}</p>
                 </div>
               </div>
             </Card>
@@ -229,7 +229,7 @@ export function Operations() {
                 </div>
                 <div>
                   <p className="text-sm text-stone-500">Inventory batches</p>
-                  <p className="text-2xl font-bold text-stone-900">{totalInventoryBatches}</p>
+                  <p className="text-xl font-bold text-stone-900">{totalInventoryBatches}</p>
                 </div>
               </div>
             </Card>
@@ -300,11 +300,11 @@ export function Operations() {
               <div className="grid min-w-[220px] gap-3 sm:grid-cols-3 lg:grid-cols-1">
                 <div className="rounded-2xl border border-amber-100 bg-white p-4 shadow-sm">
                   <p className="text-xs uppercase tracking-[0.18em] text-stone-500">Ready now</p>
-                  <p className="mt-2 text-2xl font-bold text-stone-900">{availableDrivers}</p>
+                  <p className="mt-2 text-xl font-bold text-stone-900">{availableDrivers}</p>
                 </div>
                 <div className="rounded-2xl border border-amber-100 bg-white p-4 shadow-sm">
                   <p className="text-xs uppercase tracking-[0.18em] text-stone-500">Near you</p>
-                  <p className="mt-2 text-2xl font-bold text-stone-900">{nearbyDrivers}</p>
+                  <p className="mt-2 text-xl font-bold text-stone-900">{nearbyDrivers}</p>
                 </div>
                 <div className="rounded-2xl border border-amber-100 bg-white p-4 shadow-sm">
                   <p className="text-xs uppercase tracking-[0.18em] text-stone-500">Selected</p>

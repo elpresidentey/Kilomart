@@ -336,7 +336,7 @@ export function Marketplace() {
             <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-stone-100 mb-6">
               <Search className="w-10 h-10 text-stone-400" />
             </div>
-            <h3 className="text-xl font-semibold text-stone-900 mb-2">No listings found</h3>
+            <h3 className="text-lg font-semibold text-stone-900 mb-2">No listings found</h3>
             <p className="text-stone-500 max-w-md mx-auto">
               Try adjusting your search or filters to find what you're looking for.
             </p>

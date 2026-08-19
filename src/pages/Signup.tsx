@@ -86,11 +86,11 @@ export function Signup() {
             <p className="eyebrow mb-4 justify-start before:opacity-100 text-primary-200/90">
               Start selling
             </p>
-            <h1 className="font-display text-4xl font-semibold leading-tight tracking-tight sm:text-5xl">
+            <h1 className="font-display text-3xl font-semibold leading-tight tracking-tight sm:text-4xl">
               Join the farm-to-table movement.{' '}
               <span className="block">Sell directly to buyers who value freshness.</span>
             </h1>
-            <p className="mt-6 max-w-md text-lg text-primary-200/85">
+            <p className="mt-5 max-w-md text-base text-primary-200/85">
               List your produce by weight, set fair prices, and reach thousands of
               buyers across Nigeria — no middlemen.
             </p>
@@ -125,7 +125,7 @@ export function Signup() {
         <div className="flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
           <Card className="w-full max-w-md border border-stone-100 bg-white/95 shadow-overlay" padding="lg">
             <div className="text-center mb-8">
-              <h2 className="font-display text-2xl font-bold text-stone-900">
+              <h2 className="font-display text-xl font-bold text-stone-900">
                 {t('auth.signup.title')}
               </h2>
               <p className="mt-1 text-stone-500">{t('auth.signup.subtitle')}</p>

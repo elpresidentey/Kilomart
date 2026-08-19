@@ -235,7 +235,7 @@ export function BuyerDashboard() {
             <div className="flex items-start justify-between">
               <div>
                 <p className="text-sm text-stone-500 mb-1">{copy.totalOrders}</p>
-                <p className="text-2xl font-bold text-stone-900">{stats.totalOrders}</p>
+                <p className="text-xl font-bold text-stone-900">{stats.totalOrders}</p>
               </div>
               <div className="p-2.5 bg-primary-100 rounded-xl ring-1 ring-inset ring-primary-600/10">
                 <ShoppingBag className="w-5 h-5 text-primary-700" />
@@ -247,7 +247,7 @@ export function BuyerDashboard() {
             <div className="flex items-start justify-between">
               <div>
                 <p className="text-sm text-stone-500 mb-1">{copy.activeOrders}</p>
-                <p className="text-2xl font-bold text-blue-600">{stats.activeOrders}</p>
+                <p className="text-xl font-bold text-blue-600">{stats.activeOrders}</p>
               </div>
               <div className="p-2.5 bg-blue-100 rounded-xl ring-1 ring-inset ring-blue-600/10">
                 <Clock className="w-5 h-5 text-blue-700" />
@@ -259,7 +259,7 @@ export function BuyerDashboard() {
             <div className="flex items-start justify-between">
               <div>
                 <p className="text-sm text-stone-500 mb-1">{copy.totalSpent}</p>
-                <p className="text-2xl font-bold text-stone-900">{formatCurrency(stats.totalSpent)}</p>
+                <p className="text-xl font-bold text-stone-900">{formatCurrency(stats.totalSpent)}</p>
               </div>
               <div className="p-2.5 bg-amber-100 rounded-xl ring-1 ring-inset ring-amber-600/10">
                 <CreditCard className="w-5 h-5 text-amber-700" />
@@ -271,7 +271,7 @@ export function BuyerDashboard() {
             <div className="flex items-start justify-between">
               <div>
                 <p className="text-sm text-stone-500 mb-1">{copy.favorites}</p>
-                <p className="text-2xl font-bold text-stone-900">{stats.favoritesCount}</p>
+                <p className="text-xl font-bold text-stone-900">{stats.favoritesCount}</p>
               </div>
               <div className="p-2.5 bg-red-100 rounded-xl ring-1 ring-inset ring-red-600/10">
                 <Heart className="w-5 h-5 text-red-700" />

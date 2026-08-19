@@ -432,7 +432,7 @@ export function Layout({ children, cartItemCount }: LayoutProps) {
         {/* Main Navigation */}
         <div className="bg-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center justify-between h-16 lg:h-16">
+            <div className="flex items-center justify-between h-14">
               {/* Logo */}
               <Link
                 to="/"
@@ -441,7 +441,7 @@ export function Layout({ children, cartItemCount }: LayoutProps) {
                 <img
                   src="/logo-farmers-market.png"
                   alt="Farmers Market logo"
-                  className="h-11 w-auto sm:h-12 lg:h-14 drop-shadow-sm"
+                  className="h-9 w-auto sm:h-10 lg:h-11 drop-shadow-sm"
                 />
               </Link>
 
@@ -811,7 +811,7 @@ className={cn(
                   onChange={(e) => setHeaderSearch(e.target.value)}
                   placeholder={t('search.placeholderMobile')}
                   ref={mobileSearchRef}
-                  className="w-full pl-10 pr-4 py-3 bg-stone-50 border border-stone-200 rounded-xl text-sm shadow-soft focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/80 transition-all duration-200"
+                  className="w-full pl-10 pr-4 py-2.5 bg-stone-50 border border-stone-200 rounded-xl text-sm shadow-soft focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/80 transition-all duration-200"
                 />
                 <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400 pointer-events-none" />
               </div>

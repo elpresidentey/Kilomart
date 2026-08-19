@@ -22,7 +22,7 @@ export function About() {
             <Leaf className="w-6 h-6 text-white" />
           </div>
           <div>
-            <h1 className="text-3xl font-bold text-stone-900">{t('about.title')}</h1>
+            <h1 className="text-2xl font-bold text-stone-900">{t('about.title')}</h1>
             <p className="text-stone-600">{t('about.subtitle')}</p>
           </div>
         </div>

@@ -181,7 +181,7 @@ export function FarmerDashboard() {
             <div className="flex items-start justify-between">
               <div>
                 <p className="text-sm text-stone-500 mb-1">{copy.totalListings}</p>
-                <p className="text-2xl font-bold text-stone-900">
+                <p className="text-xl font-bold text-stone-900">
                   {stats.totalListings}
                 </p>
               </div>
@@ -195,7 +195,7 @@ export function FarmerDashboard() {
             <div className="flex items-start justify-between">
               <div>
                 <p className="text-sm text-stone-500 mb-1">{copy.activeListings}</p>
-                <p className="text-2xl font-bold text-stone-900">
+                <p className="text-xl font-bold text-stone-900">
                   {stats.activeListings}
                 </p>
               </div>
@@ -209,7 +209,7 @@ export function FarmerDashboard() {
             <div className="flex items-start justify-between">
               <div>
                 <p className="text-sm text-stone-500 mb-1">{copy.totalSales}</p>
-                <p className="text-2xl font-bold text-stone-900">
+                <p className="text-xl font-bold text-stone-900">
                   {stats.totalSales}
                 </p>
               </div>
@@ -223,7 +223,7 @@ export function FarmerDashboard() {
             <div className="flex items-start justify-between">
               <div>
                 <p className="text-sm text-stone-500 mb-1">{copy.totalEarnings}</p>
-                <p className="text-2xl font-bold text-primary-700">
+                <p className="text-xl font-bold text-primary-700">
                   {formatCurrency(stats.totalEarnings)}
                 </p>
               </div>

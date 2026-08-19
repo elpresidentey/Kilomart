@@ -22,7 +22,7 @@ export function Careers() {
             <Briefcase className="w-8 h-8" />
           </div>
           <div>
-            <h1 className="text-3xl font-bold text-stone-900">{t('careers.title')}</h1>
+            <h1 className="text-2xl font-bold text-stone-900">{t('careers.title')}</h1>
             <p className="text-stone-600">{t('careers.subtitle')}</p>
           </div>
         </div>

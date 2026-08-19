@@ -411,13 +411,13 @@ export function LandingPage() {
         {/* Main Navigation */}
         <div className="bg-white/90">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex h-16 items-center justify-between gap-3 lg:h-16">
+            <div className="flex h-14 items-center justify-between gap-3">
               {/* Logo */}
               <Link
                 to="/"
                 className="inline-flex items-center gap-3 tap-highlight-none motion-safe:transition-opacity motion-safe:duration-200 hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
               >
-                <div className="pulse-soft flex h-10 w-10 items-center justify-center overflow-hidden rounded-full sm:h-11 sm:w-11 lg:h-11 lg:w-11">
+                <div className="pulse-soft flex h-9 w-9 items-center justify-center overflow-hidden rounded-full sm:h-10 sm:w-10 lg:h-10 lg:w-10">
                   <img
                     src="/logo-farmers-market.png"
                     alt="Farmers Market logo"
