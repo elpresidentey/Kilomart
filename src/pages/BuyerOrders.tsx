@@ -207,7 +207,7 @@ export function BuyerOrders() {
             [...Array(3)].map((_, i) => (
               <Card key={i} className="animate-pulse" padding="lg">
                 <div className="flex gap-4">
-                  <div className="w-20 h-20 bg-stone-200 rounded-lg" />
+                  <div className="w-20 h-20 bg-stone-200 rounded-xl" />
                   <div className="flex-1 space-y-3">
                     <div className="h-5 bg-stone-200 rounded w-1/3" />
                     <div className="h-4 bg-stone-200 rounded w-1/4" />
@@ -226,7 +226,7 @@ export function BuyerOrders() {
               return (
                 <Card key={order.id} padding="lg">
                   <div className="flex flex-col sm:flex-row gap-4">
-                    <div className="w-full sm:w-24 h-24 bg-stone-100 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden">
+                    <div className="w-full sm:w-24 h-24 bg-stone-100 rounded-xl flex items-center justify-center flex-shrink-0 overflow-hidden">
                       <img
                         src={getProductImageSrc(thumb, order.listing?.product_name)}
                         alt=""

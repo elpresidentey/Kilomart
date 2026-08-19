@@ -369,8 +369,8 @@ export function Checkout() {
     return (
       <Layout cartItemCount={0}>
         <div className="max-w-2xl mx-auto py-16 text-center">
-          <div className="w-20 h-20 bg-stone-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <CreditCard className="w-10 h-10 text-stone-400" />
+          <div className="w-20 h-20 bg-gradient-to-br from-primary-50 to-primary-100 rounded-full flex items-center justify-center mx-auto mb-6 ring-1 ring-inset ring-primary-100">
+            <CreditCard className="w-10 h-10 text-primary-600" />
           </div>
           <h2 className="text-2xl font-bold text-stone-900 mb-2">{copy.cartEmptyTitle}</h2>
           <p className="text-stone-600 mb-6">{copy.cartEmptyBody}</p>
@@ -386,7 +386,7 @@ export function Checkout() {
     return (
       <Layout cartItemCount={0}>
         <div className="max-w-2xl mx-auto py-16 text-center">
-          <div className="w-20 h-20 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-6">
+          <div className="w-20 h-20 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-6 ring-1 ring-inset ring-primary-200">
             <CheckCircle className="w-10 h-10 text-primary-600" />
           </div>
           <h2 className="text-2xl font-bold text-stone-900 mb-2">{copy.orderPlaced}</h2>
@@ -421,9 +421,9 @@ export function Checkout() {
         <div className="grid lg:grid-cols-2 gap-8">
           {/* Delivery Information */}
           <div className="space-y-6">
-            <div className="bg-white rounded-xl border border-stone-200 p-6">
+            <div className="bg-white rounded-2xl border border-stone-100 shadow-card p-6">
               <div className="flex items-center gap-3 mb-6">
-                <div className="w-10 h-10 bg-stone-100 rounded-lg flex items-center justify-center">
+                <div className="w-10 h-10 bg-primary-50 rounded-xl flex items-center justify-center ring-1 ring-inset ring-primary-100">
                   <MapPin className="w-5 h-5 text-primary-600" />
                 </div>
                 <h2 className="text-lg font-semibold text-stone-900">{t('checkout.deliveryInfoTitle')}</h2>
@@ -441,7 +441,7 @@ export function Checkout() {
                       name="fullName"
                       value={deliveryInfo.fullName}
                       onChange={handleInputChange}
-                      className="w-full pl-10 pr-4 py-2 border border-stone-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                      className="w-full pl-10 pr-4 py-2.5 border border-stone-300 rounded-xl bg-white shadow-soft hover:border-stone-400 focus:ring-2 focus:ring-primary-500/70 focus:border-transparent"
                       placeholder={t('checkout.fullNamePlaceholder')}
                     />
                   </div>
@@ -458,7 +458,7 @@ export function Checkout() {
                       name="phone"
                       value={deliveryInfo.phone}
                       onChange={handleInputChange}
-                      className="w-full pl-10 pr-4 py-2 border border-stone-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                      className="w-full pl-10 pr-4 py-2.5 border border-stone-300 rounded-xl bg-white shadow-soft hover:border-stone-400 focus:ring-2 focus:ring-primary-500/70 focus:border-transparent"
                       placeholder={t('checkout.phonePlaceholder')}
                     />
                   </div>
@@ -473,7 +473,7 @@ export function Checkout() {
                     value={deliveryInfo.address}
                     onChange={handleInputChange}
                     rows={3}
-                    className="w-full px-4 py-2 border border-stone-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    className="w-full px-4 py-2.5 border border-stone-300 rounded-xl bg-white shadow-soft hover:border-stone-400 focus:ring-2 focus:ring-primary-500/70 focus:border-transparent"
                     placeholder={t('checkout.addressPlaceholder')}
                   />
                 </div>
@@ -488,7 +488,7 @@ export function Checkout() {
                       name="city"
                       value={deliveryInfo.city}
                       onChange={handleInputChange}
-                      className="w-full px-4 py-2 border border-stone-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                      className="w-full px-4 py-2.5 border border-stone-300 rounded-xl bg-white shadow-soft hover:border-stone-400 focus:ring-2 focus:ring-primary-500/70 focus:border-transparent"
                       placeholder={t('checkout.cityPlaceholder')}
                     />
                   </div>
@@ -501,7 +501,7 @@ export function Checkout() {
                       name="state"
                       value={deliveryInfo.state}
                       onChange={handleInputChange}
-                      className="w-full px-4 py-2 border border-stone-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                      className="w-full px-4 py-2.5 border border-stone-300 rounded-xl bg-white shadow-soft hover:border-stone-400 focus:ring-2 focus:ring-primary-500/70 focus:border-transparent"
                       placeholder={t('checkout.statePlaceholder')}
                     />
                   </div>
@@ -509,9 +509,9 @@ export function Checkout() {
               </div>
             </div>
 
-            <div className="bg-white rounded-xl border border-stone-200 p-6">
+            <div className="bg-white rounded-2xl border border-stone-100 shadow-card p-6">
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 bg-stone-100 rounded-lg flex items-center justify-center">
+                <div className="w-10 h-10 bg-primary-50 rounded-xl flex items-center justify-center ring-1 ring-inset ring-primary-100">
                   <CreditCard className="w-5 h-5 text-primary-600" />
                 </div>
                 <h2 className="text-lg font-semibold text-stone-900">{t('checkout.paymentTitle')}</h2>
@@ -520,11 +520,11 @@ export function Checkout() {
                 {t('checkout.paymentSubtitle')}
               </p>
               <div className="space-y-3">
-                <label className="flex items-start gap-3 p-3 rounded-lg border border-stone-200 has-[:checked]:border-primary-500 has-[:checked]:bg-primary-50/50 cursor-pointer">
+                <label className="flex items-start gap-3 p-3.5 rounded-xl border border-stone-200 shadow-soft transition-all cursor-pointer has-[:checked]:border-primary-500 has-[:checked]:bg-primary-50/50 has-[:checked]:shadow-md">
                   <input
                     type="radio"
                     name="pay"
-                    className="mt-1"
+                    className="mt-1 accent-primary-600"
                     checked={paymentMethod === 'paystack'}
                     onChange={() => setPaymentMethod('paystack')}
                   />
@@ -536,11 +536,11 @@ export function Checkout() {
                     </span>
                   </span>
                 </label>
-                <label className="flex items-start gap-3 cursor-pointer p-3 rounded-lg border border-stone-200 has-[:checked]:border-primary-500 has-[:checked]:bg-primary-50/50">
+                <label className="flex items-start gap-3 cursor-pointer p-3.5 rounded-xl border border-stone-200 shadow-soft transition-all has-[:checked]:border-primary-500 has-[:checked]:bg-primary-50/50 has-[:checked]:shadow-md">
                   <input
                     type="radio"
                     name="pay"
-                    className="mt-1"
+                    className="mt-1 accent-primary-600"
                     checked={paymentMethod === 'cash_on_delivery'}
                     onChange={() => setPaymentMethod('cash_on_delivery')}
                   />
@@ -549,11 +549,11 @@ export function Checkout() {
                     <span className="block text-sm text-stone-500">{t('checkout.codSub')}</span>
                   </span>
                 </label>
-                <label className="flex items-start gap-3 cursor-pointer p-3 rounded-lg border border-stone-200 has-[:checked]:border-primary-500 has-[:checked]:bg-primary-50/50">
+                <label className="flex items-start gap-3 cursor-pointer p-3.5 rounded-xl border border-stone-200 shadow-soft transition-all has-[:checked]:border-primary-500 has-[:checked]:bg-primary-50/50 has-[:checked]:shadow-md">
                   <input
                     type="radio"
                     name="pay"
-                    className="mt-1"
+                    className="mt-1 accent-primary-600"
                     checked={paymentMethod === 'bank_transfer'}
                     onChange={() => setPaymentMethod('bank_transfer')}
                   />
@@ -570,9 +570,9 @@ export function Checkout() {
 
           {/* Order Summary */}
           <div className="space-y-6">
-            <div className="bg-white rounded-xl border border-stone-200 p-6">
+            <div className="bg-white rounded-2xl border border-stone-100 shadow-card p-6">
               <div className="flex items-center gap-3 mb-6">
-                <div className="w-10 h-10 bg-stone-100 rounded-lg flex items-center justify-center">
+                <div className="w-10 h-10 bg-primary-50 rounded-xl flex items-center justify-center ring-1 ring-inset ring-primary-100">
                   <Truck className="w-5 h-5 text-primary-600" />
                 </div>
                 <h2 className="text-lg font-semibold text-stone-900">{t('checkout.orderSummaryTitle')}</h2>
@@ -611,8 +611,8 @@ export function Checkout() {
               </div>
 
               {error && (
-                <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-                  <p className="text-sm text-red-600">{error}</p>
+                <div className="mt-4 p-3.5 bg-red-50 border border-red-200/70 rounded-xl">
+                  <p className="text-sm text-red-700">{error}</p>
                   {debugHint && (
                     <p className="text-xs text-red-700/80 mt-2 break-all">{debugHint}</p>
                   )}

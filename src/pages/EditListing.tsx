@@ -335,7 +335,7 @@ export function EditListing() {
                   value={formData.category_id}
                   onChange={(e) => setFormData({ ...formData, category_id: e.target.value })}
                   required
-                  className="block w-full px-3 py-2.5 border border-stone-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  className="block w-full px-3.5 py-2.5 border border-stone-300 rounded-xl bg-white shadow-soft text-sm hover:border-stone-400 focus:outline-none focus:ring-2 focus:ring-primary-500/70 focus:border-transparent"
                 >
                   <option value="">Select a category</option>
                   {categories.map((cat) => (
@@ -441,7 +441,7 @@ export function EditListing() {
                   onChange={(e) =>
                     setFormData({ ...formData, status: e.target.value as ProduceListing['status'] })
                   }
-                  className="block w-full px-3 py-2.5 border border-stone-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  className="block w-full px-3.5 py-2.5 border border-stone-300 rounded-xl bg-white shadow-soft text-sm hover:border-stone-400 focus:outline-none focus:ring-2 focus:ring-primary-500/70 focus:border-transparent"
                 >
                   {STATUS_OPTIONS.map((option) => (
                     <option key={option.value} value={option.value}>
@@ -478,7 +478,7 @@ export function EditListing() {
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   rows={4}
-                  className="block w-full px-3 py-2.5 border border-stone-300 rounded-lg text-sm placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all resize-none"
+                  className="block w-full px-3.5 py-2.5 border border-stone-300 rounded-xl bg-white shadow-soft text-sm placeholder:text-stone-400 hover:border-stone-400 focus:outline-none focus:ring-2 focus:ring-primary-500/70 focus:border-transparent transition-all resize-none"
                 />
               </div>
             </div>

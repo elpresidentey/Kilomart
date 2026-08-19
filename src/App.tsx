@@ -1,4 +1,4 @@
-import { Suspense, lazy, type ReactNode } from 'react'
+import { Suspense, lazy, useEffect, type ReactNode } from 'react'
 import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import { ErrorBoundary } from './components/ErrorBoundary'
 import { ToastViewport } from './components/ToastViewport'
@@ -13,6 +13,23 @@ const loadingFallback = (
     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-700" />
   </div>
 )
+
+function ScrollToTop() {
+  const { pathname, hash } = useLocation()
+
+  useEffect(() => {
+    if (hash) {
+      const id = hash.replace(/^#/, '')
+      const timer = window.setTimeout(() => {
+        document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      }, 100)
+      return () => window.clearTimeout(timer)
+    }
+    window.scrollTo(0, 0)
+  }, [pathname, hash])
+
+  return null
+}
 
 const Marketplace = lazy(() => import('./pages/Marketplace').then((mod) => ({ default: mod.Marketplace })))
 const Login = lazy(() => import('./pages/Login').then((mod) => ({ default: mod.Login })))
@@ -197,6 +214,7 @@ function App() {
       <I18nProvider>
         <AuthProvider>
           <ErrorBoundary>
+            <ScrollToTop />
             <ToastViewport />
             <Suspense fallback={loadingFallback}>
               <AppRoutes />

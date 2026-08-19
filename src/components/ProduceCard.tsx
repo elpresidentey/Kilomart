@@ -136,7 +136,7 @@ export function ProduceCard({
       className="group motion-safe:animate-fade-in-up motion-reduce:animate-none"
     >
       {/* Image Area */}
-      <div className="relative bg-gradient-to-br from-stone-100 to-stone-200 h-44 flex items-center justify-center overflow-hidden">
+      <div className="relative aspect-[4/3] overflow-hidden bg-gradient-to-br from-stone-100 via-stone-50 to-primary-50/70">
         <Link
           to={`/listing/${listing.id}`}
           className="absolute inset-0 flex items-center justify-center z-0"
@@ -154,14 +154,14 @@ export function ProduceCard({
         
         {/* Quality Badge */}
         <div
-          className={`absolute top-3 left-3 z-10 ${quality.bg} ${quality.text} px-2 py-1 rounded-md text-xs font-semibold pointer-events-none shadow-sm transition-transform duration-300 motion-safe:group-hover:-translate-y-0.5`}
+          className={`absolute top-3 left-3 z-10 ${quality.bg} ${quality.text} px-2.5 py-1 rounded-full text-xs font-semibold pointer-events-none shadow-sm ring-1 ring-inset ring-white/50 backdrop-blur-sm transition-transform duration-300 motion-safe:group-hover:-translate-y-0.5`}
         >
           {quality.label}
         </div>
 
         {/* Stock Badge */}
         {listing.available_quantity < 100 && (
-          <div className="absolute top-3 right-3 z-10 bg-red-100 text-red-700 px-2 py-1 rounded-md text-xs font-semibold pointer-events-none shadow-sm transition-transform duration-300 motion-safe:group-hover:-translate-y-0.5">
+          <div className="absolute top-3 right-3 z-10 bg-red-100/90 text-red-700 px-2.5 py-1 rounded-full text-xs font-semibold pointer-events-none shadow-sm ring-1 ring-inset ring-white/50 backdrop-blur-sm transition-transform duration-300 motion-safe:group-hover:-translate-y-0.5">
             {copy.lowStock}
           </div>
         )}
@@ -186,7 +186,7 @@ export function ProduceCard({
         </div>
 
         <div>
-          <span className="inline-flex items-center rounded-full bg-stone-100 px-2.5 py-1 text-xs font-medium text-stone-700 transition-all duration-300 motion-safe:group-hover:bg-primary-50 motion-safe:group-hover:text-primary-700">
+          <span className="inline-flex items-center rounded-full bg-stone-100 px-2.5 py-1 text-xs font-medium text-stone-700 ring-1 ring-inset ring-stone-500/10 transition-all duration-300 motion-safe:group-hover:bg-primary-50 motion-safe:group-hover:text-primary-700 motion-safe:group-hover:ring-primary-600/10">
             Minimum order: {listing.min_order_kg || 1} kg
           </span>
         </div>
@@ -194,13 +194,13 @@ export function ProduceCard({
         {/* Price Row */}
         <div className="flex items-baseline justify-between transition-transform duration-300 motion-safe:group-hover:translate-y-[-1px]">
           <div>
-            <span className="text-xl font-bold text-primary-700 transition-colors duration-300 motion-safe:group-hover:text-primary-800">
+            <span className="text-xl font-bold tabular-nums text-primary-700 transition-colors duration-300 motion-safe:group-hover:text-primary-800">
               {formatPrice(listing.price_per_kg)}
             </span>
             <span className="text-sm text-stone-500">{copy.perKg}</span>
           </div>
           <span className="text-xs text-stone-400">
-            {listing.available_quantity.toLocaleString()} {copy.kgAvailable}
+            <span className="tabular-nums">{listing.available_quantity.toLocaleString()}</span> {copy.kgAvailable}
           </span>
         </div>
 
@@ -222,7 +222,7 @@ export function ProduceCard({
               >
                 <Minus className="w-4 h-4 text-stone-600" />
               </button>
-              <span className="w-12 text-center font-semibold text-stone-900">{quantity}</span>
+              <span className="w-12 text-center font-semibold tabular-nums text-stone-900">{quantity}</span>
               <button
                 type="button"
                 onClick={incrementQuantity}
@@ -238,7 +238,7 @@ export function ProduceCard({
         {/* Total Price */}
         <div className="flex items-center justify-between">
           <span className="text-sm text-stone-500">{copy.total}</span>
-          <span className="text-lg font-bold text-stone-900 transition-transform duration-300 motion-safe:group-hover:translate-x-0.5">
+          <span className="text-lg font-bold tabular-nums text-stone-900 transition-transform duration-300 motion-safe:group-hover:translate-x-0.5">
             {formatPrice(totalPrice)}
           </span>
         </div>

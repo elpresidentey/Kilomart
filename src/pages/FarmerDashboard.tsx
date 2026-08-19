@@ -185,7 +185,7 @@ export function FarmerDashboard() {
                   {stats.totalListings}
                 </p>
               </div>
-              <div className="p-2 bg-primary-100 rounded-lg">
+              <div className="p-2.5 bg-primary-100 rounded-xl ring-1 ring-inset ring-primary-600/10">
                 <Package className="w-5 h-5 text-primary-700" />
               </div>
             </div>
@@ -199,7 +199,7 @@ export function FarmerDashboard() {
                   {stats.activeListings}
                 </p>
               </div>
-              <div className="p-2 bg-blue-100 rounded-lg">
+              <div className="p-2.5 bg-blue-100 rounded-xl ring-1 ring-inset ring-blue-600/10">
                 <TrendingUp className="w-5 h-5 text-blue-700" />
               </div>
             </div>
@@ -213,7 +213,7 @@ export function FarmerDashboard() {
                   {stats.totalSales}
                 </p>
               </div>
-              <div className="p-2 bg-amber-100 rounded-lg">
+              <div className="p-2.5 bg-amber-100 rounded-xl ring-1 ring-inset ring-amber-600/10">
                 <ShoppingCart className="w-5 h-5 text-amber-700" />
               </div>
             </div>
@@ -227,7 +227,7 @@ export function FarmerDashboard() {
                   {formatCurrency(stats.totalEarnings)}
                 </p>
               </div>
-              <div className="p-2 bg-green-100 rounded-lg">
+              <div className="p-2.5 bg-green-100 rounded-xl ring-1 ring-inset ring-green-600/10">
                 <DollarSign className="w-5 h-5 text-green-700" />
               </div>
             </div>

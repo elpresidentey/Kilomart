@@ -247,9 +247,9 @@ export function ListingDetail({ onAddToCart, cartItemCount }: ListingDetailProps
     return (
       <Layout cartItemCount={cartItemCount}>
         <div className="max-w-4xl mx-auto py-12 animate-pulse space-y-4">
-          <div className="h-8 bg-stone-200 rounded w-1/3" />
-          <div className="h-64 bg-stone-200 rounded-xl" />
-          <div className="h-24 bg-stone-200 rounded" />
+          <div className="h-8 bg-stone-200 rounded-xl w-1/3" />
+          <div className="h-64 bg-stone-200 rounded-2xl" />
+          <div className="h-24 bg-stone-200 rounded-2xl" />
         </div>
       </Layout>
     )
@@ -259,7 +259,9 @@ export function ListingDetail({ onAddToCart, cartItemCount }: ListingDetailProps
     return (
       <Layout cartItemCount={cartItemCount}>
         <div className="max-w-lg mx-auto py-16 text-center">
-          <Package className="w-16 h-16 text-stone-300 mx-auto mb-4" />
+          <div className="w-20 h-20 bg-stone-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <Package className="w-10 h-10 text-stone-400" />
+          </div>
           <h1 className="text-xl font-bold text-stone-900 mb-2">{copy.notFoundTitle}</h1>
           <p className="text-stone-500 mb-6">{copy.notFoundBody}</p>
           <Button onClick={() => navigate('/marketplace')}>{copy.backToMarketplace}</Button>
@@ -301,7 +303,7 @@ export function ListingDetail({ onAddToCart, cartItemCount }: ListingDetailProps
 
           <div className="space-y-4">
             <div className="flex flex-wrap gap-2">
-              <span className={`${q.bg} ${q.text} px-2 py-1 rounded-md text-xs font-semibold`}>
+              <span className={`${q.bg} ${q.text} px-2.5 py-1 rounded-full text-xs font-semibold ring-1 ring-inset ring-white/50 shadow-sm`}>
                 {q.label}
               </span>
               {listing.category?.name && (
@@ -328,13 +330,13 @@ export function ListingDetail({ onAddToCart, cartItemCount }: ListingDetailProps
               </Card>
             )}
 
-            <div className="flex items-center justify-between p-3 bg-stone-50 rounded-lg max-w-sm">
+            <div className="flex items-center justify-between p-3 bg-stone-50 rounded-xl max-w-sm ring-1 ring-inset ring-stone-100">
               <span className="text-sm font-medium text-stone-700">{copy.quantity}</span>
               <div className="flex items-center gap-3">
                 <button
                   type="button"
                   onClick={() => setQuantity((q) => Math.max(minQ, q - 1))}
-                  className="w-9 h-9 flex items-center justify-center bg-white rounded-md shadow-sm"
+                  className="w-9 h-9 flex items-center justify-center bg-white rounded-xl shadow-soft hover:bg-stone-50 transition-colors motion-safe:active:scale-90 disabled:opacity-50"
                   disabled={quantity <= minQ}
                 >
                   <Minus className="w-4 h-4" />
@@ -343,7 +345,7 @@ export function ListingDetail({ onAddToCart, cartItemCount }: ListingDetailProps
                 <button
                   type="button"
                   onClick={() => setQuantity((q) => Math.min(listing.available_quantity, q + 1))}
-                  className="w-9 h-9 flex items-center justify-center bg-white rounded-md shadow-sm"
+                  className="w-9 h-9 flex items-center justify-center bg-white rounded-xl shadow-soft hover:bg-stone-50 transition-colors motion-safe:active:scale-90 disabled:opacity-50"
                   disabled={quantity >= listing.available_quantity}
                 >
                   <Plus className="w-4 h-4" />

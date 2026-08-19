@@ -234,7 +234,7 @@ export function FarmerOrders() {
                   <div className="flex flex-col sm:flex-row lg:flex-col gap-2 lg:items-end flex-shrink-0">
                     <label className="text-xs text-stone-500">{t('farmerOrders.orderStatusLabel')}</label>
                     <select
-                      className="px-3 py-2 border border-stone-200 rounded-lg text-sm bg-white min-w-[180px]"
+                      className="px-3.5 py-2 border border-stone-300 rounded-xl bg-white shadow-soft text-sm min-w-[180px] focus:outline-none focus:ring-2 focus:ring-primary-500/70 focus:border-transparent"
                       value={order.status}
                       disabled={updatingId === order.id}
                       onChange={(e) => updateOrderStatus(order.id, e.target.value as OrderStatus)}

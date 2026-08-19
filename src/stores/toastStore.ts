@@ -23,6 +23,11 @@ type ToastStore = {
 
 const activeTimers = new Map<string, number>()
 const DEFAULT_DURATION = 4500
+const MAX_VISIBLE_TOASTS = 4
+
+function toastKey(type: ToastType, title: string | undefined, message: string) {
+  return `${type}|${title ?? ''}|${message}`
+}
 
 function scheduleDismiss(id: string, dismissToast: (id: string) => void, durationMs: number) {
   if (typeof window === 'undefined') return
@@ -47,8 +52,18 @@ function createToastId() {
 export const useToastStore = create<ToastStore>((set, get) => ({
   toasts: [],
   pushToast: (toast) => {
+    const { toasts } = get()
+
+    const existing = toasts.find((item) => toastKey(item.type, item.title, item.message) === toastKey(toast.type, toast.title, toast.message))
+    if (existing) {
+      scheduleDismiss(existing.id, get().dismissToast, DEFAULT_DURATION)
+      return existing.id
+    }
+
     const id = createToastId()
-    set((state) => ({ toasts: [...state.toasts, { id, ...toast }] }))
+    const next = { id, ...toast }
+    const updated = toasts.length >= MAX_VISIBLE_TOASTS ? [...toasts.slice(toasts.length - MAX_VISIBLE_TOASTS + 1), next] : [...toasts, next]
+    set({ toasts: updated })
     scheduleDismiss(id, get().dismissToast, DEFAULT_DURATION)
     return id
   },

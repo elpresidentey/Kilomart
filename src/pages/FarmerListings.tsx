@@ -190,12 +190,14 @@ export function FarmerListings() {
         {loading ? (
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="rounded-xl border border-stone-100 animate-pulse h-40 bg-stone-100" />
+              <div key={i} className="rounded-2xl border border-stone-100 shadow-card animate-pulse h-40 bg-stone-100" />
             ))}
           </div>
         ) : listings.length === 0 ? (
           <Card className="text-center py-14" padding="lg">
-            <Package className="w-12 h-12 text-stone-300 mx-auto mb-4" />
+            <div className="w-16 h-16 bg-stone-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+              <Package className="w-8 h-8 text-stone-400" />
+            </div>
             <h2 className="text-lg font-semibold text-stone-900 mb-2">{copy.emptyTitle}</h2>
             <p className="text-stone-500 mb-6 max-w-md mx-auto">{copy.emptyBody}</p>
             <Link to="/listings/new">
@@ -210,7 +212,7 @@ export function FarmerListings() {
             {listings.map((listing) => (
               <Card key={listing.id} padding="lg" className="flex flex-col">
                 <div className="flex gap-3 mb-3">
-                  <div className="w-16 h-16 rounded-lg bg-stone-100 overflow-hidden flex-shrink-0 flex items-center justify-center">
+                  <div className="w-16 h-16 rounded-xl bg-stone-100 overflow-hidden flex-shrink-0 flex items-center justify-center">
                     <img
                       src={getProductImageSrc(listing.images?.[0], listing.product_name)}
                       alt=""

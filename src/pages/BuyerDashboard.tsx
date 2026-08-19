@@ -237,7 +237,7 @@ export function BuyerDashboard() {
                 <p className="text-sm text-stone-500 mb-1">{copy.totalOrders}</p>
                 <p className="text-2xl font-bold text-stone-900">{stats.totalOrders}</p>
               </div>
-              <div className="p-2 bg-primary-100 rounded-lg">
+              <div className="p-2.5 bg-primary-100 rounded-xl ring-1 ring-inset ring-primary-600/10">
                 <ShoppingBag className="w-5 h-5 text-primary-700" />
               </div>
             </div>
@@ -249,7 +249,7 @@ export function BuyerDashboard() {
                 <p className="text-sm text-stone-500 mb-1">{copy.activeOrders}</p>
                 <p className="text-2xl font-bold text-blue-600">{stats.activeOrders}</p>
               </div>
-              <div className="p-2 bg-blue-100 rounded-lg">
+              <div className="p-2.5 bg-blue-100 rounded-xl ring-1 ring-inset ring-blue-600/10">
                 <Clock className="w-5 h-5 text-blue-700" />
               </div>
             </div>
@@ -261,7 +261,7 @@ export function BuyerDashboard() {
                 <p className="text-sm text-stone-500 mb-1">{copy.totalSpent}</p>
                 <p className="text-2xl font-bold text-stone-900">{formatCurrency(stats.totalSpent)}</p>
               </div>
-              <div className="p-2 bg-amber-100 rounded-lg">
+              <div className="p-2.5 bg-amber-100 rounded-xl ring-1 ring-inset ring-amber-600/10">
                 <CreditCard className="w-5 h-5 text-amber-700" />
               </div>
             </div>
@@ -273,7 +273,7 @@ export function BuyerDashboard() {
                 <p className="text-sm text-stone-500 mb-1">{copy.favorites}</p>
                 <p className="text-2xl font-bold text-stone-900">{stats.favoritesCount}</p>
               </div>
-              <div className="p-2 bg-red-100 rounded-lg">
+              <div className="p-2.5 bg-red-100 rounded-xl ring-1 ring-inset ring-red-600/10">
                 <Heart className="w-5 h-5 text-red-700" />
               </div>
             </div>
@@ -309,8 +309,8 @@ export function BuyerDashboard() {
               ) : orders.length > 0 ? (
                 <div className="space-y-4">
                   {orders.slice(0, 3).map((order) => (
-                    <div key={order.id} className="flex items-center gap-4 p-4 bg-stone-50 rounded-lg">
-                      <div className="w-16 h-16 bg-stone-200 rounded-lg flex items-center justify-center">
+                    <div key={order.id} className="flex items-center gap-4 p-4 bg-stone-50 rounded-xl ring-1 ring-inset ring-stone-100">
+                      <div className="w-16 h-16 bg-stone-200 rounded-xl flex items-center justify-center">
                         <Package className="w-8 h-8 text-stone-400" />
                       </div>
                       <div className="flex-1">
@@ -358,8 +358,8 @@ export function BuyerDashboard() {
               {recentProducts.length > 0 ? (
                 <div className="grid sm:grid-cols-2 gap-4">
                   {recentProducts.map((product) => (
-                    <div key={product.id} className="flex gap-3 p-3 border border-stone-100 rounded-lg hover:shadow-md transition-shadow">
-                      <div className="w-20 h-20 bg-stone-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <div key={product.id} className="flex gap-3 p-3 border border-stone-100 rounded-xl hover:shadow-card transition-shadow hover:border-stone-200">
+                      <div className="w-20 h-20 bg-stone-100 rounded-xl flex items-center justify-center flex-shrink-0">
                         <Package className="w-8 h-8 text-stone-400" />
                       </div>
                       <div className="flex-1 min-w-0">
@@ -421,7 +421,7 @@ export function BuyerDashboard() {
                   <Link 
                     key={category} 
                     to={`/marketplace?category=${encodeURIComponent(category)}`}
-                    className="flex items-center justify-between p-3 bg-stone-50 rounded-lg hover:bg-stone-100 transition-colors"
+                    className="flex items-center justify-between p-3 bg-stone-50 rounded-xl hover:bg-stone-100 transition-colors"
                   >
                     <span className="font-medium text-stone-700">{category}</span>
                     <TrendingUp className="w-4 h-4 text-stone-400" />
@@ -433,7 +433,7 @@ export function BuyerDashboard() {
             {/* Tips Card */}
             <Card padding="lg" className="bg-gradient-to-br from-primary-50 to-primary-50 border-primary-100">
               <div className="flex items-start gap-3">
-                <div className="p-2 bg-primary-100 rounded-lg">
+                <div className="p-2.5 bg-primary-100 rounded-xl ring-1 ring-inset ring-primary-600/10">
                   <Star className="w-5 h-5 text-primary-700" />
                 </div>
                 <div>

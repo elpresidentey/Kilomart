@@ -246,10 +246,10 @@ export function Marketplace() {
                 <button
                   key={product}
                   onClick={() => setSelectedProduct(product)}
-                  className={`motion-lift motion-press px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
+                  className={`motion-lift motion-press px-3.5 py-1.5 rounded-full text-sm font-medium transition-all ${
                     selectedProduct === product
-                      ? 'bg-primary-100 text-primary-800'
-                      : 'bg-white text-stone-600 hover:bg-stone-100 border border-stone-200'
+                      ? 'bg-gradient-to-b from-primary-600 to-primary-700 text-white shadow-sm ring-1 ring-inset ring-primary-700'
+                      : 'bg-white text-stone-600 hover:bg-stone-100 hover:text-stone-900 border border-stone-200'
                   }`}
                 >
                   {product}
@@ -264,7 +264,7 @@ export function Marketplace() {
                 <select
                   value={selectedLocation}
                   onChange={(e) => setSelectedLocation(e.target.value)}
-                  className="px-3 py-2 border border-stone-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  className="select py-2 pl-3.5 pr-8 border border-stone-300 rounded-xl bg-white shadow-soft text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/70 focus:border-transparent"
                 >
                   {locations.map((loc) => (
                     <option key={loc.value} value={loc.value}>
@@ -279,7 +279,7 @@ export function Marketplace() {
                 <select
                   value={selectedGrade}
                   onChange={(e) => setSelectedGrade(e.target.value)}
-                  className="px-3 py-2 border border-stone-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  className="select py-2 pl-3.5 pr-8 border border-stone-300 rounded-xl bg-white shadow-soft text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/70 focus:border-transparent"
                 >
                   {qualityGrades.map((grade) => (
                     <option key={grade.value} value={grade.value}>
@@ -289,9 +289,10 @@ export function Marketplace() {
                 </select>
               </div>
 
-              <div className="flex items-center gap-2 text-sm text-stone-500">
-                <span>
-                  {filteredListings.length} {t('marketplace.listingsFound')}
+              <div className="flex items-center">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-stone-100 px-3 py-1.5 text-sm font-medium text-stone-600 ring-1 ring-inset ring-stone-500/10">
+                  <span className="font-bold tabular-nums text-primary-700">{filteredListings.length}</span>
+                  {t('marketplace.listingsFound')}
                 </span>
               </div>
             </div>
@@ -304,10 +305,10 @@ export function Marketplace() {
             {[...Array(8)].map((_, i) => (
               <div
                 key={i}
-                className="motion-safe:animate-fade-in-up bg-white rounded-xl border border-stone-100 p-4 overflow-hidden relative"
+                className="motion-safe:animate-fade-in-up bg-white rounded-2xl border border-stone-100 shadow-card p-4 overflow-hidden relative"
                 style={{ animationDelay: `${i * 45}ms` }}
               >
-                <div className="bg-stone-200 h-40 rounded-lg mb-4 relative overflow-hidden">
+                <div className="bg-stone-200 h-40 rounded-xl mb-4 relative overflow-hidden">
                   <div className="absolute inset-0 w-full motion-safe:animate-shimmer motion-reduce:animate-none bg-gradient-to-r from-transparent via-white/60 to-transparent" />
                 </div>
                 <div className="bg-stone-200 h-6 rounded w-3/4 mb-2 motion-safe:animate-pulse" />

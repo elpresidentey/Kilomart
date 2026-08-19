@@ -6,8 +6,7 @@ import { useI18n } from '../i18n/useI18n'
 import { Seo } from './Seo'
 import { PageTransition } from './PageTransition'
 import { Button } from './ui/Button'
-import {
-  Store,
+import { Store,
   Package,
   User,
   LogOut,
@@ -30,6 +29,7 @@ import { useCartStore, cartUnitsCount } from '../stores/cartStore'
 import { canAccessBuyerOrders, canAccessOperations } from '../lib/roles'
 import { getSiteUrl, toAbsoluteUrl } from '../lib/site'
 import type { Language } from '../i18n/strings'
+import { Footer } from './Footer'
 
 interface LayoutProps {
   children: ReactNode
@@ -72,11 +72,6 @@ export function Layout({ children, cartItemCount }: LayoutProps) {
       const q = new URLSearchParams(location.search).get('q') || ''
       setHeaderSearch(q)
     }
-  }, [location.pathname, location.search])
-
-  useEffect(() => {
-    if (location.pathname !== '/marketplace') return
-    window.scrollTo({ top: 0, left: 0, behavior: 'auto' })
   }, [location.pathname, location.search])
 
   useEffect(() => {
@@ -396,31 +391,33 @@ export function Layout({ children, cartItemCount }: LayoutProps) {
       {/* Header */}
       <header
         className={cn(
-          'sticky top-0 z-50 border-b border-transparent bg-white/90 backdrop-blur-md transition-[box-shadow,border-color] duration-300 ease-out',
-          headerElevated ? 'shadow-md shadow-stone-900/5 border-stone-200/80' : 'shadow-sm'
+          'sticky top-0 z-50 border-b bg-white/85 backdrop-blur-xl transition-[box-shadow,border-color] duration-300 ease-out',
+          headerElevated
+            ? 'shadow-[0_8px_30px_-12px_rgba(12,89,65,0.18)] border-stone-200/80'
+            : 'border-transparent'
         )}
       >
         {/* Top Bar */}
-        <div className="bg-stone-900 text-stone-300 text-xs py-2 hidden lg:block">
+        <div className="bg-gradient-to-r from-primary-950 via-primary-900 to-primary-950 text-primary-100/85 text-xs py-2 hidden lg:block">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
             <div className="flex items-center gap-6">
               <span className="flex items-center gap-1.5">
-                <Phone className="w-3.5 h-3.5" />
+                <Phone className="w-3.5 h-3.5 text-primary-300" />
                 {t('topbar.contactPhone')}
               </span>
               <span className="flex items-center gap-1.5">
-                <MapPin className="w-3.5 h-3.5" />
+                <MapPin className="w-3.5 h-3.5 text-primary-300" />
                 {t('topbar.location')}
               </span>
             </div>
             <div className="flex items-center gap-4">
-              <span>{t('topbar.freeDelivery')}</span>
-              <label className="inline-flex items-center gap-2 text-stone-300">
-                <Globe className="w-3.5 h-3.5" />
+              <span className="hidden xl:inline text-primary-200/80">{t('topbar.freeDelivery')}</span>
+              <label className="inline-flex items-center gap-2 text-primary-200/80">
+                <Globe className="w-3.5 h-3.5 text-primary-300" />
                 <select
                   value={language}
                   onChange={(e) => setLanguage(parseLanguage(e.target.value))}
-                  className="bg-stone-900 border border-stone-700 rounded px-2 py-1 text-xs text-stone-100"
+                  className="rounded-lg border border-primary-700/60 bg-primary-900/70 px-3 py-1.5 text-xs text-primary-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-400/70"
                 >
                   <option value="en">English</option>
                   <option value="ha">Hausa</option>
@@ -459,7 +456,7 @@ export function Layout({ children, cartItemCount }: LayoutProps) {
                     value={headerSearch}
                     onChange={(e) => setHeaderSearch(e.target.value)}
                     placeholder={t('search.placeholder')}
-                    className="w-full pl-10 pr-4 py-2.5 bg-stone-50 border border-stone-200 rounded-full text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/80 focus-visible:border-primary-200/50 transition-all duration-200"
+                    className="w-full pl-10 pr-4 py-2.5 bg-stone-50 border border-stone-200 rounded-full text-sm shadow-soft focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/80 focus-visible:border-transparent transition-all duration-200"
                   />
                   <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400 pointer-events-none" />
                 </div>
@@ -477,8 +474,8 @@ export function Layout({ children, cartItemCount }: LayoutProps) {
                         <Link
                           key={item.name}
                           to={item.href}
-                          className={cn(
-                            'relative flex items-center gap-1 px-2.5 lg:px-3 py-1.5 rounded-lg text-sm font-medium tap-highlight-none',
+className={cn(
+                            'relative flex items-center gap-1 px-2.5 lg:px-3 py-1.5 rounded-xl text-sm font-medium tap-highlight-none',
                             'motion-safe:transition-all motion-safe:duration-200 motion-safe:active:scale-[0.98]',
                             'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2',
                             isActive(item.href)
@@ -502,14 +499,14 @@ export function Layout({ children, cartItemCount }: LayoutProps) {
 
                     return (
                       <div key={item.name} className="relative" ref={ordersMenuRef}>
-                        <button
+<button
                           type="button"
                           aria-label="Orders: open menu for My orders and Pending orders"
                           aria-haspopup="menu"
                           aria-expanded={ordersMenuOpen}
                           onClick={() => setOrdersMenuOpen((v) => !v)}
                           className={cn(
-                            'relative flex items-center gap-1 px-2.5 lg:px-3 py-1.5 rounded-lg text-sm font-medium tap-highlight-none',
+                            'relative flex items-center gap-1 px-2.5 lg:px-3 py-1.5 rounded-xl text-sm font-medium tap-highlight-none',
                             'motion-safe:transition-all motion-safe:duration-200 motion-safe:active:scale-[0.98]',
                             'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2',
                             activeOrders
@@ -533,14 +530,14 @@ export function Layout({ children, cartItemCount }: LayoutProps) {
                         </button>
 
                         {ordersMenuOpen && (
-                          <div
+<div
                             role="menu"
-                            className="absolute left-0 mt-2 w-48 rounded-xl border border-stone-200 bg-white shadow-lg shadow-stone-900/10 p-1"
+                            className="absolute left-0 mt-2 w-48 rounded-2xl border border-stone-200 bg-white shadow-overlay p-1.5"
                           >
                             <Link
                               to="/orders"
                               role="menuitem"
-                              className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-stone-700 hover:bg-stone-50"
+                              className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-stone-700 hover:bg-stone-50"
                               onClick={() => setOrdersMenuOpen(false)}
                             >
                               <Package className="w-4 h-4" />
@@ -549,7 +546,7 @@ export function Layout({ children, cartItemCount }: LayoutProps) {
                             <Link
                               to="/orders?status=pending"
                               role="menuitem"
-                              className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-stone-700 hover:bg-stone-50"
+                              className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-stone-700 hover:bg-stone-50"
                               onClick={() => setOrdersMenuOpen(false)}
                             >
                               <ClipboardList className="w-4 h-4" />
@@ -587,10 +584,10 @@ export function Layout({ children, cartItemCount }: LayoutProps) {
                       />
                     </button>
 
-                    {operationsMenuOpen && (
+{operationsMenuOpen && (
                       <div
                         role="menu"
-                        className="absolute right-0 mt-2 w-64 rounded-2xl border border-amber-100 bg-white p-2 shadow-xl shadow-stone-900/10"
+                        className="absolute right-0 mt-2 w-64 rounded-2xl border border-amber-100 bg-white p-2 shadow-overlay"
                       >
                         <div className="px-3 py-2">
                           <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-amber-700">
@@ -702,10 +699,10 @@ export function Layout({ children, cartItemCount }: LayoutProps) {
                           />
                         </button>
 
-                        {accountMenuOpen && (
+{accountMenuOpen && (
                           <div
                             role="menu"
-                            className="absolute right-0 mt-2 w-56 rounded-2xl border border-stone-200 bg-white p-2 shadow-xl shadow-stone-900/10"
+                            className="absolute right-0 mt-2 w-56 rounded-2xl border border-stone-200 bg-white p-2 shadow-overlay"
                           >
                             <div className="px-3 py-2">
                               <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-stone-500">
@@ -805,16 +802,16 @@ export function Layout({ children, cartItemCount }: LayoutProps) {
               : 'max-h-0 border-transparent pointer-events-none'
           )}
         >
-          <div className="pointer-events-auto">
-            <form onSubmit={submitHeaderSearch} className="px-4 py-3 border-b border-stone-100">
+          <div className="pointer-events-auto max-h-[min(85vh,560px)] overflow-y-auto overscroll-contain">
+            <form onSubmit={submitHeaderSearch} className="sticky top-0 z-10 border-b border-stone-100 bg-white px-4 py-3">
               <div className="relative">
-                <input
+<input
                   type="search"
                   value={headerSearch}
                   onChange={(e) => setHeaderSearch(e.target.value)}
                   placeholder={t('search.placeholderMobile')}
                   ref={mobileSearchRef}
-                  className="w-full pl-10 pr-4 py-3 bg-stone-50 border border-stone-200 rounded-lg text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/80 transition-all duration-200"
+                  className="w-full pl-10 pr-4 py-3 bg-stone-50 border border-stone-200 rounded-xl text-sm shadow-soft focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/80 transition-all duration-200"
                 />
                 <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400 pointer-events-none" />
               </div>
@@ -827,7 +824,7 @@ export function Layout({ children, cartItemCount }: LayoutProps) {
                 <select
                   value={language}
                   onChange={(e) => setLanguage(parseLanguage(e.target.value))}
-                  className="ml-auto min-w-0 flex-1 max-w-[10rem] rounded-lg border border-stone-200 bg-white px-3 py-2 text-sm text-stone-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/80"
+                  className="select ml-auto min-w-0 flex-1 max-w-[10rem] rounded-lg border border-stone-200 bg-white py-2 pl-3 pr-8 text-sm text-stone-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/80"
                 >
                   <option value="en">English</option>
                   <option value="ha">Hausa</option>
@@ -837,7 +834,7 @@ export function Layout({ children, cartItemCount }: LayoutProps) {
               </label>
             </div>
 
-            <nav className="px-4 py-3 space-y-4">
+            <nav className="space-y-4 px-4 py-3">
               <div className="space-y-1">
                 {mobileNavigation.map((item) => {
                   const isOrdersDropdown =
@@ -1070,6 +1067,9 @@ export function Layout({ children, cartItemCount }: LayoutProps) {
       >
         <PageTransition key={location.pathname}>{children}</PageTransition>
       </main>
+
+      {/* Footer */}
+      <Footer />
     </div>
   )
 }

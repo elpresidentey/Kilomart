@@ -57,12 +57,12 @@ export function ToastViewport() {
             key={toast.id}
             role={toast.type === 'error' ? 'alert' : 'status'}
             className={cn(
-              'pointer-events-auto flex items-start gap-3 rounded-2xl border px-4 py-3 shadow-lg backdrop-blur',
+              'pointer-events-auto flex items-start gap-3 rounded-2xl border px-4 py-3.5 shadow-float backdrop-blur-md',
               'motion-safe:animate-fade-in-up motion-reduce:animate-none',
               tone.wrapper,
             )}
           >
-            <div className={cn('mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/70', tone.icon)}>
+            <div className={cn('mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/80 ring-1 ring-inset ring-black/5', tone.icon)}>
               <Icon className="h-5 w-5" />
             </div>
             <div className="min-w-0 flex-1">

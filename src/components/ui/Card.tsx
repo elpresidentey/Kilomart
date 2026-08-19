@@ -22,11 +22,11 @@ const Card = forwardRef<HTMLDivElement, CardProps>(
       <div
         ref={ref}
         className={cn(
-          'group relative overflow-hidden bg-white rounded-xl shadow-sm border border-stone-100',
+          'group relative overflow-hidden bg-white rounded-2xl shadow-card border border-stone-100',
           'transform-gpu will-change-transform',
           'motion-safe:transition-[transform,box-shadow,border-color,background-color] motion-safe:duration-300 motion-safe:ease-out',
-          'motion-safe:hover:-translate-y-1 motion-safe:hover:shadow-[0_18px_50px_rgba(15,23,42,0.10)] motion-safe:hover:border-stone-200/90',
-          'motion-safe:active:scale-[0.995] motion-safe:focus-within:-translate-y-1 motion-safe:focus-within:shadow-[0_18px_50px_rgba(15,23,42,0.10)]',
+          'motion-safe:hover:-translate-y-1 motion-safe:hover:shadow-[0_22px_60px_-12px_rgba(12,89,65,0.16)] motion-safe:hover:border-primary-200/80',
+          'motion-safe:active:scale-[0.995] motion-safe:focus-within:-translate-y-1 motion-safe:focus-within:shadow-[0_22px_60px_-12px_rgba(12,89,65,0.16)]',
           interactive &&
             'cursor-default',
           paddings[padding],
@@ -34,7 +34,7 @@ const Card = forwardRef<HTMLDivElement, CardProps>(
         )}
         {...props}
       >
-        <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary-200/70 to-transparent opacity-0 transition-opacity duration-300 motion-safe:group-hover:opacity-100" />
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary-300/70 to-transparent opacity-0 transition-opacity duration-300 motion-safe:group-hover:opacity-100" />
         {children}
       </div>
     )

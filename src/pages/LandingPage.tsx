@@ -1,10 +1,10 @@
 import { useState, useEffect, type FormEvent } from 'react'
-import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { Button } from '../components/ui'
 import { useAuth } from '../hooks/useAuth'
 import { useCartStore, cartUnitsCount } from '../stores/cartStore'
 import { ThreeParticlesField } from '../components/ThreeParticlesField'
-import { fallbackOnImageError, sanitizeImageUrl, FALLBACK_IMAGE_SRC } from '../lib/image'
+import { fallbackOnImageError } from '../lib/image'
 import { useI18n } from '../i18n/useI18n'
 import heroVideo from '../../Hero image/4K Cinematic Drone view village Highway l Free  Drone Video l Free stock footage l Copyright free.mp4'
 import { 
@@ -44,7 +44,6 @@ export function LandingPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const { user, signOut } = useAuth()
   const cartItemCount = useCartStore((s) => cartUnitsCount(s.cart))
-  const location = useLocation()
   const navigate = useNavigate()
   const { language, setLanguage, t } = useI18n()
   function parseLanguage(raw: string) {
@@ -56,16 +55,6 @@ export function LandingPage() {
   const [newsletterStatus, setNewsletterStatus] = useState<'idle' | 'ok' | 'invalid'>('idle')
   const [heroVideoReady, setHeroVideoReady] = useState(false)
   const [heroVideoError, setHeroVideoError] = useState(false)
-
-  useEffect(() => {
-    if (location.pathname !== '/') return
-    const id = location.hash.replace(/^#/, '')
-    if (!id) return
-    const t = window.setTimeout(() => {
-      document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-    }, 100)
-    return () => window.clearTimeout(t)
-  }, [location.pathname, location.hash])
 
   useEffect(() => {
     let cancelled = false
@@ -388,26 +377,26 @@ export function LandingPage() {
       {/* Header */}
       <header className="sticky top-0 z-50 border-b border-stone-200 bg-white/95 shadow-[0_14px_40px_rgba(15,23,42,0.06)] backdrop-blur">
         {/* Top Bar */}
-        <div className="bg-stone-900 text-stone-300 text-xs py-2 hidden lg:block">
+        <div className="bg-primary-950 text-primary-100/85 text-xs py-2 hidden lg:block">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
             <div className="flex items-center gap-6">
               <span className="flex items-center gap-1.5">
-                <Phone className="w-3.5 h-3.5" />
+                <Phone className="w-3.5 h-3.5 text-primary-300" />
                 {t('topbar.contactPhone')}
               </span>
               <span className="flex items-center gap-1.5">
-                <MapPin className="w-3.5 h-3.5" />
+                <MapPin className="w-3.5 h-3.5 text-primary-300" />
                 {t('topbar.location')}
               </span>
             </div>
             <div className="flex items-center gap-4">
-              <span>{t('topbar.freeDelivery')}</span>
-              <label className="inline-flex items-center gap-2 text-stone-300">
-                <Globe className="w-3.5 h-3.5" />
+              <span className="hidden xl:inline">{t('topbar.freeDelivery')}</span>
+              <label className="inline-flex items-center gap-2 text-primary-200/80">
+                <Globe className="w-3.5 h-3.5 text-primary-300" />
                 <select
                   value={language}
                   onChange={(e) => setLanguage(parseLanguage(e.target.value))}
-                  className="bg-stone-900 border border-stone-700 rounded px-2 py-1 text-xs text-stone-100"
+                  className="rounded-lg border border-primary-700/60 bg-primary-900/70 px-3 py-1.5 text-xs text-primary-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-400/70"
                 >
                   <option value="en">English</option>
                   <option value="ha">Hausa</option>
@@ -448,7 +437,7 @@ export function LandingPage() {
                     value={headerSearch}
                     onChange={(e) => setHeaderSearch(e.target.value)}
                     placeholder={t('search.placeholder')}
-                    className="w-full rounded-full border border-stone-200 bg-stone-50/90 py-3 pl-10 pr-4 text-sm shadow-inner shadow-stone-200/40 transition-all focus:border-transparent focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    className="w-full rounded-full border border-stone-200 bg-stone-50/90 py-2.5 pl-10 pr-4 text-sm shadow-inner shadow-stone-200/40 transition-all focus:border-transparent focus:outline-none focus:ring-2 focus:ring-primary-500"
                   />
                   <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400" />
                 </div>
@@ -557,7 +546,7 @@ export function LandingPage() {
                   value={headerSearch}
                   onChange={(e) => setHeaderSearch(e.target.value)}
                     placeholder={t('search.placeholderMobile')}
-                  className="w-full pl-10 pr-4 py-3 bg-stone-50 border border-stone-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  className="w-full pl-10 pr-4 py-3 bg-stone-50 border border-stone-200 rounded-xl text-sm shadow-soft focus:outline-none focus:ring-2 focus:ring-primary-500/70 focus:border-transparent transition-all"
                 />
                 <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400" />
               </div>
@@ -630,32 +619,38 @@ export function LandingPage() {
       </header>
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden pb-12 pt-8 lg:pb-20 lg:pt-12">
+      <section className="relative overflow-hidden pb-12 pt-8 lg:pb-16 lg:pt-10">
         {/* Background Decorations */}
         <div className="absolute inset-0 -z-10">
           <div className="absolute left-[-3rem] top-10 h-72 w-72 rounded-full bg-stone-100/80 blur-3xl" />
           <div className="absolute right-[-4rem] top-24 h-96 w-96 rounded-full bg-stone-100/70 blur-3xl" />
           <div className="absolute bottom-[-5rem] left-1/3 h-72 w-72 rounded-full bg-stone-100/60 blur-3xl" />
+          <div className="absolute left-1/4 top-1/3 h-80 w-80 rounded-full bg-primary-100/50 blur-3xl" />
         </div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid items-center gap-8 lg:grid-cols-[minmax(0,0.92fr)_minmax(0,1.18fr)] lg:gap-14">
+          <div className="grid items-center gap-8 lg:grid-cols-[minmax(0,0.92fr)_minmax(0,1.18fr)] lg:gap-12">
             {/* Left Content */}
-            <div className="fade-up max-w-lg space-y-4 lg:space-y-4">
-              <h1 className="text-4xl sm:text-[3.2rem] lg:text-[3.7rem] font-bold text-stone-900 leading-[1.05]">
+            <div className="fade-up max-w-lg space-y-5 lg:space-y-5">
+              <span className="inline-flex w-fit items-center gap-2 rounded-full border border-primary-200/70 bg-primary-50/80 px-4 py-1.5 text-[0.68rem] font-bold uppercase tracking-[0.18em] text-primary-800 shadow-sm shadow-primary-600/5 backdrop-blur">
+                <Sprout className="h-3.5 w-3.5" />
+                Fresh from the Farm
+              </span>
+
+              <h1 className="text-balance text-4xl sm:text-[2.9rem] lg:text-[3.3rem] font-extrabold text-stone-900 leading-[1.05] tracking-[-0.02em]">
                 {copy.heroTitleTop}
-                <span className="block text-primary-700">
+                <span className="block bg-gradient-to-r from-primary-700 via-primary-600 to-earth-600 bg-clip-text pb-1 text-transparent">
                   {copy.heroTitleBottom}
                 </span>
               </h1>
 
-              <p className="fade-up fade-up-delay-1 text-base sm:text-lg text-stone-600 leading-relaxed max-w-xl">
+              <p className="fade-up fade-up-delay-1 text-base text-stone-600 leading-relaxed max-w-xl">
                 {copy.heroSub}
               </p>
 
               <div className="fade-up fade-up-delay-2 flex flex-col gap-3 sm:flex-row sm:gap-4">
                 <Link to="/marketplace">
-                  <Button size="lg" className="group motion-lift motion-press w-full bg-primary-600 shadow-lg shadow-primary-500/20 sm:w-auto">
+                  <Button size="lg" className="group motion-lift motion-press w-full sm:w-auto">
                     Explore Marketplace
                     <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
                   </Button>
@@ -683,12 +678,31 @@ export function LandingPage() {
                 </div>
                 <p className="text-sm text-stone-500">Trusted by verified farmers and active buyers.</p>
               </div>
+
+              {/* Hero Stats */}
+              <dl className="fade-up fade-up-delay-3 grid grid-cols-3 divide-x divide-stone-200/80 rounded-2xl border border-stone-200/70 bg-white/70 shadow-soft backdrop-blur-sm">
+                {[
+                  { value: '2,500+', label: 'Produce listings' },
+                  { value: '500+', label: 'Verified farmers' },
+                  { value: '24–48h', label: 'Nationwide delivery' },
+                ].map((stat) => (
+                  <div key={stat.label} className="px-3 py-4 text-center first:rounded-l-2xl last:rounded-r-2xl">
+                    <dd className="order-1 text-base font-bold tabular-nums text-stone-900 sm:text-lg">
+                      {stat.value}
+                    </dd>
+                    <dt className="order-2 mt-0.5 text-[0.62rem] font-semibold uppercase tracking-[0.14em] text-stone-500">
+                      {stat.label}
+                    </dt>
+                  </div>
+                ))}
+              </dl>
             </div>
 
             {/* Right Content - Hero Video */}
             <div className="fade-up fade-up-delay-2 relative w-full">
-              <div className="float-soft relative overflow-hidden rounded-[2rem] border border-stone-200/80 bg-white p-3 shadow-[0_28px_80px_rgba(15,23,42,0.14)] lg:p-4">
-                <ThreeParticlesField className="pointer-events-none absolute inset-0 z-0 opacity-70" />
+              <div className="float-soft relative rounded-[2.35rem] bg-gradient-to-br from-primary-200/80 via-stone-100 to-amber-200/70 p-[2px] shadow-[0_32px_90px_rgba(15,23,42,0.16)]">
+                <div className="relative overflow-hidden rounded-[2.15rem] bg-white p-3 lg:p-4">
+                  <ThreeParticlesField className="pointer-events-none absolute inset-0 z-0 opacity-70" />
                 <div className="aspect-[4/3] overflow-hidden rounded-[1.5rem] border border-white/40 bg-stone-900 shadow-inner shadow-stone-950/40 sm:aspect-[16/11] lg:aspect-[5/4]">
                   {!heroVideoError && heroVideoReady ? (
                     <video
@@ -724,25 +738,36 @@ export function LandingPage() {
                       </div>
                     </div>
                   )}
+
+                  {/* Floating glass chips */}
+                  <div className="pointer-events-none absolute left-4 top-4 z-20 hidden items-center gap-1.5 rounded-full border border-white/40 bg-white/85 px-3 py-1.5 text-xs font-semibold text-stone-800 shadow-lg shadow-stone-900/10 backdrop-blur sm:flex">
+                    <ShieldCheck className="h-3.5 w-3.5 text-primary-600" />
+                    Quality checked
+                  </div>
+                  <div className="pointer-events-none absolute bottom-4 right-4 z-20 hidden items-center gap-1.5 rounded-full border border-white/40 bg-white/85 px-3 py-1.5 text-xs font-semibold text-stone-800 shadow-lg shadow-stone-900/10 backdrop-blur sm:flex">
+                    <Truck className="h-3.5 w-3.5 text-primary-600" />
+                    Free delivery · 24–48h
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
+        </div>
       </section>
 
       {/* Categories Section */}
-      <section className="py-14 lg:py-20 bg-white">
+      <section className="py-12 lg:py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="fade-up text-center max-w-3xl mx-auto mb-10 lg:mb-12">
+          <div className="fade-up text-center max-w-3xl mx-auto mb-8 lg:mb-10">
             <span className="inline-flex items-center gap-2 px-4 py-2 bg-primary-50 rounded-full text-sm font-medium text-primary-700 mb-4">
               <Sprout className="w-4 h-4" />
               Browse by Category
             </span>
-            <h2 className="text-3xl lg:text-4xl font-bold text-stone-900 mb-4">
+            <h2 className="text-2xl sm:text-3xl lg:text-[2.4rem] font-bold text-stone-900 mb-4">
               Explore Our Product Range
             </h2>
-            <p className="text-lg text-stone-600">
+            <p className="text-base text-stone-600">
               From farm-fresh vegetables to premium grains, find exactly what you need from verified Nigerian farmers.
             </p>
           </div>
@@ -752,10 +777,10 @@ export function LandingPage() {
               <Link
                 key={category.name}
                 to={category.marketplaceHref}
-                className={`group motion-lift motion-press flex h-full min-h-[11.5rem] flex-col overflow-hidden rounded-2xl border border-stone-200/80 shadow-sm outline-none transition-all duration-300 hover:border-primary-300/80 hover:shadow-lg hover:shadow-primary-100/60 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 ${category.surface} transform-gpu motion-safe:transition-transform motion-safe:duration-200 hover:-translate-y-0.5 motion-safe:active:scale-[0.99]`}
+                className={`group motion-lift motion-press flex h-full min-h-[10.5rem] flex-col overflow-hidden rounded-2xl border border-stone-200/80 shadow-sm outline-none transition-all duration-300 hover:border-primary-300/80 hover:shadow-lg hover:shadow-primary-100/60 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 ${category.surface} transform-gpu motion-safe:transition-transform motion-safe:duration-200 hover:-translate-y-0.5 motion-safe:active:scale-[0.99]`}
               >
                 <div
-                  className="flex h-full w-full flex-col p-5 sm:p-6"
+                  className="flex h-full w-full flex-col p-4 sm:p-5"
                 >
                   {category.images ? (
                     category.images.length > 1 ? (
@@ -803,13 +828,13 @@ export function LandingPage() {
       </section>
 
       {/* Features Section */}
-      <section id="features" className="py-14 lg:py-20">
+      <section id="features" className="py-12 lg:py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="fade-up text-center max-w-3xl mx-auto mb-10 lg:mb-12">
-            <h2 className="text-3xl lg:text-4xl font-bold text-stone-900 mb-4">
+          <div className="fade-up text-center max-w-3xl mx-auto mb-8 lg:mb-10">
+            <h2 className="text-2xl sm:text-3xl lg:text-[2.4rem] font-bold text-stone-900 mb-4">
               {copy.featuresHeading}
             </h2>
-            <p className="text-lg text-stone-600">
+            <p className="text-base text-stone-600">
               {copy.featuresSub}
             </p>
           </div>
@@ -818,12 +843,12 @@ export function LandingPage() {
             {features.map((feature) => (
               <div
                 key={feature.title}
-                className="group motion-lift p-6 bg-white rounded-2xl border border-stone-100 hover:border-primary-200 hover:shadow-lg hover:shadow-primary-100/50 transition-all duration-300 h-full"
+                className="group motion-lift p-5 sm:p-6 bg-white rounded-2xl border border-stone-100 hover:border-primary-200 hover:shadow-lg hover:shadow-primary-100/50 transition-all duration-300 h-full"
               >
-                <div className={`w-14 h-14 ${feature.color} rounded-xl flex items-center justify-center mb-5 group-hover:scale-110 transition-transform`}>
-                  <feature.icon className="w-7 h-7 text-white" />
+                <div className={`w-12 h-12 ${feature.color} rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
+                  <feature.icon className="w-6 h-6 text-white" />
                 </div>
-                <h3 className="text-xl font-semibold text-stone-900 mb-2">
+                <h3 className="text-lg font-semibold text-stone-900 mb-2">
                   {feature.title}
                 </h3>
                 <p className="text-stone-600 leading-relaxed">
@@ -836,13 +861,13 @@ export function LandingPage() {
       </section>
 
       {/* How It Works */}
-      <section id="how-it-works" className="py-14 lg:py-20 bg-gradient-to-br from-stone-50 to-primary-50/30">
+      <section id="how-it-works" className="py-12 lg:py-16 bg-gradient-to-br from-stone-50 to-primary-50/30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="fade-up text-center max-w-3xl mx-auto mb-10 lg:mb-12">
-            <h2 className="text-3xl lg:text-4xl font-bold text-stone-900 mb-4">
+          <div className="fade-up text-center max-w-3xl mx-auto mb-8 lg:mb-10">
+            <h2 className="text-2xl sm:text-3xl lg:text-[2.4rem] font-bold text-stone-900 mb-4">
               How It Works
             </h2>
-            <p className="text-lg text-stone-600">
+            <p className="text-base text-stone-600">
               Getting fresh produce has never been easier. Three simple steps to farm-fresh quality.
             </p>
           </div>
@@ -850,14 +875,14 @@ export function LandingPage() {
           <div className="grid md:grid-cols-3 gap-6 lg:gap-8">
             {howItWorks.map((step) => (
               <div key={step.step} className="relative">
-                <div className="motion-lift p-8 bg-white rounded-2xl border border-stone-100 h-full hover:shadow-lg hover:border-primary-200 transition-all duration-300">
-                  <div className={`w-16 h-16 bg-gradient-to-br ${step.color} rounded-2xl flex items-center justify-center mb-6 shadow-lg`}>
-                    <step.icon className="w-8 h-8 text-white" />
+                <div className="motion-lift p-6 bg-white rounded-2xl border border-stone-100 h-full hover:shadow-lg hover:border-primary-200 transition-all duration-300">
+                  <div className={`w-14 h-14 bg-gradient-to-br ${step.color} rounded-2xl flex items-center justify-center mb-5 shadow-lg`}>
+                    <step.icon className="w-7 h-7 text-white" />
                   </div>
-                  <span className="text-5xl font-bold text-stone-200">
+                  <span className="text-4xl font-bold text-stone-200">
                     {step.step}
                   </span>
-                  <h3 className="text-xl font-semibold text-stone-900 mt-4 mb-3">
+                  <h3 className="text-lg font-semibold text-stone-900 mt-3 mb-2">
                     {step.title}
                   </h3>
                   <p className="text-stone-600 leading-relaxed">
@@ -871,11 +896,11 @@ export function LandingPage() {
       </section>
 
       {/* For Farmers Section */}
-      <section id="for-farmers" className="py-14 lg:py-20">
+      <section id="for-farmers" className="py-12 lg:py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-8 lg:gap-10 items-center">
             <div className="order-2 lg:order-1">
-              <div className="motion-lift bg-gradient-to-br from-primary-50 to-primary-50 rounded-3xl p-8">
+              <div className="motion-lift bg-gradient-to-br from-primary-50 to-primary-50 rounded-3xl p-6 lg:p-8">
                 <div className="space-y-4">
                   {[
                     'Direct access to thousands of buyers',
@@ -885,7 +910,7 @@ export function LandingPage() {
                     'Real-time market insights',
                   ].map((benefit, i) => (
                     <div key={i} className="flex items-start gap-3">
-                      <CheckCircle2 className="w-6 h-6 text-primary-500 flex-shrink-0 mt-0.5" />
+                      <CheckCircle2 className="w-5 h-5 text-primary-500 flex-shrink-0 mt-0.5" />
                       <p className="text-stone-700">{benefit}</p>
                     </div>
                   ))}
@@ -900,11 +925,11 @@ export function LandingPage() {
                 </span>
               </div>
 
-              <h2 className="text-3xl lg:text-4xl font-bold text-stone-900">
+              <h2 className="text-2xl sm:text-3xl lg:text-[2.4rem] font-bold text-stone-900">
                 Grow Your Business with Farmers Market
               </h2>
 
-              <p className="text-lg text-stone-600 leading-relaxed">
+              <p className="text-base text-stone-600 leading-relaxed">
                 Join 500+ verified farmers already selling on our platform. 
                 Get fair prices, reduce waste, and connect directly with buyers 
                 who value quality.
@@ -924,17 +949,17 @@ export function LandingPage() {
       </section>
 
       {/* Testimonials Section */}
-      <section id="testimonials" className="py-14 lg:py-20 bg-stone-50">
+      <section id="testimonials" className="py-12 lg:py-16 bg-stone-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="fade-up text-center max-w-3xl mx-auto mb-10 lg:mb-12">
+          <div className="fade-up text-center max-w-3xl mx-auto mb-8 lg:mb-10">
             <span className="inline-flex items-center gap-2 px-4 py-2 bg-primary-50 rounded-full text-sm font-medium text-primary-700 mb-4">
               <Star className="w-4 h-4" />
               Customer Reviews
             </span>
-            <h2 className="text-3xl lg:text-4xl font-bold text-stone-900 mb-4">
+            <h2 className="text-2xl sm:text-3xl lg:text-[2.4rem] font-bold text-stone-900 mb-4">
               What Our Customers Say
             </h2>
-            <p className="text-lg text-stone-600">
+            <p className="text-base text-stone-600">
               Join thousands of satisfied buyers and sellers who trust Farmers Market for their agricultural needs.
             </p>
           </div>
@@ -943,7 +968,7 @@ export function LandingPage() {
             {testimonials.map((testimonial, index) => (
               <div
                 key={index}
-                className="motion-lift bg-white rounded-2xl p-8 shadow-sm border border-stone-100 hover:shadow-lg transition-shadow duration-300"
+                className="motion-lift bg-white rounded-2xl p-6 shadow-sm border border-stone-100 hover:shadow-lg transition-shadow duration-300"
               >
                 <div className="flex items-center gap-1 mb-4">
                   {[...Array(testimonial.rating)].map((_, i) => (
@@ -951,7 +976,7 @@ export function LandingPage() {
                   ))}
                 </div>
                 <div className="flex items-start gap-3 mb-6">
-                  <Quote className="w-8 h-8 text-primary-200 flex-shrink-0" />
+                  <Quote className="w-6 h-6 text-primary-200 flex-shrink-0" />
                   <p className="text-stone-600 italic leading-relaxed">
                     "{testimonial.quote}"
                   </p>
@@ -966,10 +991,10 @@ export function LandingPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-14 lg:py-20 bg-gradient-to-br from-primary-600 to-primary-700">
+      <section className="py-12 lg:py-16 bg-gradient-to-br from-primary-600 to-primary-700">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl lg:text-4xl font-bold text-white mb-6">{landingUi.ctaTitle}</h2>
-          <p className="text-xl text-primary-100 mb-8 max-w-2xl mx-auto">
+          <h2 className="text-2xl sm:text-3xl lg:text-[2.4rem] font-bold text-white mb-6">{landingUi.ctaTitle}</h2>
+          <p className="text-base text-primary-100 mb-8 max-w-2xl mx-auto lg:text-lg">
             Move from signup to verified onboarding quickly, then buy or list produce with clear payments and logistics.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -1028,7 +1053,7 @@ export function LandingPage() {
                       placeholder="Enter your email"
                       autoComplete="email"
                       aria-invalid={newsletterStatus === 'invalid'}
-                      className="flex-1 md:w-64 px-4 py-2.5 bg-stone-900 border border-stone-800 rounded-lg text-sm text-white placeholder:text-stone-500 focus:outline-none focus:border-primary-500"
+                      className="flex-1 md:w-64 px-4 py-2.5 bg-stone-900 border border-stone-800 rounded-xl text-sm text-white placeholder:text-stone-500 focus:outline-none focus:ring-2 focus:ring-primary-500/60 focus:border-transparent transition-all"
                     />
                     <Button type="submit" className="bg-primary-600 hover:bg-primary-700 whitespace-nowrap">
                       Subscribe

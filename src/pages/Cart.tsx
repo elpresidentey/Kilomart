@@ -23,8 +23,8 @@ export function Cart() {
     return (
       <Layout cartItemCount={0}>
         <div className="max-w-2xl mx-auto py-16 px-4 text-center">
-          <div className="w-24 h-24 bg-stone-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <ShoppingCart className="w-12 h-12 text-stone-400" />
+          <div className="w-24 h-24 bg-gradient-to-br from-primary-50 to-primary-100 rounded-full flex items-center justify-center mx-auto mb-6 ring-1 ring-inset ring-primary-100">
+            <ShoppingCart className="w-12 h-12 text-primary-600" />
           </div>
           <h1 className="text-2xl font-bold text-stone-900 mb-2">{t('cart.emptyTitle')}</h1>
           <p className="text-stone-600 mb-8">{t('cart.emptySub')}</p>
@@ -49,9 +49,9 @@ export function Cart() {
             {cart.map((item) => (
               <div
                 key={item.id}
-                className="flex gap-4 p-4 bg-white rounded-xl border border-stone-200 hover:border-primary-200 transition-colors"
+                className="flex gap-4 p-4 bg-white rounded-2xl border border-stone-200 shadow-card hover:border-primary-200 transition-colors"
               >
-                <div className="w-24 h-24 bg-stone-100 rounded-lg flex-shrink-0 overflow-hidden">
+                <div className="w-24 h-24 bg-stone-100 rounded-xl flex-shrink-0 overflow-hidden">
                   <img
                     src={getProductImageSrc(item.image, item.name)}
                     alt={item.name}
@@ -82,11 +82,11 @@ export function Cart() {
                             : `${item.name} quantity updated.`
                         )
                       }}
-                      className="w-8 h-8 rounded-lg border border-stone-200 flex items-center justify-center hover:bg-stone-50 transition-colors"
+                      className="w-8 h-8 rounded-xl border border-stone-200 bg-white shadow-soft flex items-center justify-center hover:bg-stone-50 hover:border-stone-300 transition-colors motion-safe:active:scale-90"
                     >
                       <Minus className="w-4 h-4" />
                     </button>
-                    <span className="w-12 text-center font-medium">{item.quantity}</span>
+                    <span className="w-12 text-center font-semibold">{item.quantity}</span>
                     <button
                       type="button"
                       onClick={() => {
@@ -94,7 +94,7 @@ export function Cart() {
                         updateQuantity(item.id, nextQuantity)
                         successToast(`${item.name} quantity updated.`)
                       }}
-                      className="w-8 h-8 rounded-lg border border-stone-200 flex items-center justify-center hover:bg-stone-50 transition-colors"
+                      className="w-8 h-8 rounded-xl border border-stone-200 bg-white shadow-soft flex items-center justify-center hover:bg-stone-50 hover:border-stone-300 transition-colors motion-safe:active:scale-90"
                     >
                       <Plus className="w-4 h-4" />
                     </button>
@@ -111,7 +111,7 @@ export function Cart() {
                       removeFromCart(item.id)
                       successToast(`${item.name} removed from cart.`)
                     }}
-                    className="p-2 text-stone-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                    className="p-2 text-stone-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-colors motion-safe:active:scale-90"
                   >
                     <Trash2 className="w-5 h-5" />
                   </button>
@@ -132,7 +132,7 @@ export function Cart() {
           </div>
 
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-xl border border-stone-200 p-6 sticky top-24">
+            <div className="bg-white rounded-2xl border border-stone-100 shadow-card p-6 sticky top-24">
               <h2 className="text-lg font-semibold text-stone-900 mb-4">{t('cart.orderSummary')}</h2>
 
               <div className="space-y-3 mb-4">

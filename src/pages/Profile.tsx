@@ -357,7 +357,7 @@ export function Profile() {
                 value={formData.bio || ''}
                 onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
                 placeholder={t('profile.bioPlaceholder')}
-                className="w-full h-48 p-3 border border-stone-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 resize-none"
+                className="w-full h-48 p-3.5 border border-stone-300 rounded-xl bg-white shadow-soft focus:outline-none focus:ring-2 focus:ring-primary-500/70 focus:border-transparent resize-none hover:border-stone-400 transition-all"
               />
             ) : (
               <p className="text-stone-600 leading-relaxed">
