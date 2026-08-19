@@ -2,6 +2,8 @@ import { Suspense, lazy, useEffect, type ReactNode } from 'react'
 import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import { ErrorBoundary } from './components/ErrorBoundary'
 import { ToastViewport } from './components/ToastViewport'
+import { ScrollProgress } from './components/ScrollProgress'
+import { initScrollReveal } from './lib/scrollReveal'
 import { I18nProvider } from './i18n/I18nProvider'
 import { AuthProvider, useAuth } from './hooks/useAuth'
 import { useCart } from './hooks/useCart'
@@ -27,6 +29,16 @@ function ScrollToTop() {
     }
     window.scrollTo(0, 0)
   }, [pathname, hash])
+
+  return null
+}
+
+function ScrollRevealManager() {
+  const { pathname } = useLocation()
+
+  useEffect(() => {
+    initScrollReveal()
+  }, [pathname])
 
   return null
 }
@@ -215,6 +227,8 @@ function App() {
         <AuthProvider>
           <ErrorBoundary>
             <ScrollToTop />
+            <ScrollRevealManager />
+            <ScrollProgress />
             <ToastViewport />
             <Suspense fallback={loadingFallback}>
               <AppRoutes />

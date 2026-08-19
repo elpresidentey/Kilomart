@@ -759,7 +759,7 @@ export function LandingPage() {
       {/* Categories Section */}
       <section className="py-12 lg:py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="fade-up text-center max-w-3xl mx-auto mb-8 lg:mb-10">
+          <div data-reveal className="text-center max-w-3xl mx-auto mb-8 lg:mb-10">
             <span className="inline-flex items-center gap-2 px-4 py-2 bg-primary-50 rounded-full text-sm font-medium text-primary-700 mb-4">
               <Sprout className="w-4 h-4" />
               Browse by Category
@@ -773,10 +773,12 @@ export function LandingPage() {
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {categories.map((category) => (
+            {categories.map((category, index) => (
               <Link
                 key={category.name}
                 to={category.marketplaceHref}
+                data-reveal
+                data-reveal-delay={(index % 4) * 70}
                 className={`group motion-lift motion-press flex h-full min-h-[10.5rem] flex-col overflow-hidden rounded-2xl border border-stone-200/80 shadow-sm outline-none transition-all duration-300 hover:border-primary-300/80 hover:shadow-lg hover:shadow-primary-100/60 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 ${category.surface} transform-gpu motion-safe:transition-transform motion-safe:duration-200 hover:-translate-y-0.5 motion-safe:active:scale-[0.99]`}
               >
                 <div
@@ -830,7 +832,7 @@ export function LandingPage() {
       {/* Features Section */}
       <section id="features" className="py-12 lg:py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="fade-up text-center max-w-3xl mx-auto mb-8 lg:mb-10">
+          <div data-reveal className="text-center max-w-3xl mx-auto mb-8 lg:mb-10">
             <h2 className="text-2xl sm:text-3xl lg:text-[2.4rem] font-bold text-stone-900 mb-4">
               {copy.featuresHeading}
             </h2>
@@ -840,9 +842,11 @@ export function LandingPage() {
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-            {features.map((feature) => (
+            {features.map((feature, index) => (
               <div
                 key={feature.title}
+                data-reveal
+                data-reveal-delay={(index % 3) * 80}
                 className="group motion-lift p-5 sm:p-6 bg-white rounded-2xl border border-stone-100 hover:border-primary-200 hover:shadow-lg hover:shadow-primary-100/50 transition-all duration-300 h-full"
               >
                 <div className={`w-12 h-12 ${feature.color} rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
@@ -863,7 +867,7 @@ export function LandingPage() {
       {/* How It Works */}
       <section id="how-it-works" className="py-12 lg:py-16 bg-gradient-to-br from-stone-50 to-primary-50/30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="fade-up text-center max-w-3xl mx-auto mb-8 lg:mb-10">
+          <div data-reveal className="text-center max-w-3xl mx-auto mb-8 lg:mb-10">
             <h2 className="text-2xl sm:text-3xl lg:text-[2.4rem] font-bold text-stone-900 mb-4">
               How It Works
             </h2>
@@ -873,8 +877,8 @@ export function LandingPage() {
           </div>
 
           <div className="grid md:grid-cols-3 gap-6 lg:gap-8">
-            {howItWorks.map((step) => (
-              <div key={step.step} className="relative">
+            {howItWorks.map((step, index) => (
+              <div key={step.step} data-reveal data-reveal-delay={index * 110} className="relative">
                 <div className="motion-lift p-6 bg-white rounded-2xl border border-stone-100 h-full hover:shadow-lg hover:border-primary-200 transition-all duration-300">
                   <div className={`w-14 h-14 bg-gradient-to-br ${step.color} rounded-2xl flex items-center justify-center mb-5 shadow-lg`}>
                     <step.icon className="w-7 h-7 text-white" />
@@ -899,7 +903,7 @@ export function LandingPage() {
       <section id="for-farmers" className="py-12 lg:py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-8 lg:gap-10 items-center">
-            <div className="order-2 lg:order-1">
+            <div className="order-2 lg:order-1" data-reveal>
               <div className="motion-lift bg-gradient-to-br from-primary-50 to-primary-50 rounded-3xl p-6 lg:p-8">
                 <div className="space-y-4">
                   {[
@@ -918,7 +922,7 @@ export function LandingPage() {
               </div>
             </div>
 
-            <div className="order-1 lg:order-2 space-y-6">
+            <div className="order-1 lg:order-2 space-y-6" data-reveal data-reveal-delay="90">
               <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary-50 rounded-full">
                 <span className="text-sm font-medium text-primary-700">
                   For Farmers
@@ -951,7 +955,7 @@ export function LandingPage() {
       {/* Testimonials Section */}
       <section id="testimonials" className="py-12 lg:py-16 bg-stone-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="fade-up text-center max-w-3xl mx-auto mb-8 lg:mb-10">
+          <div data-reveal className="text-center max-w-3xl mx-auto mb-8 lg:mb-10">
             <span className="inline-flex items-center gap-2 px-4 py-2 bg-primary-50 rounded-full text-sm font-medium text-primary-700 mb-4">
               <Star className="w-4 h-4" />
               Customer Reviews
@@ -968,6 +972,8 @@ export function LandingPage() {
             {testimonials.map((testimonial, index) => (
               <div
                 key={index}
+                data-reveal
+                data-reveal-delay={index * 90}
                 className="motion-lift bg-white rounded-2xl p-6 shadow-sm border border-stone-100 hover:shadow-lg transition-shadow duration-300"
               >
                 <div className="flex items-center gap-1 mb-4">
@@ -992,7 +998,7 @@ export function LandingPage() {
 
       {/* CTA Section */}
       <section className="py-12 lg:py-16 bg-gradient-to-br from-primary-600 to-primary-700">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center" data-reveal>
           <h2 className="text-2xl sm:text-3xl lg:text-[2.4rem] font-bold text-white mb-6">{landingUi.ctaTitle}</h2>
           <p className="text-base text-primary-100 mb-8 max-w-2xl mx-auto lg:text-lg">
             Move from signup to verified onboarding quickly, then buy or list produce with clear payments and logistics.
