@@ -782,7 +782,7 @@ export function LandingPage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-2 gap-4 lg:auto-rows-[11rem] lg:grid-cols-4">
+          <div className="grid grid-cols-2 gap-4 lg:auto-rows-[13rem] lg:grid-cols-4">
             {categories.map((category, index) => (
               <Link
                 key={category.name}
@@ -836,12 +836,12 @@ export function LandingPage() {
                   </div>
                 ) : (
                   <div className="relative flex h-full flex-col p-4 sm:p-5">
-                    <div className={`mb-3 flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br shadow-md ring-1 ring-white/40 transition-transform duration-200 group-hover:scale-105 group-hover:-translate-y-0.5 ${category.iconGradient}`}>
+                    <div className={`mb-2.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br shadow-md ring-1 ring-white/40 transition-transform duration-200 group-hover:scale-105 group-hover:-translate-y-0.5 ${category.iconGradient}`}>
                       <category.icon className="h-5 w-5 text-white drop-shadow-sm" />
                     </div>
-                    <h3 className="mb-1 font-semibold text-stone-900">{category.name}</h3>
+                    <h3 className="mb-1 text-base font-semibold leading-tight text-stone-900">{category.name}</h3>
                     <p className="line-clamp-2 flex-1 text-xs leading-snug text-stone-600 sm:text-sm">{category.items}</p>
-                    <span className="mt-3 inline-flex w-fit items-center rounded-full bg-white/70 px-2.5 py-0.5 text-xs font-semibold text-primary-700 ring-1 ring-inset ring-primary-600/10">
+                    <span className="mt-2.5 inline-flex w-fit items-center rounded-full bg-white/70 px-2.5 py-0.5 text-xs font-semibold text-primary-700 ring-1 ring-inset ring-primary-600/10">
                       {category.count} listings
                     </span>
                   </div>
