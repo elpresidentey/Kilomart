@@ -210,8 +210,8 @@ export function BuyerDashboard() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-stone-900">{copy.title}</h1>
-            <p className="text-stone-500">{copy.welcome}{user?.full_name ? `, ${user.full_name.split(' ')[0]}` : ''}! {copy.welcomeSuffix}</p>
+            <h1 className="text-2xl font-display font-bold text-stone-900">{copy.title}</h1>
+            <p className="text-stone-500 font-medium">{copy.welcome}{user?.full_name ? `, ${user.full_name.split(' ')[0]}` : ''}! {copy.welcomeSuffix}</p>
           </div>
           <div className="flex gap-3">
             <Link to="/marketplace">

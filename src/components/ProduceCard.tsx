@@ -145,6 +145,8 @@ export function ProduceCard({
           <img
             src={getProductImageSrc(listing.images?.[0], listing.product_name)}
             alt=""
+            loading="lazy"
+            decoding="async"
             onError={fallbackOnImageError}
             className="w-full h-full object-cover transition-transform duration-500 ease-out motion-safe:group-hover:scale-110 motion-safe:group-active:scale-105"
           />
@@ -236,7 +238,7 @@ export function ProduceCard({
         )}
 
         {/* Total Price */}
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between pt-3 border-t border-stone-100">
           <span className="text-sm text-stone-500">{copy.total}</span>
           <span className="text-lg font-bold tabular-nums text-stone-900 transition-transform duration-300 motion-safe:group-hover:translate-x-0.5">
             {formatPrice(totalPrice)}

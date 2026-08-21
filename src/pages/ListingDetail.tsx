@@ -285,17 +285,18 @@ export function ListingDetail({ onAddToCart, cartItemCount }: ListingDetailProps
         <button
           type="button"
           onClick={() => navigate(-1)}
-          className="flex items-center gap-2 text-stone-600 hover:text-stone-900 mb-6 rounded-lg tap-highlight-none motion-safe:transition-colors motion-safe:active:scale-[0.98]"
+          className="flex items-center gap-2 text-stone-600 hover:text-stone-900 mb-6 rounded-lg tap-highlight-none motion-safe:transition-all motion-safe:duration-200 motion-safe:hover:-translate-x-0.5 motion-safe:active:scale-[0.98]"
         >
           <ArrowLeft className="w-4 h-4" />
           {copy.back}
         </button>
 
         <div className="grid md:grid-cols-2 gap-8 items-start">
-          <div className="rounded-2xl bg-stone-100 aspect-square overflow-hidden flex items-center justify-center">
+          <div className="rounded-2xl bg-stone-100 aspect-square overflow-hidden flex items-center justify-center shadow-card ring-1 ring-stone-900/5">
             <img
               src={getProductImageSrc(listing.images?.[0], listing.product_name)}
               alt={listing.product_name}
+              decoding="async"
               onError={fallbackOnImageError}
               className="w-full h-full object-cover"
             />
@@ -353,7 +354,10 @@ export function ListingDetail({ onAddToCart, cartItemCount }: ListingDetailProps
               </div>
             </div>
 
-            <p className="text-lg font-semibold text-stone-900">{copy.total}: {formatPrice(totalPrice)}</p>
+            <div className="flex items-center justify-between max-w-sm p-3 bg-primary-50/70 rounded-xl ring-1 ring-inset ring-primary-100">
+              <span className="text-sm font-medium text-stone-600">{copy.total}</span>
+              <span className="text-lg font-bold tabular-nums text-stone-900">{formatPrice(totalPrice)}</span>
+            </div>
 
             <div className="flex flex-wrap gap-3">
               {user?.id === listing.seller_id ? (

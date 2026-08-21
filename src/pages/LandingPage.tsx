@@ -625,7 +625,12 @@ export function LandingPage() {
           <div className="absolute left-[-3rem] top-10 h-72 w-72 rounded-full bg-stone-100/80 blur-3xl" />
           <div className="absolute right-[-4rem] top-24 h-96 w-96 rounded-full bg-stone-100/70 blur-3xl" />
           <div className="absolute bottom-[-5rem] left-1/3 h-72 w-72 rounded-full bg-stone-100/60 blur-3xl" />
-          <div className="absolute left-1/4 top-1/3 h-80 w-80 rounded-full bg-primary-100/50 blur-3xl" />
+          <div className="absolute left-1/4 top-1/3 h-80 w-80 blur-3xl" />
+          {/* Premium accent glows */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full blur-3xl bg-primary-600/10 w-96 h-96 opacity-80" />
+          <div className="absolute bottom-0 right-0 -z-10 opacity-15">
+            <div className="rounded-full blur-3xl bg-leaf-500/10 w-80 h-80" />
+          </div>
         </div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -639,7 +644,7 @@ export function LandingPage() {
 
               <h1 className="text-balance text-4xl sm:text-[2.9rem] lg:text-[3.3rem] font-extrabold text-stone-900 leading-[1.05] tracking-[-0.02em]">
                 {copy.heroTitleTop}
-                <span className="block bg-gradient-to-r from-primary-700 via-primary-600 to-earth-600 bg-clip-text pb-1 text-transparent">
+                <span className="block bg-gradient-to-r from-primary-700 via-primary-600 to-leaf-600 bg-clip-text pb-1 text-transparent">
                   {copy.heroTitleBottom}
                 </span>
               </h1>
@@ -700,8 +705,8 @@ export function LandingPage() {
 
             {/* Right Content - Hero Video */}
             <div className="fade-up fade-up-delay-2 relative w-full">
-              <div className="float-soft relative rounded-[2.35rem] bg-gradient-to-br from-primary-200/80 via-stone-100 to-amber-200/70 p-[2px] shadow-[0_32px_90px_rgba(15,23,42,0.16)]">
-                <div className="relative overflow-hidden rounded-[2.15rem] bg-white p-3 lg:p-4">
+              <div className="float-soft relative rounded-2xl bg-gradient-to-br from-primary-200/80 via-stone-100 to-amber-200/70 p-2 shadow-[0_32px_90px_rgba(15,23,42,0.16)]">
+                <div className="relative overflow-hidden rounded-xl bg-white p-3 lg:p-4">
                   <ThreeParticlesField className="pointer-events-none absolute inset-0 z-0 opacity-70" />
                 <div className="aspect-[4/3] overflow-hidden rounded-[1.5rem] border border-white/40 bg-stone-900 shadow-inner shadow-stone-950/40 sm:aspect-[16/11] lg:aspect-[5/4]">
                   {!heroVideoError && heroVideoReady ? (
@@ -717,7 +722,7 @@ export function LandingPage() {
                       onError={() => setHeroVideoError(true)}
                     />
                   ) : (
-                    <div className="relative z-10 flex h-full w-full items-center justify-center bg-gradient-to-br from-primary-950 via-stone-900 to-amber-950">
+                    <div className="relative z-10 flex h-full w-full items-center justify-center bg-gradient-to-br from-primary-950 via-stone-900 to-leaf-950">
                       <div className="flex flex-col items-center gap-4 text-center px-6">
                         <div className="flex h-20 w-20 items-center justify-center rounded-full bg-white/10 ring-1 ring-white/15 backdrop-blur">
                           <img
