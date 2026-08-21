@@ -4,7 +4,6 @@ import { Button } from '../components/ui'
 import { useAuth } from '../hooks/useAuth'
 import { useCartStore, cartUnitsCount } from '../stores/cartStore'
 import { ThreeParticlesField } from '../components/ThreeParticlesField'
-import { fallbackOnImageError } from '../lib/image'
 import { useI18n } from '../i18n/useI18n'
 import heroVideo from '../../Hero image/4K Cinematic Drone view village Highway l Free  Drone Video l Free stock footage l Copyright free.mp4'
 import { 
@@ -268,18 +267,13 @@ export function LandingPage() {
     count: string
     marketplaceHref: string
     images?: string[]
+    /** Spans 2 columns (and 2 rows on desktop) in the bento grid */
+    featured?: boolean
+    /** Spans 2 columns in the bento grid */
+    wide?: boolean
   }
 
   const categories: LandingCategory[] = [
-    {
-      name: 'Grains & cereals',
-      icon: Wheat,
-      iconGradient: 'from-amber-500 via-amber-500 to-amber-700',
-      surface: 'bg-gradient-to-br from-amber-50 via-amber-50 to-amber-100/90',
-      items: 'Rice, Maize, Millet, Sorghum, Fonio',
-      count: '2,500+',
-      marketplaceHref: '/marketplace?category=Grains',
-    },
     {
       name: 'Vegetables',
       icon: Carrot,
@@ -289,6 +283,7 @@ export function LandingPage() {
         'Ugwu (Efo Riro), Nigerian spinach (Efo Shoko), Jos tomatoes, Peppers (Tatashe + Ata Rodo), Fresh okra',
       count: '1,800+',
       marketplaceHref: '/marketplace?category=Vegetables',
+      featured: true,
     },
     {
       name: 'Fruits',
@@ -298,6 +293,16 @@ export function LandingPage() {
       items: 'Oranges, Mangoes, Pawpaw, Pineapple, Watermelon, Bananas, Guava',
       count: '1,200+',
       marketplaceHref: '/marketplace?category=Fruits',
+      wide: true,
+    },
+    {
+      name: 'Grains & cereals',
+      icon: Wheat,
+      iconGradient: 'from-amber-500 via-amber-500 to-amber-700',
+      surface: 'bg-gradient-to-br from-amber-50 via-amber-50 to-amber-100/90',
+      items: 'Rice, Maize, Millet, Sorghum, Fonio',
+      count: '2,500+',
+      marketplaceHref: '/marketplace?category=Grains',
     },
     {
       name: 'Tubers & roots',
@@ -777,57 +782,70 @@ export function LandingPage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 gap-4 lg:auto-rows-[11rem] lg:grid-cols-4">
             {categories.map((category, index) => (
               <Link
                 key={category.name}
                 to={category.marketplaceHref}
                 data-reveal
                 data-reveal-delay={(index % 4) * 70}
-                className={`group motion-lift motion-press flex h-full min-h-[10.5rem] flex-col overflow-hidden rounded-2xl border border-stone-200/80 shadow-sm outline-none transition-all duration-300 hover:border-primary-300/80 hover:shadow-lg hover:shadow-primary-100/60 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 ${category.surface} transform-gpu motion-safe:transition-transform motion-safe:duration-200 hover:-translate-y-0.5 motion-safe:active:scale-[0.99]`}
+                className={`group motion-lift motion-press relative flex h-full min-h-[10.5rem] transform-gpu flex-col overflow-hidden rounded-2xl border border-stone-200/80 shadow-sm outline-none transition-all duration-300 hover:-translate-y-0.5 hover:border-primary-300/80 hover:shadow-lg hover:shadow-primary-100/60 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 motion-safe:active:scale-[0.99] ${category.featured ? 'col-span-2 lg:row-span-2' : ''} ${category.wide ? 'col-span-2' : ''} ${category.surface}`}
               >
-                <div
-                  className="flex h-full w-full flex-col p-4 sm:p-5"
-                >
-                  {category.images ? (
-                    category.images.length > 1 ? (
-                      <div className="mb-4 grid h-24 grid-cols-[1.4fr_1fr] gap-2 overflow-hidden rounded-2xl">
-                        <img
-                          src={category.images[0]}
-                          alt={`${category.name} preview 1`}
-                          className="h-full w-full rounded-xl object-cover"
-                          loading="lazy"
-                          onError={fallbackOnImageError}
-                        />
-                        <img
-                          src={category.images[1]}
-                          alt={`${category.name} preview 2`}
-                          className="h-full w-full rounded-xl object-cover"
-                          loading="lazy"
-                          onError={fallbackOnImageError}
-                        />
-                      </div>
-                    ) : (
-                      <div className="mb-4 h-24 overflow-hidden rounded-2xl">
-                        <img
-                          src={category.images[0]}
-                          alt={`${category.name} preview`}
-                          className="h-full w-full rounded-2xl object-cover"
-                          loading="lazy"
-                          onError={fallbackOnImageError}
-                        />
-                      </div>
-                    )
-                  ) : null}
-                  <div
-                    className={`mb-4 flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br shadow-md ring-1 ring-white/40 transition-transform duration-200 group-hover:scale-105 group-hover:-translate-y-0.5 ${category.iconGradient}`}
-                  >
-                    <category.icon className="h-6 w-6 text-white drop-shadow-sm" />
+                {/* Oversized watermark icon */}
+                <category.icon
+                  aria-hidden
+                  className={`pointer-events-none absolute -bottom-5 -right-5 rotate-12 text-stone-900 opacity-[0.05] transition-transform duration-500 ease-out motion-safe:group-hover:rotate-6 motion-safe:group-hover:scale-110 ${category.featured ? 'h-40 w-40' : 'h-24 w-24'}`}
+                />
+
+                {category.featured ? (
+                  <div className="relative flex h-full flex-col p-5 sm:p-6">
+                    <div
+                      aria-hidden
+                      className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-white/50 blur-2xl"
+                    />
+                    <div className={`mb-5 flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br shadow-md ring-1 ring-white/40 transition-transform duration-200 group-hover:scale-105 group-hover:-translate-y-0.5 ${category.iconGradient}`}>
+                      <category.icon className="h-7 w-7 text-white drop-shadow-sm" />
+                    </div>
+                    <h3 className="mb-1.5 text-xl font-bold text-stone-900">{category.name}</h3>
+                    <p className="max-w-sm text-sm leading-relaxed text-stone-600">{category.items}</p>
+                    <div className="mt-auto flex items-center justify-between pt-4">
+                      <span className="inline-flex items-center rounded-full bg-white/70 px-3 py-1 text-xs font-semibold text-primary-700 ring-1 ring-inset ring-primary-600/10 backdrop-blur-sm">
+                        {category.count} listings
+                      </span>
+                      <span className="inline-flex items-center gap-1 text-sm font-semibold text-primary-700">
+                        Shop now
+                        <ArrowRight className="h-4 w-4 transition-transform duration-300 motion-safe:group-hover:translate-x-1" />
+                      </span>
+                    </div>
                   </div>
-                  <h3 className="mb-1 font-semibold text-stone-900">{category.name}</h3>
-                  <p className="flex-1 text-sm leading-snug text-stone-600">{category.items}</p>
-                  <p className="mt-3 text-xs font-medium text-primary-700">{category.count} listings</p>
-                </div>
+                ) : category.wide ? (
+                  <div className="relative flex h-full items-center gap-4 p-5">
+                    <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br shadow-md ring-1 ring-white/40 transition-transform duration-200 group-hover:scale-105 group-hover:-translate-y-0.5 ${category.iconGradient}`}>
+                      <category.icon className="h-6 w-6 text-white drop-shadow-sm" />
+                    </div>
+                    <div className="min-w-0">
+                      <h3 className="font-semibold text-stone-900">{category.name}</h3>
+                      <p className="mt-0.5 line-clamp-2 text-sm leading-snug text-stone-600">{category.items}</p>
+                      <div className="mt-2 flex items-center gap-2">
+                        <span className="inline-flex items-center rounded-full bg-white/70 px-2.5 py-0.5 text-xs font-semibold text-primary-700 ring-1 ring-inset ring-primary-600/10">
+                          {category.count} listings
+                        </span>
+                        <ArrowRight className="h-4 w-4 text-primary-600 transition-transform duration-300 motion-safe:group-hover:translate-x-1" />
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="relative flex h-full flex-col p-4 sm:p-5">
+                    <div className={`mb-3 flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br shadow-md ring-1 ring-white/40 transition-transform duration-200 group-hover:scale-105 group-hover:-translate-y-0.5 ${category.iconGradient}`}>
+                      <category.icon className="h-5 w-5 text-white drop-shadow-sm" />
+                    </div>
+                    <h3 className="mb-1 font-semibold text-stone-900">{category.name}</h3>
+                    <p className="line-clamp-2 flex-1 text-xs leading-snug text-stone-600 sm:text-sm">{category.items}</p>
+                    <span className="mt-3 inline-flex w-fit items-center rounded-full bg-white/70 px-2.5 py-0.5 text-xs font-semibold text-primary-700 ring-1 ring-inset ring-primary-600/10">
+                      {category.count} listings
+                    </span>
+                  </div>
+                )}
               </Link>
             ))}
           </div>
