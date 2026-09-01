@@ -398,26 +398,28 @@ export function Layout({ children, cartItemCount }: LayoutProps) {
         )}
       >
         {/* Top Bar */}
-        <div className="bg-gradient-to-r from-primary-950 via-primary-900 to-primary-950 text-primary-100/85 text-xs py-2 hidden lg:block">
+        <div className="bg-gradient-to-r from-primary-950 via-primary-900 to-primary-950 text-white text-xs py-2 hidden lg:block">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
             <div className="flex items-center gap-6">
-              <span className="flex items-center gap-1.5">
-                <Phone className="w-3.5 h-3.5 text-primary-300" />
+              <span className="flex items-center gap-1.5 text-white/90">
+                <Phone className="w-3.5 h-3.5 text-white/70" aria-hidden />
                 {t('topbar.contactPhone')}
               </span>
-              <span className="flex items-center gap-1.5">
-                <MapPin className="w-3.5 h-3.5 text-primary-300" />
+              <span className="flex items-center gap-1.5 text-white/90">
+                <MapPin className="w-3.5 h-3.5 text-white/70" aria-hidden />
                 {t('topbar.location')}
               </span>
             </div>
             <div className="flex items-center gap-4">
-              <span className="hidden xl:inline text-primary-200/80">{t('topbar.freeDelivery')}</span>
-              <label className="inline-flex items-center gap-2 text-primary-200/80">
-                <Globe className="w-3.5 h-3.5 text-primary-300" />
+              <span className="hidden xl:inline text-white/90">{t('topbar.freeDelivery')}</span>
+              <label className="inline-flex items-center gap-1.5 rounded-full bg-white px-2.5 py-1 shadow-sm ring-1 ring-white/10">
+                <Globe className="h-3.5 w-3.5 shrink-0 text-primary-700" aria-hidden />
+                <span className="sr-only">Language</span>
                 <select
                   value={language}
                   onChange={(e) => setLanguage(parseLanguage(e.target.value))}
-                  className="rounded-lg border border-primary-700/60 bg-primary-900/70 px-3 py-1.5 text-xs text-primary-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-400/70"
+                  aria-label="Select language"
+                  className="cursor-pointer bg-transparent py-0.5 pl-1 pr-5 text-xs font-semibold text-stone-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-1 rounded-full"
                 >
                   <option value="en">English</option>
                   <option value="ha">Hausa</option>
@@ -818,13 +820,14 @@ className={cn(
             </form>
 
             <div className="px-4 py-3 border-b border-stone-100">
-              <label className="flex items-center gap-3 rounded-xl bg-stone-50 px-4 py-3 text-sm text-stone-700">
-                <Globe className="w-5 h-5 text-primary-600 shrink-0" />
-                <span className="font-medium">{t('topbar.language')}</span>
+              <label className="flex items-center gap-3 rounded-xl border border-stone-200 bg-stone-50 px-4 py-3">
+                <Globe className="h-5 w-5 shrink-0 text-primary-700" aria-hidden />
+                <span className="text-sm font-semibold text-stone-900">Language</span>
                 <select
                   value={language}
                   onChange={(e) => setLanguage(parseLanguage(e.target.value))}
-                  className="select ml-auto min-w-0 flex-1 max-w-[10rem] rounded-lg border border-stone-200 bg-white py-2 pl-3 pr-8 text-sm text-stone-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/80"
+                  aria-label="Select language"
+                  className="ml-auto min-w-0 flex-1 max-w-[10rem] cursor-pointer rounded-lg border border-stone-300 bg-white py-2 pl-3 pr-8 text-sm font-medium text-stone-900 shadow-sm focus:border-primary-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/30"
                 >
                   <option value="en">English</option>
                   <option value="ha">Hausa</option>
