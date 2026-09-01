@@ -281,7 +281,7 @@ export function LandingPage() {
       surface: 'bg-gradient-to-br from-primary-50 via-primary-50 to-primary-100/90',
       items:
         'Ugwu (Efo Riro), Nigerian spinach (Efo Shoko), Jos tomatoes, Peppers (Tatashe + Ata Rodo), Fresh okra',
-      count: '1,800+',
+      count: '24+',
       marketplaceHref: '/marketplace?category=Vegetables',
       featured: true,
     },
@@ -291,7 +291,7 @@ export function LandingPage() {
       iconGradient: 'from-rose-500 via-rose-500 to-rose-700',
       surface: 'bg-gradient-to-br from-rose-50 via-rose-50 to-rose-100/90',
       items: 'Oranges, Mangoes, Pawpaw, Pineapple, Watermelon, Bananas, Guava',
-      count: '1,200+',
+      count: '18+',
       marketplaceHref: '/marketplace?category=Fruits',
       wide: true,
     },
@@ -301,7 +301,7 @@ export function LandingPage() {
       iconGradient: 'from-amber-500 via-amber-500 to-amber-700',
       surface: 'bg-gradient-to-br from-amber-50 via-amber-50 to-amber-100/90',
       items: 'Rice, Maize, Millet, Sorghum, Fonio',
-      count: '2,500+',
+      count: '8+',
       marketplaceHref: '/marketplace?category=Grains',
     },
     {
@@ -310,7 +310,7 @@ export function LandingPage() {
       iconGradient: 'from-violet-500 via-violet-600 to-violet-800',
       surface: 'bg-gradient-to-br from-violet-50 via-violet-50 to-violet-100/90',
       items: 'Yam, Cassava, Sweet potato, Irish potato - Plantain listed separately',
-      count: '1,400+',
+      count: '32+',
       marketplaceHref: '/marketplace',
     },
     {
@@ -319,7 +319,7 @@ export function LandingPage() {
       iconGradient: 'from-lime-600 via-lime-600 to-green-800',
       surface: 'bg-gradient-to-br from-lime-50 via-lime-50 to-green-100/90',
       items: 'Honey beans, Oloyin, Brown beans, Cowpea, Soybeans',
-      count: '950+',
+      count: '12+',
       marketplaceHref: '/marketplace?category=Beans',
     },
     {
@@ -328,7 +328,7 @@ export function LandingPage() {
       iconGradient: 'from-orange-500 via-orange-500 to-orange-700',
       surface: 'bg-gradient-to-br from-orange-50 via-orange-50 to-orange-100/90',
       items: 'Broilers, Layers, Turkey, Duck, Fresh eggs',
-      count: '900+',
+      count: '15+',
       marketplaceHref: '/marketplace?category=Poultry',
     },
     {
@@ -337,7 +337,7 @@ export function LandingPage() {
       iconGradient: 'from-red-500 via-red-500 to-red-800',
       surface: 'bg-gradient-to-br from-red-50 via-red-50 to-red-100/90',
       items: 'Beef, Goat, Ram, Pork (cuts & live where listed)',
-      count: '600+',
+      count: '10+',
       marketplaceHref: '/marketplace?category=Livestock',
     },
     {
@@ -346,7 +346,7 @@ export function LandingPage() {
       iconGradient: 'from-amber-700 via-amber-800 to-stone-800',
       surface: 'bg-gradient-to-br from-amber-50 via-stone-50 to-amber-100/90',
       items: 'Groundnut, Sesame, Palm kernel, Shea - oils & kernels',
-      count: '480+',
+      count: '9+',
       marketplaceHref: '/marketplace?category=Oil%20Seeds',
     },
   ]
@@ -692,8 +692,8 @@ export function LandingPage() {
               {/* Hero Stats */}
               <dl className="fade-up fade-up-delay-3 grid grid-cols-3 divide-x divide-stone-200/80 rounded-2xl border border-stone-200/70 bg-white/70 shadow-soft backdrop-blur-sm">
                 {[
-                  { value: '2,500+', label: 'Produce listings' },
-                  { value: '500+', label: 'Verified farmers' },
+                  { value: '100+', label: 'Produce listings' },
+                  { value: '25+', label: 'Verified farmers' },
                   { value: '24–48h', label: 'Nationwide delivery' },
                 ].map((stat) => (
                   <div key={stat.label} className="px-3 py-4 text-center first:rounded-l-2xl last:rounded-r-2xl">
@@ -957,7 +957,7 @@ export function LandingPage() {
               </h2>
 
               <p className="text-base text-stone-600 leading-relaxed">
-                Join 500+ verified farmers already selling on our platform. 
+                Join 25+ verified farmers already selling on our platform. 
                 Get fair prices, reduce waste, and connect directly with buyers 
                 who value quality.
               </p>
@@ -987,7 +987,7 @@ export function LandingPage() {
               What Our Customers Say
             </h2>
             <p className="text-base text-stone-600">
-              Join thousands of satisfied buyers and sellers who trust Farmers Market for their agricultural needs.
+              Join hundreds of satisfied buyers and sellers who trust Farmers Market for their agricultural needs.
             </p>
           </div>
 
