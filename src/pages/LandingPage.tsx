@@ -1,11 +1,10 @@
-import { useState, useEffect, type FormEvent } from 'react'
+import { useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Button } from '../components/ui'
 import { useAuth } from '../hooks/useAuth'
 import { useCartStore, cartUnitsCount } from '../stores/cartStore'
 import { ThreeParticlesField } from '../components/ThreeParticlesField'
 import { useI18n } from '../i18n/useI18n'
-import heroVideo from '../../Hero image/4K Cinematic Drone view village Highway l Free  Drone Video l Free stock footage l Copyright free.mp4'
 import { 
   Leaf,
   ShoppingCart, 
@@ -50,34 +49,6 @@ export function LandingPage() {
   const [headerSearch, setHeaderSearch] = useState('')
   const [newsletterEmail, setNewsletterEmail] = useState('')
   const [newsletterStatus, setNewsletterStatus] = useState<'idle' | 'ok' | 'invalid'>('idle')
-  const [heroVideoReady, setHeroVideoReady] = useState(false)
-  const [heroVideoError, setHeroVideoError] = useState(false)
-
-  useEffect(() => {
-    let cancelled = false
-    const start = () => {
-      if (!cancelled) setHeroVideoReady(true)
-    }
-
-    const idleWindow = window as Window & {
-      requestIdleCallback?: (callback: IdleRequestCallback, options?: IdleRequestOptions) => number
-      cancelIdleCallback?: (handle: number) => void
-    }
-
-    if (typeof idleWindow.requestIdleCallback === 'function') {
-      const idleId = idleWindow.requestIdleCallback(start, { timeout: 1400 })
-      return () => {
-        cancelled = true
-        idleWindow.cancelIdleCallback?.(idleId)
-      }
-    }
-
-    const timeoutId = window.setTimeout(start, 900)
-    return () => {
-      cancelled = true
-      window.clearTimeout(timeoutId)
-    }
-  }, [])
 
   const handleLogout = async () => {
     await signOut()
@@ -688,46 +659,17 @@ export function LandingPage() {
               </dl>
             </div>
 
-            {/* Right Content - Hero Video */}
+            {/* Right Content - Hero Image */}
             <div className="fade-up fade-up-delay-2 relative w-full">
               <div className="float-soft relative rounded-2xl bg-gradient-to-br from-primary-200/80 via-stone-100 to-amber-200/70 p-2 shadow-[0_32px_90px_rgba(15,23,42,0.16)]">
                 <div className="relative overflow-hidden rounded-xl bg-white p-3 lg:p-4">
                   <ThreeParticlesField className="pointer-events-none absolute inset-0 z-0 opacity-70" />
                 <div className="aspect-[4/3] overflow-hidden rounded-[1.5rem] border border-white/40 bg-stone-900 shadow-inner shadow-stone-950/40 sm:aspect-[16/11] lg:aspect-[5/4]">
-                  {!heroVideoError && heroVideoReady ? (
-                    <video
-                      className="relative z-10 w-full h-full object-cover"
-                      src={heroVideo}
-                      poster="/logo-farmers-market.png"
-                      preload="none"
-                      autoPlay
-                      muted
-                      loop
-                      playsInline
-                      onError={() => setHeroVideoError(true)}
-                    />
-                  ) : (
-                    <div className="relative z-10 flex h-full w-full items-center justify-center bg-gradient-to-br from-primary-950 via-stone-900 to-leaf-950">
-                      <div className="flex flex-col items-center gap-4 text-center px-6">
-                        <div className="flex h-20 w-20 items-center justify-center rounded-full bg-white/10 ring-1 ring-white/15 backdrop-blur">
-                          <img
-                            src="/logo-farmers-market.png"
-                            alt=""
-                            aria-hidden="true"
-                            className="h-14 w-14 rounded-full object-contain"
-                          />
-                        </div>
-                        <div className="space-y-1">
-                          <p className="text-sm font-semibold uppercase tracking-[0.18em] text-primary-100/90">
-                            Platform preview
-                          </p>
-                          <p className="text-base font-medium text-white">
-                            Fresh produce, faster flows.
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  )}
+                  <img
+                    src="/hero-farmers.jpg"
+                    alt="Nigerian women farmers working in a lush green field"
+                    className="relative z-10 w-full h-full object-cover"
+                  />
 
                   {/* Floating glass chips */}
                   <div className="pointer-events-none absolute left-4 top-4 z-20 hidden items-center gap-1.5 rounded-full border border-white/40 bg-white/85 px-3 py-1.5 text-xs font-semibold text-stone-800 shadow-lg shadow-stone-900/10 backdrop-blur sm:flex">
