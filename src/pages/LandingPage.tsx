@@ -42,7 +42,11 @@ export function LandingPage() {
   const { user, signOut } = useAuth()
   const cartItemCount = useCartStore((s) => cartUnitsCount(s.cart))
   const navigate = useNavigate()
-  const { language, t } = useI18n()
+  const { language, setLanguage, t } = useI18n()
+  function parseLanguage(raw: string) {
+    if (raw === 'en' || raw === 'ha' || raw === 'yo' || raw === 'ig') return raw
+    return 'en'
+  }
   const [headerSearch, setHeaderSearch] = useState('')
   const [newsletterEmail, setNewsletterEmail] = useState('')
   const [newsletterStatus, setNewsletterStatus] = useState<'idle' | 'ok' | 'invalid'>('idle')
@@ -375,6 +379,58 @@ export function LandingPage() {
     <div className="min-h-screen bg-white">
       {/* Header */}
       <header className="sticky top-0 z-50 border-b border-stone-200/80 bg-white/90 backdrop-blur-xl">
+        {/* Top Bar: Language + Scrolling Produce */}
+        <div className="bg-primary-950 text-primary-100/80 text-[0.65rem] py-1.5 hidden lg:block overflow-hidden">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
+            <label className="inline-flex items-center gap-1.5 shrink-0">
+              <Globe className="w-3 h-3 text-primary-400" />
+              <select
+                value={language}
+                onChange={(e) => setLanguage(parseLanguage(e.target.value))}
+                className="appearance-none bg-transparent text-[0.65rem] text-primary-200 hover:text-white focus:outline-none cursor-pointer"
+              >
+                <option value="en">English</option>
+                <option value="ha">Hausa</option>
+                <option value="yo">Yoruba</option>
+                <option value="ig">Igbo</option>
+              </select>
+            </label>
+            <div className="flex-1 mx-6 overflow-hidden">
+              <div className="marquee flex items-center gap-6 whitespace-nowrap text-primary-300/70">
+                <span>Ugwu</span><span className="text-primary-600/40">●</span>
+                <span>Fresh Tomatoes</span><span className="text-primary-600/40">●</span>
+                <span>Ofada Rice</span><span className="text-primary-600/40">●</span>
+                <span>Honey Beans</span><span className="text-primary-600/40">●</span>
+                <span>Puna Yam</span><span className="text-primary-600/40">●</span>
+                <span>Broiler Chickens</span><span className="text-primary-600/40">●</span>
+                <span>Sweet Oranges</span><span className="text-primary-600/40">●</span>
+                <span>Plantain</span><span className="text-primary-600/40">●</span>
+                <span>Millet</span><span className="text-primary-600/40">●</span>
+                <span>Groundnut</span><span className="text-primary-600/40">●</span>
+                <span>Goat Meat</span><span className="text-primary-600/40">●</span>
+                <span>Scotch Bonnet</span><span className="text-primary-600/40">●</span>
+                <span>Egusi Seeds</span><span className="text-primary-600/40">●</span>
+                <span>Fresh Eggs</span><span className="text-primary-600/40">●</span>
+                <span>Cassava</span><span className="text-primary-600/40">●</span>
+                <span>Ugwu</span><span className="text-primary-600/40">●</span>
+                <span>Fresh Tomatoes</span><span className="text-primary-600/40">●</span>
+                <span>Ofada Rice</span><span className="text-primary-600/40">●</span>
+                <span>Honey Beans</span><span className="text-primary-600/40">●</span>
+                <span>Puna Yam</span><span className="text-primary-600/40">●</span>
+                <span>Broiler Chickens</span><span className="text-primary-600/40">●</span>
+                <span>Sweet Oranges</span><span className="text-primary-600/40">●</span>
+                <span>Plantain</span><span className="text-primary-600/40">●</span>
+                <span>Millet</span><span className="text-primary-600/40">●</span>
+                <span>Groundnut</span><span className="text-primary-600/40">●</span>
+                <span>Goat Meat</span><span className="text-primary-600/40">●</span>
+                <span>Scotch Bonnet</span><span className="text-primary-600/40">●</span>
+                <span>Egusi Seeds</span><span className="text-primary-600/40">●</span>
+                <span>Fresh Eggs</span><span className="text-primary-600/40">●</span>
+                <span>Cassava</span><span className="text-primary-600/40">●</span>
+              </div>
+            </div>
+          </div>
+        </div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex h-14 items-center justify-between gap-3">
             {/* Logo */}
@@ -492,6 +548,22 @@ export function LandingPage() {
                 {t('nav.marketplace')}
               </Link>
 
+              <div className="px-3 py-2">
+                <label className="flex items-center gap-2 text-xs text-stone-500">
+                  <Globe className="w-3.5 h-3.5" />
+                  <select
+                    value={language}
+                    onChange={(e) => setLanguage(parseLanguage(e.target.value))}
+                    className="bg-transparent text-xs text-stone-700 focus:outline-none cursor-pointer"
+                  >
+                    <option value="en">English</option>
+                    <option value="ha">Hausa</option>
+                    <option value="yo">Yoruba</option>
+                    <option value="ig">Igbo</option>
+                  </select>
+                </label>
+              </div>
+
               {!user && (
                 <div className="pt-2 border-t border-stone-100 mt-2 space-y-1.5 px-1">
                   <Link to="/login" onClick={() => setMobileMenuOpen(false)}>
@@ -555,7 +627,7 @@ export function LandingPage() {
                 Fresh from the Farm
               </span>
 
-              <h1 className="text-balance text-4xl sm:text-[2.9rem] lg:text-[3.3rem] font-extrabold text-stone-900 leading-[1.05] tracking-[-0.02em]">
+              <h1 className="text-balance text-3xl sm:text-[2.2rem] lg:text-[2.6rem] font-extrabold text-stone-900 leading-[1.1] tracking-[-0.02em]">
                 {copy.heroTitleTop}
                 <span className="block bg-gradient-to-r from-primary-700 via-primary-600 to-leaf-600 bg-clip-text pb-1 text-transparent">
                   {copy.heroTitleBottom}
@@ -605,7 +677,7 @@ export function LandingPage() {
                   { value: '24–48h', label: 'Nationwide delivery' },
                 ].map((stat) => (
                   <div key={stat.label} className="px-3 py-4 text-center first:rounded-l-2xl last:rounded-r-2xl">
-                    <dd className="order-1 text-base font-bold tabular-nums text-stone-900 sm:text-lg">
+                    <dd className="order-1 text-base font-bold tabular-nums text-stone-900 sm:text-base">
                       {stat.value}
                     </dd>
                     <dt className="order-2 mt-0.5 text-[0.62rem] font-semibold uppercase tracking-[0.14em] text-stone-500">
@@ -649,7 +721,7 @@ export function LandingPage() {
                           <p className="text-sm font-semibold uppercase tracking-[0.18em] text-primary-100/90">
                             Platform preview
                           </p>
-                          <p className="text-lg font-medium text-white">
+                          <p className="text-base font-medium text-white">
                             Fresh produce, faster flows.
                           </p>
                         </div>
@@ -682,7 +754,7 @@ export function LandingPage() {
               <Sprout className="w-4 h-4" />
               Browse by Category
             </span>
-            <h2 className="text-2xl sm:text-3xl lg:text-[2.4rem] font-bold text-stone-900 mb-4">
+            <h2 className="text-xl sm:text-2xl lg:text-[1.7rem] font-bold text-stone-900 mb-4">
               Explore Our Product Range
             </h2>
             <p className="text-base text-stone-600">
@@ -764,7 +836,7 @@ export function LandingPage() {
       <section id="features" className="py-12 lg:py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div data-reveal className="text-center max-w-3xl mx-auto mb-8 lg:mb-10">
-            <h2 className="text-2xl sm:text-3xl lg:text-[2.4rem] font-bold text-stone-900 mb-4">
+            <h2 className="text-xl sm:text-2xl lg:text-[1.7rem] font-bold text-stone-900 mb-4">
               {copy.featuresHeading}
             </h2>
             <p className="text-base text-stone-600">
@@ -783,7 +855,7 @@ export function LandingPage() {
                 <div className={`w-12 h-12 ${feature.color} rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
                   <feature.icon className="w-6 h-6 text-white" />
                 </div>
-                <h3 className="text-lg font-semibold text-stone-900 mb-2">
+                <h3 className="text-base font-semibold text-stone-900 mb-2">
                   {feature.title}
                 </h3>
                 <p className="text-stone-600 leading-relaxed">
@@ -799,7 +871,7 @@ export function LandingPage() {
       <section id="how-it-works" className="py-12 lg:py-16 bg-gradient-to-br from-stone-50 to-primary-50/30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div data-reveal className="text-center max-w-3xl mx-auto mb-8 lg:mb-10">
-            <h2 className="text-2xl sm:text-3xl lg:text-[2.4rem] font-bold text-stone-900 mb-4">
+            <h2 className="text-xl sm:text-2xl lg:text-[1.7rem] font-bold text-stone-900 mb-4">
               How It Works
             </h2>
             <p className="text-base text-stone-600">
@@ -817,7 +889,7 @@ export function LandingPage() {
                   <span className="text-4xl font-bold text-stone-200">
                     {step.step}
                   </span>
-                  <h3 className="text-lg font-semibold text-stone-900 mt-3 mb-2">
+                  <h3 className="text-base font-semibold text-stone-900 mt-3 mb-2">
                     {step.title}
                   </h3>
                   <p className="text-stone-600 leading-relaxed">
@@ -860,7 +932,7 @@ export function LandingPage() {
                 </span>
               </div>
 
-              <h2 className="text-2xl sm:text-3xl lg:text-[2.4rem] font-bold text-stone-900">
+              <h2 className="text-xl sm:text-2xl lg:text-[1.7rem] font-bold text-stone-900">
                 Grow Your Business with Farmers Market
               </h2>
 
@@ -891,7 +963,7 @@ export function LandingPage() {
               <Star className="w-4 h-4" />
               Customer Reviews
             </span>
-            <h2 className="text-2xl sm:text-3xl lg:text-[2.4rem] font-bold text-stone-900 mb-4">
+            <h2 className="text-xl sm:text-2xl lg:text-[1.7rem] font-bold text-stone-900 mb-4">
               What Our Customers Say
             </h2>
             <p className="text-base text-stone-600">
@@ -930,8 +1002,8 @@ export function LandingPage() {
       {/* CTA Section */}
       <section className="py-12 lg:py-16 bg-gradient-to-br from-primary-600 to-primary-700">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center" data-reveal>
-          <h2 className="text-2xl sm:text-3xl lg:text-[2.4rem] font-bold text-white mb-6">{landingUi.ctaTitle}</h2>
-          <p className="text-base text-primary-100 mb-8 max-w-2xl mx-auto lg:text-lg">
+          <h2 className="text-xl sm:text-2xl lg:text-[1.7rem] font-bold text-white mb-6">{landingUi.ctaTitle}</h2>
+          <p className="text-base text-primary-100 mb-8 max-w-2xl mx-auto lg:text-base">
             Move from signup to verified onboarding quickly, then buy or list produce with clear payments and logistics.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">

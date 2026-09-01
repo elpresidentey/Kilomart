@@ -32,9 +32,9 @@
     @apply font-display tracking-tight text-stone-950;
   }
 
-  h1 { @apply text-4xl md:text-5xl leading-tight; }
-  h2 { @apply text-3xl md:text-4xl leading-tight; }
-  h3 { @apply text-2xl md:text-3xl leading-snug; }
+  h1 { @apply text-3xl md:text-4xl leading-tight; }
+  h2 { @apply text-2xl md:text-3xl leading-tight; }
+  h3 { @apply text-xl md:text-2xl leading-snug; }
 
   :focus-visible {
     outline: 2px solid theme('colors.primary.500');
@@ -325,4 +325,17 @@
     transform: scale(1.03);
     box-shadow: 0 0 0 8px rgba(34, 197, 94, 0);
   }
+}
+
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.marquee {
+  animation: marquee 30s linear infinite;
+}
+
+.marquee:hover {
+  animation-play-state: paused;
 }
