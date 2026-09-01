@@ -42,11 +42,7 @@ export function LandingPage() {
   const { user, signOut } = useAuth()
   const cartItemCount = useCartStore((s) => cartUnitsCount(s.cart))
   const navigate = useNavigate()
-  const { language, setLanguage, t } = useI18n()
-  function parseLanguage(raw: string) {
-    if (raw === 'en' || raw === 'ha' || raw === 'yo' || raw === 'ig') return raw
-    return 'en'
-  }
+  const { language, t } = useI18n()
   const [headerSearch, setHeaderSearch] = useState('')
   const [newsletterEmail, setNewsletterEmail] = useState('')
   const [newsletterStatus, setNewsletterStatus] = useState<'idle' | 'ok' | 'invalid'>('idle')
@@ -381,35 +377,21 @@ export function LandingPage() {
       <header className="sticky top-0 z-50 border-b border-stone-200/80 bg-white/90 backdrop-blur-xl">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex h-14 items-center justify-between gap-3">
-            {/* Logo + Language */}
-            <div className="flex items-center gap-2">
-              <Link
-                to="/"
-                className="inline-flex items-center gap-2.5 tap-highlight-none motion-safe:transition-opacity motion-safe:duration-200 hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
-              >
-                <img
-                  src="/logo-farmers-market.png"
-                  alt="Farmers Market logo"
-                  className="h-9 w-auto sm:h-10"
-                />
-                <span className="hidden min-w-0 whitespace-nowrap text-[0.95rem] font-semibold leading-none tracking-[-0.01em] text-stone-950 sm:block">
-                  Farmers Market
-                </span>
-              </Link>
-              <label className="hidden lg:inline-flex items-center gap-1 ml-1 text-stone-400">
-                <Globe className="w-3.5 h-3.5" />
-                <select
-                  value={language}
-                  onChange={(e) => setLanguage(parseLanguage(e.target.value))}
-                  className="appearance-none bg-transparent text-xs text-stone-500 hover:text-stone-700 focus:outline-none cursor-pointer pr-1"
-                >
-                  <option value="en">EN</option>
-                  <option value="ha">HA</option>
-                  <option value="yo">YO</option>
-                  <option value="ig">IG</option>
-                </select>
-              </label>
-            </div>
+            {/* Logo */}
+            <Link
+              to="/"
+              className="inline-flex items-center gap-2.5 tap-highlight-none motion-safe:transition-opacity motion-safe:duration-200 hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 shrink-0"
+            >
+              <img
+                src="/logo-farmers-market.png"
+                alt="Farmers Market logo"
+                className="h-9 w-auto sm:h-10"
+              />
+              <span className="hidden sm:flex flex-col leading-none tracking-[-0.01em] text-stone-950">
+                <span className="text-[0.6rem] font-bold uppercase tracking-[0.12em] text-primary-700">Farmers</span>
+                <span className="text-[0.6rem] font-bold uppercase tracking-[0.12em] text-primary-700">Market</span>
+              </span>
+            </Link>
 
             {/* Search Bar - Desktop */}
             <form onSubmit={submitHeaderSearch} className="hidden lg:flex flex-1 max-w-sm mx-4">
@@ -509,22 +491,6 @@ export function LandingPage() {
               >
                 {t('nav.marketplace')}
               </Link>
-
-              <div className="px-3 py-2.5">
-                <label className="flex items-center gap-2 text-sm text-stone-500">
-                  <Globe className="w-4 h-4" />
-                  <select
-                    value={language}
-                    onChange={(e) => setLanguage(parseLanguage(e.target.value))}
-                    className="bg-transparent text-sm text-stone-700 focus:outline-none cursor-pointer"
-                  >
-                    <option value="en">English</option>
-                    <option value="ha">Hausa</option>
-                    <option value="yo">Yoruba</option>
-                    <option value="ig">Igbo</option>
-                  </select>
-                </label>
-              </div>
 
               {!user && (
                 <div className="pt-2 border-t border-stone-100 mt-2 space-y-1.5 px-1">
