@@ -5,11 +5,12 @@ import { useAuth } from '../hooks/useAuth'
 import { useCartStore, cartUnitsCount } from '../stores/cartStore'
 import { ThreeParticlesField } from '../components/ThreeParticlesField'
 import { useI18n } from '../i18n/useI18n'
-import { 
+import { Footer } from '../components/Footer'
+import {
   Leaf,
-  ShoppingCart, 
-  Truck, 
-  ShieldCheck, 
+  ShoppingCart,
+  Truck,
+  ShieldCheck,
   Menu,
   X,
   ArrowRight,
@@ -19,8 +20,6 @@ import {
   Search,
   Package,
   CreditCard,
-  MapPin,
-  Phone,
   Quote,
   Star,
   Mail,
@@ -968,31 +967,27 @@ export function LandingPage() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="bg-stone-950 text-stone-400">
-        {/* Newsletter Strip */}
-        <div className="border-b border-stone-800">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-primary-500/10 rounded-lg flex items-center justify-center">
-                  <Mail className="w-5 h-5 text-primary-500" />
-                </div>
-                <div>
-                  <h3 className="text-white font-semibold">{landingUi.stayUpdated}</h3>
-                  <p className="text-sm">{landingUi.stayUpdatedSub}</p>
-                </div>
+      {/* Newsletter — slim, light, not part of dark footer */}
+      <section className="border-y border-stone-200 bg-white">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-center gap-3">
+              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary-50 text-primary-700 ring-1 ring-primary-100">
+                <Mail className="h-4 w-4" />
+              </span>
+              <div>
+                <h3 className="text-sm font-semibold text-stone-900">{landingUi.stayUpdated}</h3>
+                <p className="text-sm text-stone-500">{landingUi.stayUpdatedSub}</p>
               </div>
-              <div className="w-full md:w-auto flex flex-col items-stretch md:items-end gap-2">
-                {newsletterStatus === 'ok' ? (
-                  <p className="text-sm text-primary-400 font-medium" role="status">
-                    Thanks, your request has been received by the Farmers Market team.
-                  </p>
-                ) : (
-                  <form
-                    onSubmit={handleNewsletterSubmit}
-                    className="flex w-full md:w-auto flex-col sm:flex-row gap-2"
-                  >
+            </div>
+            <div className="w-full sm:w-auto sm:min-w-[360px]">
+              {newsletterStatus === 'ok' ? (
+                <p className="rounded-xl bg-primary-50 px-4 py-2.5 text-sm font-medium text-primary-700 ring-1 ring-primary-100" role="status">
+                  Thanks — your request has been received by the Farmers Market team.
+                </p>
+              ) : (
+                <>
+                  <form onSubmit={handleNewsletterSubmit} className="flex gap-2">
                     <input
                       type="email"
                       name="email"
@@ -1004,235 +999,23 @@ export function LandingPage() {
                       placeholder="Enter your email"
                       autoComplete="email"
                       aria-invalid={newsletterStatus === 'invalid'}
-                      className="flex-1 md:w-64 px-4 py-2.5 bg-stone-900 border border-stone-800 rounded-xl text-sm text-white placeholder:text-stone-500 focus:outline-none focus:ring-2 focus:ring-primary-500/60 focus:border-transparent transition-all"
+                      className="min-w-0 flex-1 rounded-xl border border-stone-200 bg-stone-50 px-4 py-2.5 text-sm text-stone-900 placeholder:text-stone-400 focus:border-primary-300 focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary-500/20"
                     />
-                    <Button type="submit" className="bg-primary-600 hover:bg-primary-700 whitespace-nowrap">
+                    <Button type="submit" className="shrink-0 bg-primary-600 hover:bg-primary-700">
                       Subscribe
                     </Button>
                   </form>
-                )}
-                {newsletterStatus === 'invalid' && (
-                  <p className="text-sm text-red-400">{landingUi.invalidEmail}</p>
-                )}
-              </div>
+                  {newsletterStatus === 'invalid' && (
+                    <p className="mt-1.5 text-xs text-red-600">{landingUi.invalidEmail}</p>
+                  )}
+                </>
+              )}
             </div>
           </div>
         </div>
+      </section>
 
-        {/* Main Footer */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 lg:py-14">
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 lg:gap-10">
-            {/* Brand Column */}
-            <div className="col-span-2">
-              <Link
-                to="/"
-                className="inline-flex items-center gap-3 tap-highlight-none"
-              >
-                <img
-                  src="/logo-farmers-market.png"
-                  alt="Farmers Market logo"
-                  className="h-12 w-12 rounded-full object-cover"
-                />
-                <span className="text-sm font-semibold tracking-[-0.01em] text-white">
-                  Farmers Market
-                </span>
-              </Link>
-              <p className="text-sm leading-relaxed mb-6 max-w-xs">
-                Nigeria's leading digital marketplace for agricultural produce. 
-                Connecting farmers and buyers for fresher, fairer food.
-              </p>
-              {/* Social Links */}
-              <div className="flex items-center gap-3">
-                <Link
-                  to="/social/facebook"
-                  aria-label="Facebook"
-                  className="w-9 h-9 bg-stone-900 rounded-lg flex items-center justify-center hover:bg-primary-500/10 hover:text-primary-500 transition-colors"
-                >
-                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden>
-                    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
-                  </svg>
-                </Link>
-                <Link
-                  to="/social/x"
-                  aria-label="X (Twitter)"
-                  className="w-9 h-9 bg-stone-900 rounded-lg flex items-center justify-center hover:bg-primary-500/10 hover:text-primary-500 transition-colors"
-                >
-                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden>
-                    <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z" />
-                  </svg>
-                </Link>
-                <Link
-                  to="/social/instagram"
-                  aria-label="Instagram"
-                  className="w-9 h-9 bg-stone-900 rounded-lg flex items-center justify-center hover:bg-primary-500/10 hover:text-primary-500 transition-colors"
-                >
-                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden>
-                    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z" />
-                  </svg>
-                </Link>
-              </div>
-            </div>
-
-            {/* For Buyers */}
-            <div>
-              <h4 className="text-white font-semibold mb-4">{t('footer.forBuyers')}</h4>
-              <ul className="space-y-3 text-sm">
-                <li>
-                  <Link to="/marketplace" className="hover:text-primary-500 transition-colors">
-                    {t('contact.browseMarketplace')}
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to={user ? '/orders' : '/login?redirect=/orders'}
-                    className="hover:text-primary-500 transition-colors"
-                  >
-                    {t('contact.myOrders')}
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/#how-it-works" className="hover:text-primary-500 transition-colors">
-                    How to buy
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/#features" className="hover:text-primary-500 transition-colors">
-                    Delivery & quality
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/#features" className="hover:text-primary-500 transition-colors">
-                    Buyer protection
-                  </Link>
-                </li>
-              </ul>
-            </div>
-
-            {/* For Farmers */}
-            <div>
-              <h4 className="text-white font-semibold mb-4">{t('footer.forFarmers')}</h4>
-              <ul className="space-y-3 text-sm">
-                <li>
-                  <Link to="/signup" className="hover:text-primary-500 transition-colors">
-                    Start selling
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/listings/new" className="hover:text-primary-500 transition-colors">
-                    List your produce
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/#for-farmers" className="hover:text-primary-500 transition-colors">
-                    Seller guidelines
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/#features" className="hover:text-primary-500 transition-colors">
-                    Pricing & quality tips
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/#testimonials" className="hover:text-primary-500 transition-colors">
-                    Success stories
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/contact" className="hover:text-primary-500 transition-colors">
-                    Farmer support
-                  </Link>
-                </li>
-              </ul>
-            </div>
-
-            {/* Company */}
-            <div>
-              <h4 className="text-white font-semibold mb-4">{landingUi.company}</h4>
-              <ul className="space-y-3 text-sm">
-                <li>
-                  <Link to="/about" className="hover:text-primary-500 transition-colors">
-                    About us
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/careers" className="hover:text-primary-500 transition-colors">
-                    {t('careers.title')}
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/press" className="hover:text-primary-500 transition-colors">
-                    {t('press.title')}
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/partners" className="hover:text-primary-500 transition-colors">
-                    {t('partners.title')}
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/contact" className="hover:text-primary-500 transition-colors">
-                    {t('contact.title')}
-                  </Link>
-                </li>
-              </ul>
-            </div>
-
-            {/* Support */}
-            <div>
-              <h4 className="text-white font-semibold mb-4">{t('contact.helpCenter')}</h4>
-              <ul className="space-y-3 text-sm">
-                <li>
-                  <Link to="/help" className="hover:text-primary-500 transition-colors">
-                    {t('contact.helpCenter')}
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/legal/safety" className="hover:text-primary-500 transition-colors">
-                    Safety
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/legal/terms" className="hover:text-primary-500 transition-colors">
-                    Terms of service
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/legal/privacy" className="hover:text-primary-500 transition-colors">
-                    Privacy policy
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/legal/cookies" className="hover:text-primary-500 transition-colors">
-                    Cookie policy
-                  </Link>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
-
-        {/* Bottom Bar */}
-        <div className="border-t border-stone-800">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-            <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-sm">
-              <p>Copyright 2026 Farmers Market. Built by IEL Iduwe Ekene Leonard 2026.</p>
-              <div className="flex items-center gap-6">
-                <span className="flex items-center gap-2">
-                  <MapPin className="w-4 h-4" />
-                {t('topbar.location')}
-                </span>
-                <a
-                  href="tel:+2348001234567"
-                  className="flex items-center gap-2 hover:text-primary-500 transition-colors"
-                >
-                  <Phone className="w-4 h-4" />
-                {t('topbar.contactPhone')}
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <Footer />
 
     </div>
   )
