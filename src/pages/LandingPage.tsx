@@ -8,7 +8,6 @@ import { useI18n } from '../i18n/useI18n'
 import heroVideo from '../../Hero image/4K Cinematic Drone view village Highway l Free  Drone Video l Free stock footage l Copyright free.mp4'
 import { 
   Leaf,
-  Home,
   ShoppingCart, 
   Truck, 
   ShieldCheck, 
@@ -18,7 +17,6 @@ import {
   CheckCircle2,
   Users,
   User,
-  LogOut,
   Search,
   Package,
   CreditCard,
@@ -380,220 +378,156 @@ export function LandingPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
-      <header className="sticky top-0 z-50 border-b border-stone-200 bg-white/95 shadow-[0_14px_40px_rgba(15,23,42,0.06)] backdrop-blur">
-        {/* Top Bar */}
-        <div className="bg-primary-950 text-primary-100/85 text-xs py-2 hidden lg:block">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
-            <div className="flex items-center gap-6">
-              <span className="flex items-center gap-1.5">
-                <Phone className="w-3.5 h-3.5 text-primary-300" />
-                {t('topbar.contactPhone')}
-              </span>
-              <span className="flex items-center gap-1.5">
-                <MapPin className="w-3.5 h-3.5 text-primary-300" />
-                {t('topbar.location')}
-              </span>
-            </div>
-            <div className="flex items-center gap-4">
-              <span className="hidden xl:inline">{t('topbar.freeDelivery')}</span>
-              <label className="inline-flex items-center gap-2 text-primary-200/80">
-                <Globe className="w-3.5 h-3.5 text-primary-300" />
-                <select
-                  value={language}
-                  onChange={(e) => setLanguage(parseLanguage(e.target.value))}
-                  className="rounded-lg border border-primary-700/60 bg-primary-900/70 px-3 py-1.5 text-xs text-primary-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-400/70"
-                >
-                  <option value="en">English</option>
-                  <option value="ha">Hausa</option>
-                  <option value="yo">Yoruba</option>
-                  <option value="ig">Igbo</option>
-                </select>
-              </label>
-            </div>
-          </div>
-        </div>
-
-        {/* Main Navigation */}
-        <div className="bg-white/90">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex h-14 items-center justify-between gap-3">
-              {/* Logo */}
+      <header className="sticky top-0 z-50 border-b border-stone-200/80 bg-white/90 backdrop-blur-xl">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex h-14 items-center justify-between gap-3">
+            {/* Logo + Language */}
+            <div className="flex items-center gap-2">
               <Link
                 to="/"
-                className="inline-flex items-center gap-3 tap-highlight-none motion-safe:transition-opacity motion-safe:duration-200 hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
+                className="inline-flex items-center gap-2.5 tap-highlight-none motion-safe:transition-opacity motion-safe:duration-200 hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
               >
-                <div className="pulse-soft flex h-9 w-9 items-center justify-center overflow-hidden rounded-full sm:h-10 sm:w-10 lg:h-10 lg:w-10">
-                  <img
-                    src="/logo-farmers-market.png"
-                    alt="Farmers Market logo"
-                    className="h-full w-full rounded-full object-cover"
-                  />
-                </div>
-                <span className="hidden min-w-0 whitespace-nowrap text-[0.98rem] font-semibold leading-none tracking-[-0.01em] text-stone-950 sm:block lg:text-base">
+                <img
+                  src="/logo-farmers-market.png"
+                  alt="Farmers Market logo"
+                  className="h-9 w-auto sm:h-10"
+                />
+                <span className="hidden min-w-0 whitespace-nowrap text-[0.95rem] font-semibold leading-none tracking-[-0.01em] text-stone-950 sm:block">
                   Farmers Market
                 </span>
               </Link>
-
-              {/* Search Bar - Desktop */}
-              <form onSubmit={submitHeaderSearch} className="hidden lg:flex flex-1 max-w-md mx-4">
-                <div className="relative w-full">
-                  <input
-                    type="text"
-                    value={headerSearch}
-                    onChange={(e) => setHeaderSearch(e.target.value)}
-                    placeholder={t('search.placeholder')}
-                    className="w-full rounded-full border border-stone-200 bg-stone-50/90 py-2.5 pl-10 pr-4 text-sm shadow-inner shadow-stone-200/40 transition-all focus:border-transparent focus:outline-none focus:ring-2 focus:ring-primary-500"
-                  />
-                  <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400" />
-                </div>
-              </form>
-
-              {/* Desktop Navigation */}
-              <nav className="hidden md:flex items-center gap-1 rounded-full border border-stone-200/80 bg-stone-50/90 p-1 shadow-sm shadow-stone-900/5">
-                <Link
-                  to="/"
-                  className="motion-lift hover-underline-soft flex items-center gap-1 rounded-full bg-white px-3 py-2 text-sm font-medium text-primary-700 shadow-sm"
+              <label className="hidden lg:inline-flex items-center gap-1 ml-1 text-stone-400">
+                <Globe className="w-3.5 h-3.5" />
+                <select
+                  value={language}
+                  onChange={(e) => setLanguage(parseLanguage(e.target.value))}
+                  className="appearance-none bg-transparent text-xs text-stone-500 hover:text-stone-700 focus:outline-none cursor-pointer pr-1"
                 >
-                  <Home className="w-4 h-4" />
-                  <span className="hidden lg:inline">{t('nav.home')}</span>
-                </Link>
-                <a
-                  href="#features"
-                  className="motion-lift hover-underline-soft flex items-center gap-1 rounded-full px-3 py-2 text-sm font-medium text-stone-600 transition-all hover:bg-white hover:text-stone-900"
-                >
-                  <span className="hidden lg:inline">{landingUi.navFeatures}</span>
-                </a>
-                <a
-                  href="#how-it-works"
-                  className="motion-lift hover-underline-soft flex items-center gap-1 rounded-full px-3 py-2 text-sm font-medium text-stone-600 transition-all hover:bg-white hover:text-stone-900"
-                >
-                  <span className="hidden lg:inline">{landingUi.navHow}</span>
-                </a>
-                <Link
-                  to="/marketplace"
-                  className="motion-lift hover-underline-soft flex items-center gap-1 rounded-full px-3 py-2 text-sm font-medium text-stone-600 transition-all hover:bg-white hover:text-stone-900"
-                >
-                  <span className="hidden lg:inline">{t('nav.marketplace')}</span>
-                </Link>
-              </nav>
+                  <option value="en">EN</option>
+                  <option value="ha">HA</option>
+                  <option value="yo">YO</option>
+                  <option value="ig">IG</option>
+                </select>
+              </label>
+            </div>
 
-              {/* User Actions */}
-              <div className="flex items-center gap-2 lg:gap-4">
-                {/* Search Button - Mobile */}
-                <button className="md:hidden rounded-full border border-stone-200 bg-white p-2 text-stone-600 shadow-sm transition-colors hover:bg-stone-100">
-                  <Search className="w-5 h-5" />
-                </button>
-
-                {/* Cart - visible to all users */}
-                <Link to="/cart" className="motion-lift motion-press relative rounded-full border border-stone-200 bg-white p-2 text-stone-600 shadow-sm transition-colors hover:border-primary-200 hover:text-primary-600">
-                  <ShoppingCart className="w-5 h-5 lg:w-6 lg:h-6" />
-                  {(cartItemCount ?? 0) > 0 && (
-                    <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-primary-600 text-xs font-bold text-white ring-2 ring-white">
-                      {(cartItemCount ?? 0) > 9 ? '9+' : cartItemCount}
-                    </span>
-                  )}
-                </Link>
-
-                {user ? (
-                  <>
-                    <div className="hidden sm:flex items-center gap-3 pl-2 lg:pl-4 border-l border-stone-200">
-                      <Link to="/profile" className="flex items-center gap-2 rounded-full border border-transparent px-2 py-1 text-stone-600 transition-colors hover:border-primary-100 hover:bg-primary-50/60 hover:text-primary-600">
-                        <div className="w-9 h-9 rounded-full bg-gradient-to-br from-primary-100 to-primary-50 flex items-center justify-center border border-primary-200">
-                          <User className="w-4 h-4 text-primary-700" />
-                        </div>
-                        <span className="font-medium text-sm hidden lg:block">{user.full_name?.split(' ')[0]}</span>
-                      </Link>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={handleLogout}
-                        className="text-stone-500 hover:text-stone-900"
-                      >
-                        <LogOut className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  </>
-                ) : (
-                  <div className="hidden md:flex items-center gap-2">
-                    <Link to="/login">
-                      <Button variant="ghost" size="sm" className="text-stone-600">
-                        {t('nav.signIn')}
-                      </Button>
-                    </Link>
-                    <Link to="/signup">
-                      <Button size="sm" className="bg-primary-600 hover:bg-primary-700 text-white">
-                        {t('nav.getStarted')}
-                      </Button>
-                    </Link>
-                  </div>
-                )}
-
-                {/* Mobile Menu Button */}
-                <button
-                  className="md:hidden rounded-full border border-stone-200 bg-white p-2 text-stone-600 shadow-sm transition-colors hover:bg-stone-100"
-                  onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                >
-                  {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-                </button>
+            {/* Search Bar - Desktop */}
+            <form onSubmit={submitHeaderSearch} className="hidden lg:flex flex-1 max-w-sm mx-4">
+              <div className="relative w-full">
+                <input
+                  type="text"
+                  value={headerSearch}
+                  onChange={(e) => setHeaderSearch(e.target.value)}
+                  placeholder={t('search.placeholder')}
+                  className="w-full rounded-full border border-stone-200 bg-stone-50/80 py-2 pl-9 pr-4 text-sm transition-all focus:border-primary-300 focus:outline-none focus:ring-2 focus:ring-primary-500/20"
+                />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400" />
               </div>
+            </form>
+
+            {/* Nav + Actions */}
+            <div className="flex items-center gap-1">
+              <Link
+                to="/marketplace"
+                className="hidden md:inline-flex items-center gap-1.5 rounded-full px-3.5 py-2 text-sm font-medium text-stone-600 transition-colors hover:bg-stone-100 hover:text-stone-900"
+              >
+                {t('nav.marketplace')}
+              </Link>
+
+              <Link
+                to="/cart"
+                className="relative rounded-full p-2 text-stone-500 transition-colors hover:bg-stone-100 hover:text-stone-700"
+              >
+                <ShoppingCart className="w-5 h-5" />
+                {(cartItemCount ?? 0) > 0 && (
+                  <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary-600 px-1 text-[10px] font-bold text-white">
+                    {(cartItemCount ?? 0) > 9 ? '9+' : cartItemCount}
+                  </span>
+                )}
+              </Link>
+
+              {user ? (
+                <div className="flex items-center gap-1 pl-1 border-l border-stone-200 ml-1">
+                  <Link
+                    to="/profile"
+                    className="flex items-center gap-2 rounded-full px-2 py-1.5 text-stone-600 transition-colors hover:bg-stone-100 hover:text-stone-900"
+                  >
+                    <div className="h-8 w-8 rounded-full bg-gradient-to-br from-primary-100 to-primary-50 flex items-center justify-center border border-primary-200/80">
+                      <User className="w-4 h-4 text-primary-700" />
+                    </div>
+                    <span className="hidden lg:block text-sm font-medium">{user.full_name?.split(' ')[0]}</span>
+                  </Link>
+                </div>
+              ) : (
+                <div className="hidden md:flex items-center gap-1.5 pl-2 border-l border-stone-200 ml-1">
+                  <Link to="/login">
+                    <Button variant="ghost" size="sm" className="text-stone-600">
+                      {t('nav.signIn')}
+                    </Button>
+                  </Link>
+                  <Link to="/signup">
+                    <Button size="sm" className="bg-primary-600 hover:bg-primary-700 text-white">
+                      {t('nav.getStarted')}
+                    </Button>
+                  </Link>
+                </div>
+              )}
+
+              {/* Mobile Menu Button */}
+              <button
+                className="md:hidden rounded-full p-2 text-stone-500 transition-colors hover:bg-stone-100 hover:text-stone-700 ml-1"
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              >
+                {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              </button>
             </div>
           </div>
         </div>
 
         {/* Mobile Navigation */}
         {mobileMenuOpen && (
-          <div className="md:hidden border-t border-stone-100 bg-white/95 shadow-lg backdrop-blur">
+          <div className="md:hidden border-t border-stone-100 bg-white/95 backdrop-blur-xl">
             {/* Mobile Search */}
-            <form onSubmit={submitHeaderSearch} className="px-4 py-3 border-b border-stone-100">
+            <form onSubmit={submitHeaderSearch} className="px-4 py-3">
               <div className="relative">
                 <input
                   type="text"
                   value={headerSearch}
                   onChange={(e) => setHeaderSearch(e.target.value)}
-                    placeholder={t('search.placeholderMobile')}
-                  className="w-full pl-10 pr-4 py-3 bg-stone-50 border border-stone-200 rounded-xl text-sm shadow-soft focus:outline-none focus:ring-2 focus:ring-primary-500/70 focus:border-transparent transition-all"
+                  placeholder={t('search.placeholderMobile')}
+                  className="w-full pl-10 pr-4 py-2.5 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/30 focus:border-primary-300 transition-all"
                 />
                 <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400" />
               </div>
             </form>
 
-            <div className="px-4 py-3 border-b border-stone-100">
-              <label className="flex items-center gap-3 rounded-xl bg-stone-50 px-4 py-3 text-sm text-stone-700">
-                <Globe className="w-5 h-5 text-primary-600 shrink-0" />
-                <span className="font-medium">{t('topbar.language')}</span>
-                <select
-                  value={language}
-                  onChange={(e) => setLanguage(parseLanguage(e.target.value))}
-                  className="ml-auto min-w-0 flex-1 max-w-[10rem] rounded-lg border border-stone-200 bg-white px-3 py-2 text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-primary-500"
-                >
-                  <option value="en">English</option>
-                  <option value="ha">Hausa</option>
-                  <option value="yo">Yoruba</option>
-                  <option value="ig">Igbo</option>
-                </select>
-              </label>
-            </div>
-            
-            <nav className="px-4 py-3 space-y-1">
+            <nav className="px-3 pb-3 space-y-0.5">
               <Link
-                to="/"
-                className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium bg-primary-50 text-primary-700"
+                to="/marketplace"
+                className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-stone-700 hover:bg-stone-50"
                 onClick={() => setMobileMenuOpen(false)}
               >
-                <Home className="w-5 h-5" />
-                {t('nav.home')}
-              </Link>
-              <a href="#features" className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-stone-600 hover:bg-stone-50" onClick={() => setMobileMenuOpen(false)}>
-                {landingUi.navFeatures}
-              </a>
-              <a href="#how-it-works" className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-stone-600 hover:bg-stone-50" onClick={() => setMobileMenuOpen(false)}>
-                {landingUi.navHow}
-              </a>
-              <Link to="/marketplace" className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-stone-600 hover:bg-stone-50" onClick={() => setMobileMenuOpen(false)}>
                 {t('nav.marketplace')}
               </Link>
+
+              <div className="px-3 py-2.5">
+                <label className="flex items-center gap-2 text-sm text-stone-500">
+                  <Globe className="w-4 h-4" />
+                  <select
+                    value={language}
+                    onChange={(e) => setLanguage(parseLanguage(e.target.value))}
+                    className="bg-transparent text-sm text-stone-700 focus:outline-none cursor-pointer"
+                  >
+                    <option value="en">English</option>
+                    <option value="ha">Hausa</option>
+                    <option value="yo">Yoruba</option>
+                    <option value="ig">Igbo</option>
+                  </select>
+                </label>
+              </div>
+
               {!user && (
-                <div className="pt-3 border-t border-stone-100 space-y-2">
+                <div className="pt-2 border-t border-stone-100 mt-2 space-y-1.5 px-1">
                   <Link to="/login" onClick={() => setMobileMenuOpen(false)}>
                     <Button variant="outline" className="w-full justify-center">
                       {t('nav.signIn')}
@@ -607,16 +541,24 @@ export function LandingPage() {
                 </div>
               )}
               {user && (
-                <button
-                  onClick={() => {
-                    handleLogout()
-                    setMobileMenuOpen(false)
-                  }}
-                  className="flex w-full items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-stone-600 hover:bg-stone-50"
-                >
-                  <LogOut className="w-5 h-5" />
-                  {t('nav.signOut')}
-                </button>
+                <>
+                  <Link
+                    to="/profile"
+                    className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-stone-700 hover:bg-stone-50"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Profile
+                  </Link>
+                  <button
+                    onClick={() => {
+                      handleLogout()
+                      setMobileMenuOpen(false)
+                    }}
+                    className="flex w-full items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-stone-600 hover:bg-stone-50"
+                  >
+                    {t('nav.signOut')}
+                  </button>
+                </>
               )}
             </nav>
           </div>
